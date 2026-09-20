@@ -112,6 +112,8 @@ Anything that differed from the spec or the plan, with the reason.
 - mako's segment URLs carry their own 24-hour `hdntl` token minted from the 15-minute one — why playback survives past 15 minutes.
 - `install.sh`: `ssh` swallowed a piped answer (fixed with `ssh -n`); it also exits non-zero when `mediactl restart` prints "timeout" although the service does restart — not fixed yet.
 
+- **2026-09-20 22:24 — playback works end to end through Jellyfin (simulated client, container `hls`).** Log: "probe-size limiter installed", then "limiting ffmpeg probe size to 20M for this stream"; ffmpeg ran `-analyzeduration 3000000 -probesize 20M … -codec:v:0 libx264 -codec:a:0 copy -bsf:a aac_adtstoasc`, first segment served in 8 s (HTTP 200), encoding at ~17x realtime, no abort. Video is re-encoded rather than copied (the plugin's stream description has no profile/level, so Jellyfin will not stream-copy) — cheap at 576x432, worth improving in step B. ffmpeg RSS ~450 MB while encoding. Checks 5-6 on the three real apps still to be done by the user.
+
 ## Open items
 
 - mako's show index carries no genre per show (checked 2026-09-20, 654 shows). A
