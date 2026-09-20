@@ -33,7 +33,7 @@ mako calls) has no plan yet — it is written after the step A gate in task A8.
 | A5 | The channel | agent | `done` | MakoChannel implements IChannel + IRequiresMediaInfoCallback (not ISupportsLatestMedia); folders on open, stream on play. All 26 tests passing. |
 | A6 | Plugin identity, the one setting, and wiring | agent | `done` | Plugin, PluginConfiguration, PluginServiceRegistrator, configPage.html and build.yaml added; settings page embedded and DI wiring registers ICatalog/IChannel. All 28 tests passing. |
 | A7 | Build, install and uninstall scripts, and the README | agent | `done` | `scripts/build.sh` verified: `artifacts/Mako_0.1.0.0/` contains exactly `Jellyfin.Plugin.Mako.dll` and a valid `meta.json`, no stray `MediaBrowser.*`/`Jellyfin.*` dlls; `artifacts/` confirmed git-ignored. `install.sh`/`uninstall.sh` only syntax-checked (`bash -n`), never run — they touch the phone, which is task A8. `dotnet test` still 28/28. |
-| A8 | Install on the phone, run the step A checks, decide the gate | agent + user | `todo` | Changes the running server: one plugin folder, one Jellyfin restart. Needs the user's go-ahead and the user at the three apps. |
+| A8 | Install on the phone, run the step A checks, decide the gate | agent + user | `wip` | Changes the running server: one plugin folder, one Jellyfin restart. Needs the user's go-ahead and the user at the three apps. |
 
 ## Step B — live mako under one pinned show
 
@@ -97,6 +97,16 @@ Anything that differed from the spec or the plan, with the reason.
 | 2026-09-20 | review fixes | `Episode` gained a `Duration` field, fixed at 25 minutes for every static episode. | Without a duration, `RunTimeTicks` was always null, so step A check 6 (seek/resume) had nothing to seek within. It is a fixture approximation; the real duration comes from mako in step B. |
 | 2026-09-20 | review fixes | Deleted `build.yaml` (and its one line in `docs/plan.md`'s file-structure block). | Nothing read it — `scripts/build.sh` writes `meta.json` from its own constants — so it was a second, unread source of the same metadata that could only drift. `docs/plan.md`'s file-structure block had only one `build.yaml` line, not the two the fix brief expected; the rest of `docs/plan.md` (Task 6's steps) was left as written history, since it describes what was actually done at the time. |
 | 2026-09-20 | review fixes | A folder id `FolderId.Parse` cannot parse now returns an empty `ChannelItemResult` from `GetChannelItems` instead of throwing/crashing the view. | Jellyfin 12.1 does not catch exceptions thrown from `IChannel.GetChannelItems`; an uncaught `FormatException` from a stale or corrupted folder id would take down the entire Channels view with an HTTP 500 instead of just that one folder. |
+
+## Step A live findings (2026-09-20, in progress)
+
+- **Check 1 PASS.** `Mako 0.1.0.0: Active` on Jellyfin 12.1 under Termux; channel registered.
+- **Checks 2-4 PASS on web.** One plugin call per folder opened, none while idle.
+- **Bug found live, fixed:** `MediaSourceInfo.Id` must be left empty — Jellyfin's HLS endpoint does `Guid.Parse` on it (`Unrecognized Guid format`). Jellyfin fills in the item's GUID itself.
+- **Bug found live, fixed:** with no `MediaStreams`, Jellyfin ran ffmpeg with `-analyzeduration 200M`; the plugin now describes H.264/AAC and sets `AnalyzeDurationMs = 3000`.
+- **OPEN — playback still fails.** Jellyfin 12.1 never direct-plays an HLS manifest, so every play goes through server ffmpeg. Jellyfin's ffmpeg (8.1.2, Termux build) **aborts, exit 134**, on mako's master playlist whenever `-probesize 1G` is present — and Jellyfin adds that globally (`FFmpeg:probesize` default). Reproduced by hand outside Jellyfin: same URL decodes fine with the default probe size or `-probesize 5M`; copying to MPEG-TS HLS works; copying to fMP4 HLS additionally needs `-bsf:a aac_adtstoasc`, which Jellyfin only adds when the source container is `ts`/`hls`. mako's segments carry a third, unknown `bin_data` stream, which is the likely reason probing runs on until it crashes. Live TV remuxes with the same `-probesize 1G` and works.
+- mako's segment URLs carry their own 24-hour `hdntl` token minted from the 15-minute one — why playback survives past 15 minutes.
+- `install.sh`: `ssh` swallowed a piped answer (fixed with `ssh -n`); it also exits non-zero when `mediactl restart` prints "timeout" although the service does restart — not fixed yet.
 
 ## Open items
 

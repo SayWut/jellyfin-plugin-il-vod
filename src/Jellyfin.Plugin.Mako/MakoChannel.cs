@@ -73,7 +73,7 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
         _logger.LogInformation("mako: play pressed: '{EpisodeId}'", id);
 
         StreamLink link = await _catalog.GetStreamLinkAsync(id, cancellationToken).ConfigureAwait(false);
-        return [MediaSourceFactory.Create(id, link)];
+        return [MediaSourceFactory.Create(link)];
     }
 
     private FolderId? TryParseFolderId(string? rawFolderId)

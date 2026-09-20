@@ -1,5 +1,6 @@
 using Jellyfin.Plugin.Mako.Model;
 using MediaBrowser.Model.Dto;
+using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.MediaInfo;
 
 namespace Jellyfin.Plugin.Mako.Browsing;
@@ -11,10 +12,20 @@ namespace Jellyfin.Plugin.Mako.Browsing;
 public static class MediaSourceFactory
 {
     private const string SourceName = "mako";
+    private const string VideoCodec = "h264";
+    private const string AudioCodec = "aac";
+    private const int VideoStreamIndex = 0;
+    private const int AudioStreamIndex = 1;
+    private const int StereoChannels = 2;
 
-    public static MediaSourceInfo Create(string episodeId, StreamLink link) => new()
+    // The value Jellyfin itself uses for live streams. Without it, a source with unknown
+    // streams is analysed for up to 200 seconds before ffmpeg outputs anything.
+    private const int AnalyzeDurationMilliseconds = 3000;
+
+    // Id is left unset on purpose: Jellyfin assigns the item's own GUID, and its HLS
+    // endpoint parses the media source id as a GUID. Any other value breaks playback.
+    public static MediaSourceInfo Create(StreamLink link) => new()
     {
-        Id = episodeId,
         Name = SourceName,
         Path = link.Url,
         Protocol = MediaProtocol.Http,
@@ -26,5 +37,15 @@ public static class MediaSourceFactory
         SupportsTranscoding = true,
         SupportsProbing = true,
         RequiresOpening = false,
+        AnalyzeDurationMs = AnalyzeDurationMilliseconds,
+        MediaStreams = DescribeStreams(),
     };
+
+    // mako serves H.264 video with AAC audio. Telling Jellyfin so lets it copy the
+    // streams instead of analysing, guessing and re-encoding them.
+    private static MediaStream[] DescribeStreams() =>
+    [
+        new MediaStream { Type = MediaStreamType.Video, Codec = VideoCodec, Index = VideoStreamIndex },
+        new MediaStream { Type = MediaStreamType.Audio, Codec = AudioCodec, Index = AudioStreamIndex, Channels = StereoChannels },
+    ];
 }

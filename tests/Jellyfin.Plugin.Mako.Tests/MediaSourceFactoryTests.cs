@@ -1,6 +1,7 @@
 using Jellyfin.Plugin.Mako.Browsing;
 using Jellyfin.Plugin.Mako.Model;
 using MediaBrowser.Model.Dto;
+using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.MediaInfo;
 
 namespace Jellyfin.Plugin.Mako.Tests;
@@ -12,9 +13,8 @@ public class MediaSourceFactoryTests
     {
         var link = new StreamLink("https://cdn.test/master.m3u8?hdnea=t", "hls");
 
-        MediaSourceInfo source = MediaSourceFactory.Create("shemesh-s1-e1", link);
+        MediaSourceInfo source = MediaSourceFactory.Create(link);
 
-        Assert.Equal("shemesh-s1-e1", source.Id);
         Assert.Equal("https://cdn.test/master.m3u8?hdnea=t", source.Path);
         Assert.Equal(MediaProtocol.Http, source.Protocol);
         Assert.Equal("hls", source.Container);
@@ -30,8 +30,38 @@ public class MediaSourceFactoryTests
     {
         var link = new StreamLink("https://cdn.test/master.m3u8?hdnea=t", string.Empty);
 
-        MediaSourceInfo source = MediaSourceFactory.Create("shemesh-s1-e1", link);
+        MediaSourceInfo source = MediaSourceFactory.Create(link);
 
         Assert.Null(source.Container);
+    }
+
+    [Fact]
+    public void LeavesTheIdEmptySoJellyfinAssignsTheItemsGuid()
+    {
+        var link = new StreamLink("https://cdn.test/master.m3u8", string.Empty);
+
+        MediaSourceInfo source = MediaSourceFactory.Create(link);
+
+        Assert.Null(source.Id);
+    }
+
+    [Fact]
+    public void DescribesTheVideoAndAudioSoJellyfinCanCopyThemInsteadOfGuessing()
+    {
+        MediaSourceInfo source = MediaSourceFactory.Create(new StreamLink("https://cdn.test/master.m3u8", string.Empty));
+
+        MediaStream video = Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Video);
+        MediaStream audio = Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Audio);
+        Assert.Equal("h264", video.Codec);
+        Assert.Equal("aac", audio.Codec);
+        Assert.NotEqual(video.Index, audio.Index);
+    }
+
+    [Fact]
+    public void LimitsHowLongFfmpegAnalysesTheStreamBeforePlaying()
+    {
+        MediaSourceInfo source = MediaSourceFactory.Create(new StreamLink("https://cdn.test/master.m3u8", string.Empty));
+
+        Assert.Equal(3000, source.AnalyzeDurationMs);
     }
 }

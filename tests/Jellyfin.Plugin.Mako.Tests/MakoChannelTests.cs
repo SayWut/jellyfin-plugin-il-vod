@@ -52,7 +52,6 @@ public class MakoChannelTests
 
         MediaSourceInfo source = Assert.Single(sources);
         Assert.Equal(PastedUrl, source.Path);
-        Assert.Equal("shemesh-s1-e1", source.Id);
     }
 
     [Fact]

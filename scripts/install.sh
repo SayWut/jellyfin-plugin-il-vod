@@ -15,7 +15,7 @@ HOST="${SSH_HOST:?set SSH_HOST (see oneplus-ssh.personal.md)}"
 USER_="${SSH_USER:?set SSH_USER (see oneplus-ssh.personal.md)}"
 PORT="${SSH_PORT:-8022}"
 KEY="${SSH_KEY:-$HOME/.ssh/oneplus_media}"
-SSH=(ssh -i "$KEY" -p "$PORT" -o ConnectTimeout=10 "$USER_@$HOST")
+SSH=(ssh -n -i "$KEY" -p "$PORT" -o ConnectTimeout=10 "$USER_@$HOST")
 
 [ -f "$LOCAL_DIR/Jellyfin.Plugin.Mako.dll" ] || { echo "Nothing to install: run scripts/build.sh first." >&2; exit 1; }
 
