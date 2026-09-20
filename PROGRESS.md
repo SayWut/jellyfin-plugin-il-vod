@@ -28,7 +28,7 @@ mako calls) has no plan yet — it is written after the step A gate in task A8.
 |---|---|---|---|---|
 | A1 | Toolchain and empty solution | agent | `done` | Empty solution builds and `dotnet test` passes 1/1 against Jellyfin.Controller/Model 12.1.0 on net10.0. |
 | A2 | Model and folder ids | agent | `done` | Model records (Show, Season, Episode, StreamLink) and FolderId with round-trip parsing and 8 tests passing. |
-| A3 | Catalogue interface and the static catalogue | agent | `todo` | |
+| A3 | Catalogue interface and the static catalogue | agent | `done` | ICatalog interface, StaticCatalog with two shows and their seasons, and StreamUnavailableException. All 17 tests passing. |
 | A4 | Mapping to Jellyfin's types | agent | `todo` | |
 | A5 | The channel | agent | `todo` | |
 | A6 | Plugin identity, the one setting, and wiring | agent | `todo` | |
