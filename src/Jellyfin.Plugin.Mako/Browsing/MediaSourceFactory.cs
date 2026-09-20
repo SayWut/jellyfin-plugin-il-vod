@@ -48,10 +48,16 @@ public static class MediaSourceFactory
     };
 
     /// <summary>
-    /// True when <paramref name="source"/> is a media source this plugin created.
+    /// True when <paramref name="source"/> is a media source this plugin created. Checks more
+    /// than the name: Jellyfin names a local library file's media source after its file name, so
+    /// a file on disk that happens to be called "mako" must not match — only a remote HTTP
+    /// source, which is all this plugin ever produces, can be ours.
     /// </summary>
     public static bool IsMakoSource(MediaSourceInfo? source) =>
-        string.Equals(source?.Name, SourceName, StringComparison.Ordinal);
+        source is not null
+        && string.Equals(source.Name, SourceName, StringComparison.Ordinal)
+        && source.Protocol == MediaProtocol.Http
+        && source.IsRemote;
 
     // mako serves H.264 video with AAC audio. Telling Jellyfin so lets it copy the
     // streams instead of analysing, guessing and re-encoding them.

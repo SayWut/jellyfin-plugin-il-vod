@@ -56,6 +56,7 @@ public sealed class FakeTranscodeManager : ITranscodeManager, IDisposable
         string? workingDirectory = null)
     {
         _recorder.LastCommandLineArguments = commandLineArguments;
+        _recorder.StartFfMpegCallCount++;
         return Task.FromResult(new TranscodingJob(NullLogger<TranscodingJob>.Instance));
     }
 
@@ -68,7 +69,11 @@ public sealed class FakeTranscodeManager : ITranscodeManager, IDisposable
     public ValueTask<IDisposable> LockAsync(string outputPath, CancellationToken cancellationToken) =>
         new(NoopDisposable.Instance);
 
-    public void Dispose() => _recorder.WasDisposed = true;
+    public void Dispose()
+    {
+        _recorder.WasDisposed = true;
+        _recorder.DisposeCallCount++;
+    }
 
     private sealed class NoopDisposable : IDisposable
     {

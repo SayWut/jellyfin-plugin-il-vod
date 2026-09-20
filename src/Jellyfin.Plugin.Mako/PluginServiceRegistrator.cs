@@ -21,7 +21,9 @@ public sealed class PluginServiceRegistrator : IPluginServiceRegistrator
 
         // Jellyfin's global -probesize setting buffers mako's unidentified data PID in RAM
         // until the phone aborts playback (see docs/spec.md §4.3). Wrapping the transcode
-        // manager lets the plugin rewrite the probe size for its own streams only.
-        TranscodeManagerDecoration.Apply(serviceCollection);
+        // manager lets the plugin rewrite the probe size for its own streams only. No logger
+        // exists yet at this point in startup, so whether it succeeded is recorded in
+        // ProbeSizeLimiterStatus.IsInstalled for MakoChannel to report on the next play.
+        _ = TranscodeManagerDecoration.Apply(serviceCollection);
     }
 }

@@ -86,4 +86,14 @@ public class MediaSourceFactoryTests
 
         Assert.False(MediaSourceFactory.IsMakoSource(source));
     }
+
+    [Fact]
+    public void IsMakoSourceIsFalseForALocalFileHappeningToBeNamedMako()
+    {
+        // Jellyfin names a library file's media source after its file name, so a local
+        // mako.mkv would otherwise collide with the name this plugin's own streams carry.
+        var source = new MediaSourceInfo { Name = "mako", Protocol = MediaProtocol.File, IsRemote = false };
+
+        Assert.False(MediaSourceFactory.IsMakoSource(source));
+    }
 }

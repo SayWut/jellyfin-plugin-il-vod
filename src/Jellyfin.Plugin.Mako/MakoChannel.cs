@@ -1,6 +1,7 @@
 using Jellyfin.Plugin.Mako.Browsing;
 using Jellyfin.Plugin.Mako.Catalog;
 using Jellyfin.Plugin.Mako.Model;
+using Jellyfin.Plugin.Mako.Transcoding;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Channels;
@@ -20,6 +21,9 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
     private const string ContentVersion = "1";
     private const string ChannelDescription = "mako 12+ VOD, fetched on demand.";
     private const string ChannelHomePageUrl = "https://www.mako.co.il/mako-vod";
+
+    private const string ProbeSizeLimiterNotInstalledWarning =
+        "mako: the ffmpeg probe-size limiter is NOT installed (Jellyfin's ITranscodeManager registration changed); playback will likely fail";
 
     private readonly ICatalog _catalog;
     private readonly ILogger<MakoChannel> _logger;
@@ -71,9 +75,23 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
     public async Task<IEnumerable<MediaSourceInfo>> GetChannelItemMediaInfo(string id, CancellationToken cancellationToken)
     {
         _logger.LogInformation("mako: play pressed: '{EpisodeId}'", id);
+        WarnIfProbeSizeLimiterIsNotInstalled();
 
         StreamLink link = await _catalog.GetStreamLinkAsync(id, cancellationToken).ConfigureAwait(false);
         return [MediaSourceFactory.Create(link)];
+    }
+
+    // Jellyfin's global -probesize buffers mako's unidentifiable data track in RAM until the
+    // phone aborts playback (docs/spec.md §4.3); the plugin fixes this by wrapping
+    // ITranscodeManager at startup, but that wrapping can silently fail to install if a future
+    // Jellyfin update changes the seam it relies on. Checked here, on every play, so that
+    // failure is loud instead of surfacing only as mysterious playback crashes.
+    private void WarnIfProbeSizeLimiterIsNotInstalled()
+    {
+        if (!ProbeSizeLimiterStatus.IsInstalled)
+        {
+            _logger.LogWarning(ProbeSizeLimiterNotInstalledWarning);
+        }
     }
 
     private FolderId? TryParseFolderId(string? rawFolderId)

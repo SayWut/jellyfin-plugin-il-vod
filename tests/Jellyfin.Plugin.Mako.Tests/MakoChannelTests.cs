@@ -1,10 +1,13 @@
 using Jellyfin.Plugin.Mako.Catalog;
+using Jellyfin.Plugin.Mako.Tests.Transcoding;
+using Jellyfin.Plugin.Mako.Transcoding;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Model.Dto;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Jellyfin.Plugin.Mako.Tests;
 
+[Collection(ProbeSizeLimiterStatusCollection.Name)]
 public class MakoChannelTests
 {
     private const string PastedUrl = "https://example.test/master.m3u8";
@@ -82,5 +85,45 @@ public class MakoChannelTests
 
         Assert.Empty(result.Items);
         Assert.Equal(0, result.TotalRecordCount);
+    }
+
+    [Fact]
+    public async Task WarnsOnPlayWhenTheProbeSizeLimiterIsNotInstalled()
+    {
+        bool originalStatus = ProbeSizeLimiterStatus.IsInstalled;
+        ProbeSizeLimiterStatus.IsInstalled = false;
+        try
+        {
+            var logger = new RecordingLogger<MakoChannel>();
+            var channel = new MakoChannel(new StaticCatalog(() => PastedUrl, () => PastedContainer), logger);
+
+            await channel.GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
+
+            Assert.Contains(logger.Warnings, message => message.Contains("NOT installed", StringComparison.Ordinal));
+        }
+        finally
+        {
+            ProbeSizeLimiterStatus.IsInstalled = originalStatus;
+        }
+    }
+
+    [Fact]
+    public async Task DoesNotWarnOnPlayWhenTheProbeSizeLimiterIsInstalled()
+    {
+        bool originalStatus = ProbeSizeLimiterStatus.IsInstalled;
+        ProbeSizeLimiterStatus.IsInstalled = true;
+        try
+        {
+            var logger = new RecordingLogger<MakoChannel>();
+            var channel = new MakoChannel(new StaticCatalog(() => PastedUrl, () => PastedContainer), logger);
+
+            await channel.GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
+
+            Assert.Empty(logger.Warnings);
+        }
+        finally
+        {
+            ProbeSizeLimiterStatus.IsInstalled = originalStatus;
+        }
     }
 }

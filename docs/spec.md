@@ -130,18 +130,27 @@ installed by `Transcoding/TranscodeManagerDecoration.cs`) and rewrites the
 `-probesize` value in the ffmpeg command line to `20M`, but only when the
 `MediaSourceInfo` being started is one this plugin created
 (`MediaSourceFactory.IsMakoSource`); every other stream's command line passes
-through unchanged. Every path in the decorator fails open: if recognising or
-rewriting the stream throws, or if Core's `ITranscodeManager` registration
-does not look the way the plugin expects, the original arguments and the
-original registration are used respectively — a mistake here must never keep
-a non-mako stream from playing.
+through unchanged. Recognition checks more than the name: the source must
+also be a remote HTTP source, so a local library file that happens to be
+named "mako" (Jellyfin names a file's media source after its file name) is
+never mistaken for one of the plugin's own streams. Every path in the
+decorator fails open: if recognising or rewriting the stream throws, or if
+Core's `ITranscodeManager` registration does not look the way the plugin
+expects, the original arguments and the original registration are used
+respectively — a mistake here must never keep a non-mako stream from playing.
+This covers the transcode command only: Jellyfin's ffprobe path
+(`MediaEncoder.GetMediaInfo`) builds its own `-probesize` from the same
+global setting and is not covered by this decorator; it is not reached today
+because the plugin already supplies `MediaStreams` and sets
+`RequiresOpening = false`, so Jellyfin never needs to probe a mako source.
 
 This hooks a Jellyfin implementation detail, not a published extension point,
 so it costs future stability: a Jellyfin update can change or remove the seam
 without warning. If that happens `TranscodeManagerDecoration.Apply` finds
-nothing to wrap, does nothing, and the plugin loads exactly as before — it
-just stops limiting mako's probe size until the code is updated to match the
-new internals.
+nothing to wrap, returns `false`, and the plugin loads exactly as before —
+`ProbeSizeLimiterStatus.IsInstalled` stays `false` and `MakoChannel` logs a
+warning on every play so the gap is visible in Jellyfin's log instead of
+surfacing only as unexplained playback crashes.
 
 ## 5. Step B — live mako under one pinned show
 

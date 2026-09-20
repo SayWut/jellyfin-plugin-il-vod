@@ -9,9 +9,13 @@ public sealed class CallRecorder
 {
     public string? LastCommandLineArguments { get; set; }
 
+    public int StartFfMpegCallCount { get; set; }
+
     public string? LastPingedPlaySessionId { get; set; }
 
     public string? LastRequestedPlaySessionId { get; set; }
 
     public bool WasDisposed { get; set; }
+
+    public int DisposeCallCount { get; set; }
 }

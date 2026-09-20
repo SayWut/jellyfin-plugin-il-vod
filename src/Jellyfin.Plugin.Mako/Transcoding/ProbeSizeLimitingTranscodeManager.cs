@@ -21,11 +21,13 @@ public sealed class ProbeSizeLimitingTranscodeManager : ITranscodeManager, IDisp
 {
     private readonly ITranscodeManager _inner;
     private readonly ILogger<ProbeSizeLimitingTranscodeManager> _logger;
+    private bool _disposed;
 
     public ProbeSizeLimitingTranscodeManager(ITranscodeManager inner, ILogger<ProbeSizeLimitingTranscodeManager> logger)
     {
         _inner = inner;
         _logger = logger;
+        _logger.LogInformation("mako: ffmpeg probe-size limiter installed");
     }
 
     public TranscodingJob? GetTranscodingJob(string playSessionId) => _inner.GetTranscodingJob(playSessionId);
@@ -71,6 +73,12 @@ public sealed class ProbeSizeLimitingTranscodeManager : ITranscodeManager, IDisp
 
     public void Dispose()
     {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
         if (_inner is IDisposable disposableInner)
         {
             disposableInner.Dispose();

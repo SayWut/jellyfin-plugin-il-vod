@@ -63,6 +63,23 @@ public class ProbeSizeLimitingTranscodeManagerTests
     }
 
     [Fact]
+    public async Task FallsBackToTheOriginalArgumentsAndStillCallsInnerWhenTheStreamCannotBeRecognised()
+    {
+        var recorder = new CallRecorder();
+        var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
+        var sut = new ProbeSizeLimitingTranscodeManager(fake, NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
+
+        // A null StreamState is not a real Jellyfin call, but it is the simplest honest way to
+        // make recognising the stream throw without weakening ArgumentsForThisStream's own
+        // try/catch: state.MediaSource raises a NullReferenceException, exactly the kind of
+        // failure the fail-open path exists for.
+        await sut.StartFfMpeg(null!, "out.ts", OriginalArguments, Guid.NewGuid(), TranscodingJobType.Hls, new CancellationTokenSource());
+
+        Assert.Equal(1, recorder.StartFfMpegCallCount);
+        Assert.Same(OriginalArguments, recorder.LastCommandLineArguments);
+    }
+
+    [Fact]
     public void DisposingTheDecoratorDisposesADisposableInner()
     {
         var recorder = new CallRecorder();
@@ -72,6 +89,19 @@ public class ProbeSizeLimitingTranscodeManagerTests
         sut.Dispose();
 
         Assert.True(recorder.WasDisposed);
+    }
+
+    [Fact]
+    public void DisposingTwiceDisposesTheInnerOnlyOnce()
+    {
+        var recorder = new CallRecorder();
+        var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
+        var sut = new ProbeSizeLimitingTranscodeManager(fake, NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
+
+        sut.Dispose();
+        sut.Dispose();
+
+        Assert.Equal(1, recorder.DisposeCallCount);
     }
 
     // Constructs the same way Jellyfin does: MediaSourceManager and the outer transcode
