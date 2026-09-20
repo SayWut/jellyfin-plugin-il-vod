@@ -27,7 +27,7 @@ mako calls) has no plan yet — it is written after the step A gate in task A8.
 | Task | Title | Driver | Status | Notes |
 |---|---|---|---|---|
 | A1 | Toolchain and empty solution | agent | `done` | Empty solution builds and `dotnet test` passes 1/1 against Jellyfin.Controller/Model 12.1.0 on net10.0. |
-| A2 | Model and folder ids | agent | `todo` | |
+| A2 | Model and folder ids | agent | `done` | Model records (Show, Season, Episode, StreamLink) and FolderId with round-trip parsing and 8 tests passing. |
 | A3 | Catalogue interface and the static catalogue | agent | `todo` | |
 | A4 | Mapping to Jellyfin's types | agent | `todo` | |
 | A5 | The channel | agent | `todo` | |
@@ -47,6 +47,7 @@ Anything that differed from the spec or the plan, with the reason.
 |---|---|---|---|
 | 2026-09-20 | A1 | `dotnet new sln` created `Jellyfin.Plugin.Mako.slnx`, not `.sln`. | This is .NET 10's new default; the brief said either is fine. |
 | 2026-09-20 | A1 | Omitted the `<None Remove>`/`<EmbeddedResource Include>` item group for `Configuration\configPage.html` from the plugin `.csproj` (Step 4). | That file doesn't exist yet — Task 1's file list doesn't create it, and it's only added in Task 6 (`docs/plan.md`, `task-6-brief.md`). Embedding a resource that isn't on disk fails the build with CS1566. Will restore this item group in Task 6 alongside the real file. |
+| 2026-09-20 | A2 | Deleted `tests/Jellyfin.Plugin.Mako.Tests/ToolchainTests.cs`. | Per controller ruling: ToolchainTests was a smoke test; real tests now make it redundant. |
 
 ## Open items
 
