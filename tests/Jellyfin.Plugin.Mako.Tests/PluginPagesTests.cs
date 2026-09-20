@@ -15,4 +15,16 @@ public class PluginPagesTests
     {
         Assert.Equal(Guid.Parse("1b35ed7d-7558-4592-aa1a-681b9d67d305"), Plugin.PluginGuid);
     }
+
+    [Fact]
+    public void SettingsPageReferencesTheLivePluginGuid()
+    {
+        using Stream? resource = typeof(Plugin).Assembly.GetManifestResourceStream(Plugin.SettingsPageResource);
+        Assert.NotNull(resource);
+
+        using var reader = new StreamReader(resource!);
+        string html = reader.ReadToEnd();
+
+        Assert.Contains(Plugin.PluginGuid.ToString(), html, StringComparison.Ordinal);
+    }
 }

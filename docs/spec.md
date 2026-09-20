@@ -88,10 +88,14 @@ Fladder on Android.
   to test whether the apps offer a genre filter on a channel's list.
 - Shows carry name, poster URL, description and genres. Episodes carry season
   number, episode number and title.
-- Play returns the URL stored in the plugin's one setting, "Test stream URL"
-  (Dashboard → Plugins → Mako → Settings). The user pastes a freshly signed URL
-  from `mako12_vod.py --resolve` before testing. It cannot be compiled in,
-  because the token expires. Every episode plays that one URL.
+- Play returns the URL and container stored in the plugin's two settings,
+  "Test stream URL" and "Test stream container" (Dashboard → Plugins → Mako →
+  Settings). The user pastes a freshly signed URL from `mako12_vod.py
+  --resolve` before testing. It cannot be compiled in, because the token
+  expires. Every episode plays that one URL. The container setting exists
+  because Jellyfin 12.1 refuses direct play for the `hls` container, so a
+  hard-coded container would pre-decide check 5's answer; leaving it empty
+  lets Jellyfin decide, and setting it to `hls` forces the manifest path.
 - Every call from Jellyfin writes one log line: which folder was opened, or
   which item was played.
 
@@ -103,7 +107,7 @@ Fladder on Android.
 | 2 | The mako channel is visible and opens | ☐ | ☐ | ☐ |
 | 3 | Show → seasons → episodes browse; names and poster show | ☐ | ☐ | ☐ |
 | 4 | Log shows a plugin call only when a folder is opened; none while idle | log, once | | |
-| 5 | Play works with the pasted URL; note direct play vs transcode | ☐ | ☐ | ☐ |
+| 5 | Play works with the pasted URL; note direct play vs transcode — once with the container empty, once with `hls` | ☐ | ☐ | ☐ |
 | 6 | Seek works; stop and resume continues from the same place | ☐ | ☐ | ☐ |
 | 7 | Reopening a folder within 3 hours makes no plugin call | log, once | | |
 | 8 | A genre filter is offered on the channel's show list | ☐ | ☐ | ☐ |

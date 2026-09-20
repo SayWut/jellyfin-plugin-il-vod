@@ -6,4 +6,5 @@ public sealed record Episode(
     int SeasonNumber,
     int Number,
     string Name,
-    DateTime? AirDate);
+    DateTime? AirDate,
+    TimeSpan? Duration);

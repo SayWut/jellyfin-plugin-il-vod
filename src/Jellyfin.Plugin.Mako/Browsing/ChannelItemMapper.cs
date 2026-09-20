@@ -44,5 +44,6 @@ public static class ChannelItemMapper
         ParentIndexNumber = episode.SeasonNumber,
         IndexNumber = episode.Number,
         PremiereDate = episode.AirDate,
+        RunTimeTicks = episode.Duration?.Ticks,
     };
 }

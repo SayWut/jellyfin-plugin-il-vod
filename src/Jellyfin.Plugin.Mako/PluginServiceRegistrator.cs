@@ -10,10 +10,12 @@ public sealed class PluginServiceRegistrator : IPluginServiceRegistrator
 {
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
-        // The URL is read through a delegate so a change on the settings page
+        // The URL and container are read through delegates so a change on the settings page
         // takes effect on the next play, with no restart.
         serviceCollection.AddSingleton<ICatalog>(
-            _ => new StaticCatalog(() => Plugin.Instance.Configuration.TestStreamUrl));
+            _ => new StaticCatalog(
+                () => Plugin.Instance.Configuration.TestStreamUrl,
+                () => Plugin.Instance.Configuration.TestStreamContainer));
         serviceCollection.AddSingleton<IChannel, MakoChannel>();
     }
 }

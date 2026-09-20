@@ -8,9 +8,10 @@ namespace Jellyfin.Plugin.Mako.Tests;
 public class MakoChannelTests
 {
     private const string PastedUrl = "https://example.test/master.m3u8";
+    private const string PastedContainer = "hls";
 
     private static MakoChannel ChannelOverStaticCatalog()
-        => new(new StaticCatalog(() => PastedUrl), NullLogger<MakoChannel>.Instance);
+        => new(new StaticCatalog(() => PastedUrl, () => PastedContainer), NullLogger<MakoChannel>.Instance);
 
     private static Task<ChannelItemResult> Open(MakoChannel channel, string? folderId)
         => channel.GetChannelItems(new InternalChannelItemQuery { FolderId = folderId }, CancellationToken.None);
@@ -58,5 +59,29 @@ public class MakoChannelTests
     public void DoesNotAskJellyfinToCrawlItForLatestItems()
     {
         Assert.False(typeof(ISupportsLatestMedia).IsAssignableFrom(typeof(MakoChannel)));
+    }
+
+    [Fact]
+    public void DoesNotAskJellyfinToProbeTheStreamAtBrowseTime()
+    {
+        Assert.False(typeof(ISupportsMediaProbe).IsAssignableFrom(typeof(MakoChannel)));
+    }
+
+    [Fact]
+    public async Task PressingPlayWithNoPastedUrlThrowsStreamUnavailable()
+    {
+        var channel = new MakoChannel(new StaticCatalog(() => string.Empty, () => PastedContainer), NullLogger<MakoChannel>.Instance);
+
+        await Assert.ThrowsAsync<StreamUnavailableException>(
+            () => channel.GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task OpeningAFolderWithAGarbageIdReturnsAnEmptyResultInsteadOfThrowing()
+    {
+        ChannelItemResult result = await Open(ChannelOverStaticCatalog(), "garbage");
+
+        Assert.Empty(result.Items);
+        Assert.Equal(0, result.TotalRecordCount);
     }
 }

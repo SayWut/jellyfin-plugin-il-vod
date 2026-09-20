@@ -39,7 +39,7 @@ public class ChannelItemMapperTests
     public void EpisodeBecomesAPlayableVideoWithSeasonAndEpisodeNumbers()
     {
         var airDate = new DateTime(1997, 12, 25, 0, 0, 0, DateTimeKind.Utc);
-        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", airDate);
+        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", airDate, TimeSpan.FromMinutes(25));
 
         ChannelItemInfo item = ChannelItemMapper.ToPlayable(episode);
 
@@ -52,5 +52,16 @@ public class ChannelItemMapperTests
         Assert.Equal(1, item.ParentIndexNumber);
         Assert.Equal(1, item.IndexNumber);
         Assert.Equal(airDate, item.PremiereDate);
+        Assert.Equal(TimeSpan.FromMinutes(25).Ticks, item.RunTimeTicks);
+    }
+
+    [Fact]
+    public void EpisodeWithNoDurationHasNoRunTimeTicks()
+    {
+        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", AirDate: null, Duration: null);
+
+        ChannelItemInfo item = ChannelItemMapper.ToPlayable(episode);
+
+        Assert.Null(item.RunTimeTicks);
     }
 }

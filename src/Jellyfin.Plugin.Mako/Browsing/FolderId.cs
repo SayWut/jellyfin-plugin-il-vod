@@ -50,6 +50,7 @@ public sealed record FolderId(FolderKind Kind, string Value)
     {
         FolderKind.Show => $"{ShowPrefix}{Separator}{Value}",
         FolderKind.Season => $"{SeasonPrefix}{Separator}{Value}",
-        _ => string.Empty,
+        FolderKind.Root => string.Empty,
+        _ => throw new InvalidOperationException($"Folder kind '{Kind}' has no id format."),
     };
 }

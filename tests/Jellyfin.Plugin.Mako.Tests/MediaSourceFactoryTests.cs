@@ -24,4 +24,14 @@ public class MediaSourceFactoryTests
         Assert.False(source.IsInfiniteStream);
         Assert.False(source.RequiresOpening);
     }
+
+    [Fact]
+    public void AnEmptyContainerBecomesNullSoJellyfinDecides()
+    {
+        var link = new StreamLink("https://cdn.test/master.m3u8?hdnea=t", string.Empty);
+
+        MediaSourceInfo source = MediaSourceFactory.Create("shemesh-s1-e1", link);
+
+        Assert.Null(source.Container);
+    }
 }

@@ -18,7 +18,7 @@ public static class MediaSourceFactory
         Name = SourceName,
         Path = link.Url,
         Protocol = MediaProtocol.Http,
-        Container = link.Container,
+        Container = string.IsNullOrEmpty(link.Container) ? null : link.Container,
         IsRemote = true,
         IsInfiniteStream = false,
         SupportsDirectPlay = true,

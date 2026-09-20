@@ -18,6 +18,8 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
 {
     private const string ChannelName = "mako";
     private const string ContentVersion = "1";
+    private const string ChannelDescription = "mako 12+ VOD, fetched on demand.";
+    private const string ChannelHomePageUrl = "https://www.mako.co.il/mako-vod";
 
     private readonly ICatalog _catalog;
     private readonly ILogger<MakoChannel> _logger;
@@ -30,12 +32,12 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
 
     public string Name => ChannelName;
 
-    public string Description => "mako 12+ VOD, fetched on demand.";
+    public string Description => ChannelDescription;
 
     // Jellyfin discards its cached channel items when this value changes.
     public string DataVersion => ContentVersion;
 
-    public string HomePageUrl => "https://www.mako.co.il/mako-vod";
+    public string HomePageUrl => ChannelHomePageUrl;
 
     public ChannelParentalRating ParentalRating => ChannelParentalRating.GeneralAudience;
 
@@ -54,7 +56,12 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
 
     public async Task<ChannelItemResult> GetChannelItems(InternalChannelItemQuery query, CancellationToken cancellationToken)
     {
-        FolderId folder = FolderId.Parse(query.FolderId);
+        FolderId? folder = TryParseFolderId(query.FolderId);
+        if (folder is null)
+        {
+            return new ChannelItemResult { Items = [], TotalRecordCount = 0 };
+        }
+
         _logger.LogInformation("mako: folder opened: {FolderKind} '{FolderValue}'", folder.Kind, folder.Value);
 
         List<ChannelItemInfo> items = await ItemsInside(folder, cancellationToken).ConfigureAwait(false);
@@ -69,21 +76,37 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
         return [MediaSourceFactory.Create(id, link)];
     }
 
+    private FolderId? TryParseFolderId(string? rawFolderId)
+    {
+        try
+        {
+            return FolderId.Parse(rawFolderId);
+        }
+        catch (FormatException)
+        {
+            _logger.LogWarning("mako: '{RawFolderId}' is not a mako folder id; showing an empty view.", rawFolderId);
+            return null;
+        }
+    }
+
     private async Task<List<ChannelItemInfo>> ItemsInside(FolderId folder, CancellationToken cancellationToken)
     {
         switch (folder.Kind)
         {
+            case FolderKind.Root:
+                IReadOnlyList<Show> shows = await _catalog.GetShowsAsync(cancellationToken).ConfigureAwait(false);
+                return shows.Select(ChannelItemMapper.ToFolder).ToList();
+
             case FolderKind.Show:
                 IReadOnlyList<Season> seasons = await _catalog.GetSeasonsAsync(folder.Value, cancellationToken).ConfigureAwait(false);
-                return seasons.Select(season => ChannelItemMapper.ToFolder(season)).ToList();
+                return seasons.Select(ChannelItemMapper.ToFolder).ToList();
 
             case FolderKind.Season:
                 IReadOnlyList<Episode> episodes = await _catalog.GetEpisodesAsync(folder.Value, cancellationToken).ConfigureAwait(false);
                 return episodes.Select(ChannelItemMapper.ToPlayable).ToList();
 
             default:
-                IReadOnlyList<Show> shows = await _catalog.GetShowsAsync(cancellationToken).ConfigureAwait(false);
-                return shows.Select(ChannelItemMapper.ToFolder).ToList();
+                throw new InvalidOperationException($"Folder kind '{folder.Kind}' has no items.");
         }
     }
 }

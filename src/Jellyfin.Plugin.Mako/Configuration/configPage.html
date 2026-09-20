@@ -21,6 +21,14 @@
                             within a few minutes: the token lasts 15 minutes.
                         </div>
                     </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="TestStreamContainer">Test stream container</label>
+                        <input id="TestStreamContainer" name="TestStreamContainer" type="text" is="emby-input" />
+                        <div class="fieldDescription">
+                            Leave empty to let Jellyfin decide. Enter hls to force the HLS-manifest path.
+                            Step A check 5 is run once with each.
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <button is="emby-button" type="submit" class="raised button-submit block emby-button">
@@ -37,6 +45,7 @@
             Dashboard.showLoadingMsg();
             ApiClient.getPluginConfiguration(MakoConfig.pluginUniqueId).then(function (config) {
                 document.querySelector('#TestStreamUrl').value = config.TestStreamUrl || '';
+                document.querySelector('#TestStreamContainer').value = config.TestStreamContainer || '';
                 Dashboard.hideLoadingMsg();
             });
         });
@@ -46,6 +55,7 @@
             Dashboard.showLoadingMsg();
             ApiClient.getPluginConfiguration(MakoConfig.pluginUniqueId).then(function (config) {
                 config.TestStreamUrl = document.querySelector('#TestStreamUrl').value.trim();
+                config.TestStreamContainer = document.querySelector('#TestStreamContainer').value.trim();
                 ApiClient.updatePluginConfiguration(MakoConfig.pluginUniqueId, config).then(function (result) {
                     Dashboard.processPluginConfigurationUpdateResult(result);
                 });

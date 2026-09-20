@@ -11,8 +11,11 @@ public sealed class StaticCatalog : ICatalog
     public const string CardOnlyShowId = "eretz_nehederet";
 
     private const string PlayableShowName = "שמש";
-    private const string HlsContainer = "hls";
     private const int EpisodesPerSeason = 3;
+
+    // An approximation for the test fixture, so seek/resume has something to work with.
+    // The real stream's length comes from mako in step B.
+    private static readonly TimeSpan TestEpisodeDuration = TimeSpan.FromMinutes(25);
 
     private static readonly IReadOnlyList<Show> Shows =
     [
@@ -37,10 +40,12 @@ public sealed class StaticCatalog : ICatalog
     ];
 
     private readonly Func<string> _readTestStreamUrl;
+    private readonly Func<string> _readTestStreamContainer;
 
-    public StaticCatalog(Func<string> readTestStreamUrl)
+    public StaticCatalog(Func<string> readTestStreamUrl, Func<string> readTestStreamContainer)
     {
         _readTestStreamUrl = readTestStreamUrl;
+        _readTestStreamContainer = readTestStreamContainer;
     }
 
     public Task<IReadOnlyList<Show>> GetShowsAsync(CancellationToken cancellationToken)
@@ -68,7 +73,8 @@ public sealed class StaticCatalog : ICatalog
                 "No Test stream URL is set. Paste a freshly signed URL in Dashboard > Plugins > Mako.");
         }
 
-        return Task.FromResult(new StreamLink(url.Trim(), HlsContainer));
+        string container = _readTestStreamContainer();
+        return Task.FromResult(new StreamLink(url.Trim(), container.Trim()));
     }
 
     private static IReadOnlyList<Episode> EpisodesOf(Season season)
@@ -79,6 +85,7 @@ public sealed class StaticCatalog : ICatalog
                 season.Number,
                 number,
                 $"פרק בדיקה {number}",
-                AirDate: null))
+                AirDate: null,
+                Duration: TestEpisodeDuration))
             .ToList();
 }

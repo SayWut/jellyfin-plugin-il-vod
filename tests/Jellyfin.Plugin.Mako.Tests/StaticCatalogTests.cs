@@ -6,8 +6,10 @@ namespace Jellyfin.Plugin.Mako.Tests;
 public class StaticCatalogTests
 {
     private const string PastedUrl = "https://example.test/master.m3u8?hdnea=token";
+    private const string PastedContainer = "hls";
 
-    private static StaticCatalog CatalogWithPastedUrl(string url = PastedUrl) => new(() => url);
+    private static StaticCatalog CatalogWithPastedUrl(string url = PastedUrl, string container = PastedContainer)
+        => new(() => url, () => container);
 
     [Fact]
     public async Task OffersTwoShowsWithDifferentGenres()
@@ -60,24 +62,55 @@ public class StaticCatalogTests
     }
 
     [Fact]
-    public async Task EveryEpisodePlaysThePastedUrlAsHls()
+    public async Task EveryEpisodeHasTheTwentyFiveMinuteTestDuration()
     {
-        StreamLink link = await CatalogWithPastedUrl().GetStreamLinkAsync("any-episode", CancellationToken.None);
+        StaticCatalog catalog = CatalogWithPastedUrl();
+        IReadOnlyList<Season> seasons = await catalog.GetSeasonsAsync(StaticCatalog.PlayableShowId, CancellationToken.None);
+
+        IReadOnlyList<Episode> firstSeason = await catalog.GetEpisodesAsync(seasons[0].Id, CancellationToken.None);
+
+        Assert.All(firstSeason, episode => Assert.Equal(TimeSpan.FromMinutes(25), episode.Duration));
+    }
+
+    [Fact]
+    public async Task EveryEpisodePlaysThePastedUrlWithThePastedContainer()
+    {
+        StreamLink link = await CatalogWithPastedUrl(container: "hls").GetStreamLinkAsync("any-episode", CancellationToken.None);
 
         Assert.Equal(PastedUrl, link.Url);
         Assert.Equal("hls", link.Container);
     }
 
     [Fact]
+    public async Task AnEmptyContainerSettingYieldsAnEmptyStreamLinkContainer()
+    {
+        StreamLink link = await CatalogWithPastedUrl(container: string.Empty).GetStreamLinkAsync("any-episode", CancellationToken.None);
+
+        Assert.Equal(string.Empty, link.Container);
+    }
+
+    [Fact]
     public async Task UrlIsReadAtPlayTimeNotAtConstruction()
     {
         string current = "https://example.test/first.m3u8";
-        var catalog = new StaticCatalog(() => current);
+        var catalog = new StaticCatalog(() => current, () => "hls");
 
         current = "https://example.test/second.m3u8";
         StreamLink link = await catalog.GetStreamLinkAsync("any-episode", CancellationToken.None);
 
         Assert.Equal("https://example.test/second.m3u8", link.Url);
+    }
+
+    [Fact]
+    public async Task ContainerIsReadAtPlayTimeNotAtConstruction()
+    {
+        string currentContainer = "hls";
+        var catalog = new StaticCatalog(() => PastedUrl, () => currentContainer);
+
+        currentContainer = string.Empty;
+        StreamLink link = await catalog.GetStreamLinkAsync("any-episode", CancellationToken.None);
+
+        Assert.Equal(string.Empty, link.Container);
     }
 
     [Theory]
