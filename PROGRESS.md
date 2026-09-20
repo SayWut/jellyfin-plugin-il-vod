@@ -29,7 +29,7 @@ mako calls) has no plan yet — it is written after the step A gate in task A8.
 | A1 | Toolchain and empty solution | agent | `done` | Empty solution builds and `dotnet test` passes 1/1 against Jellyfin.Controller/Model 12.1.0 on net10.0. |
 | A2 | Model and folder ids | agent | `done` | Model records (Show, Season, Episode, StreamLink) and FolderId with round-trip parsing and 8 tests passing. |
 | A3 | Catalogue interface and the static catalogue | agent | `done` | ICatalog interface, StaticCatalog with two shows and their seasons, and StreamUnavailableException. All 17 tests passing. |
-| A4 | Mapping to Jellyfin's types | agent | `todo` | |
+| A4 | Mapping to Jellyfin's types | agent | `done` | ChannelItemMapper (show/season/episode) and MediaSourceFactory built against real Jellyfin.Controller/Model 12.1.0 assemblies. All 21 tests passing. |
 | A5 | The channel | agent | `todo` | |
 | A6 | Plugin identity, the one setting, and wiring | agent | `todo` | |
 | A7 | Build, install and uninstall scripts, and the README | agent | `todo` | |
@@ -48,6 +48,8 @@ Anything that differed from the spec or the plan, with the reason.
 | 2026-09-20 | A1 | `dotnet new sln` created `Jellyfin.Plugin.Mako.slnx`, not `.sln`. | This is .NET 10's new default; the brief said either is fine. |
 | 2026-09-20 | A1 | Omitted the `<None Remove>`/`<EmbeddedResource Include>` item group for `Configuration\configPage.html` from the plugin `.csproj` (Step 4). | That file doesn't exist yet — Task 1's file list doesn't create it, and it's only added in Task 6 (`docs/plan.md`, `task-6-brief.md`). Embedding a resource that isn't on disk fails the build with CS1566. Will restore this item group in Task 6 alongside the real file. |
 | 2026-09-20 | A2 | Deleted `tests/Jellyfin.Plugin.Mako.Tests/ToolchainTests.cs`. | Per controller ruling: ToolchainTests was a smoke test; real tests now make it redundant. |
+| 2026-09-20 | A4 | `ChannelItemMapper.ToFolder(Season season)` takes only the season, not the brief's `ToFolder(Season season, Show? show = null)`. | Controller ruling: nothing in step A calls it with a show, so the optional parameter (and the `ImageUrl`/`SeriesName` assignments it would feed) would be speculative. |
+| 2026-09-20 | A4 | None — every type, namespace, enum member and property named in the brief (`ChannelItemInfo`, `ChannelFolderType.Container`, `ChannelMediaType.Video`, `ChannelMediaContentType.Episode`, `MediaSourceInfo`, `MediaProtocol.Http`, and every property assigned on them) exists exactly as written in Jellyfin.Controller/Model 12.1.0. Verified by reflecting over the real NuGet assemblies before writing code; no substitutions were needed. | Recorded per the task's requirement to note this check even when nothing differed. |
 
 ## Open items
 
