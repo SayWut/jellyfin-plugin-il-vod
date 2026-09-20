@@ -31,7 +31,6 @@
 jellyfin-plugin-mako/
 ├── .gitignore
 ├── README.md
-├── build.yaml                                   plugin metadata (name, guid, targetAbi)
 ├── Jellyfin.Plugin.Mako.sln
 ├── docs/spec.md, plan.md, step-a-results.md
 ├── src/Jellyfin.Plugin.Mako/

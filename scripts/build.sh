@@ -11,6 +11,8 @@ PUBLISH_DIR="$PROJECT_ROOT/artifacts/publish"
 PLUGIN_DIR="$PROJECT_ROOT/artifacts/${PLUGIN_NAME}_${PLUGIN_VERSION}"
 DOTNET="${DOTNET:-$(command -v dotnet || echo "$HOME/.dotnet/dotnet")}"
 
+"$DOTNET" --list-sdks | grep -q '^10\.' || { echo "The .NET 10 SDK is required (found: $("$DOTNET" --list-sdks | tr '\n' ' '))." >&2; exit 1; }
+
 rm -rf "$PUBLISH_DIR" "$PLUGIN_DIR"
 "$DOTNET" publish "$PROJECT_ROOT/src/Jellyfin.Plugin.Mako" -c Release -o "$PUBLISH_DIR" --nologo
 
@@ -34,6 +36,8 @@ cat > "$PLUGIN_DIR/meta.json" <<EOF
   "assemblies": []
 }
 EOF
+
+python3 -m json.tool "$PLUGIN_DIR/meta.json" >/dev/null || { echo "meta.json is not valid JSON." >&2; exit 1; }
 
 echo "Built: $PLUGIN_DIR"
 ls -la "$PLUGIN_DIR"

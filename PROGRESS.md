@@ -39,6 +39,44 @@ mako calls) has no plan yet — it is written after the step A gate in task A8.
 
 Not planned yet. Gated on A8.
 
+## Whole-branch review fixes (2026-09-20)
+
+- Added a second setting, `TestStreamContainer`, so step A check 5 can be run once with the
+  container empty (Jellyfin decides) and once with `hls` (forces the manifest path, which
+  Jellyfin 12.1 never plays directly) — the hard-coded `"hls"` container was pre-deciding the
+  check.
+- `StaticCatalog` now reads the container through a delegate at play time, the same way it
+  already read the URL; `MediaSourceFactory` maps an empty container to `null` so Jellyfin
+  decides instead of matching against an empty string.
+- `Episode` gained a `Duration` (fixed at 25 minutes in `StaticCatalog`) so `RunTimeTicks` is
+  set on playable items and seek/resume (check 6) has something to work against.
+- `FolderId.ToString()` and `MakoChannel.ItemsInside` now throw `InvalidOperationException` on
+  an unhandled `FolderKind` instead of silently returning an empty string/list, so a future
+  enum member is a loud failure, not a quiet wrong answer.
+- `MakoChannel.GetChannelItems` now catches a `FormatException` from `FolderId.Parse`, logs a
+  warning naming the raw folder id, and returns an empty result instead of letting the
+  exception surface as an HTTP 500 for the whole Channels view.
+- Added tests pinning three invariants: `MakoChannel` does not implement
+  `ISupportsMediaProbe` (would make Jellyfin ffprobe the URL at browse time),
+  `GetChannelItemMediaInfo` throws `StreamUnavailableException` when no URL is set, and the
+  embedded settings page contains the live `Plugin.PluginGuid`.
+- `Description` and `HomePageUrl` on `MakoChannel` became named constants
+  (`ChannelDescription`, `ChannelHomePageUrl`), matching `ChannelName`/`ContentVersion`.
+- `scripts/install.sh`: the rsync destination and the `mkdir` path are now both derived from
+  one `REMOTE_PLUGINS_RELATIVE` constant so they cannot drift; the plugin-status check now
+  fails loudly (`set -o pipefail`, `curl -f`, captured output, explicit error messages) instead
+  of silently printing nothing; the Jellyfin URL is one named constant used in both places it
+  appears.
+- `scripts/uninstall.sh`: every remote command now guards `$HOME` first
+  (`: "${HOME:?remote HOME is empty}"`); if the earlier `ls` finds nothing, the script says so
+  and exits before asking to delete anything.
+- `scripts/build.sh`: now fails fast if the .NET 10 SDK is missing, and validates the written
+  `meta.json` is parseable JSON before reporting success.
+- Deleted `build.yaml` — nothing read it; `build.sh` writes `meta.json` from its own constants,
+  so the file could only drift out of sync.
+- `README.md` and `docs/spec.md` updated for the second setting, the two-pass check 5, the
+  5-minute per-episode stream cache, and the 3-hour folder cache.
+
 ## Deviations log
 
 Anything that differed from the spec or the plan, with the reason.
@@ -55,6 +93,10 @@ Anything that differed from the spec or the plan, with the reason.
 | 2026-09-20 | A6 | Restored the `<None Remove>`/`<EmbeddedResource Include>` item group for `Configuration\configPage.html` in the plugin `.csproj`, deferred from Task 1. | `Configuration/configPage.html` now exists, so the resource can be embedded; the `SettingsPageIsEmbeddedUnderTheNameThePluginAdvertises` test fails without it. This closes the A1 deviation. |
 | 2026-09-20 | A6 | None — every type, namespace, and member the brief names for `Plugin`, `PluginConfiguration`, and `PluginServiceRegistrator` (`BasePlugin<T>` in `MediaBrowser.Common.Plugins`, `IHasWebPages`/`PluginPageInfo`/`BasePluginConfiguration` in `MediaBrowser.Model.Plugins`, `IApplicationPaths` in `MediaBrowser.Common.Configuration`, `IXmlSerializer` in `MediaBrowser.Model.Serialization`, `IPluginServiceRegistrator`/`IServerApplicationHost` in `MediaBrowser.Controller`/`MediaBrowser.Controller.Plugins`, and the `BasePlugin<T>` and `RegisterServices` signatures) exists exactly as written in Jellyfin.Controller/Common/Model 12.1.0. Verified by reflecting over the real NuGet assemblies before writing code; no substitutions were needed. | Recorded per the task's requirement to note this check even when nothing differed. |
 | 2026-09-20 | A7 | `shellcheck` was not run on the three scripts — only `bash -n` syntax checks. | `command -v shellcheck` found nothing on this machine; the controller ruling made shellcheck conditional on it being installed. `install.sh`/`uninstall.sh` were also never executed, per the controller ruling that they touch the live phone (task A8). |
+| 2026-09-20 | review fixes | Added a second plugin setting, `TestStreamContainer` (spec §4.1 amended). | Jellyfin 12.1's StreamBuilder refuses direct play for the `hls` container; a fixed container pre-decided step A check 5 instead of letting it be observed both ways. |
+| 2026-09-20 | review fixes | `Episode` gained a `Duration` field, fixed at 25 minutes for every static episode. | Without a duration, `RunTimeTicks` was always null, so step A check 6 (seek/resume) had nothing to seek within. It is a fixture approximation; the real duration comes from mako in step B. |
+| 2026-09-20 | review fixes | Deleted `build.yaml` (and its one line in `docs/plan.md`'s file-structure block). | Nothing read it — `scripts/build.sh` writes `meta.json` from its own constants — so it was a second, unread source of the same metadata that could only drift. `docs/plan.md`'s file-structure block had only one `build.yaml` line, not the two the fix brief expected; the rest of `docs/plan.md` (Task 6's steps) was left as written history, since it describes what was actually done at the time. |
+| 2026-09-20 | review fixes | A folder id `FolderId.Parse` cannot parse now returns an empty `ChannelItemResult` from `GetChannelItems` instead of throwing/crashing the view. | Jellyfin 12.1 does not catch exceptions thrown from `IChannel.GetChannelItems`; an uncaught `FormatException` from a stale or corrupted folder id would take down the entire Channels view with an HTTP 500 instead of just that one folder. |
 
 ## Open items
 

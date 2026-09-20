@@ -25,6 +25,14 @@ Jellyfin, and prints the plugin's status (Active / NotSupported / Malfunctioned)
 1. Sign a URL: `python3 mako12_vod.py "שמש" --episode 1 --resolve` and copy `masterM3U8`.
 2. Dashboard → Plugins → Mako → paste it into **Test stream URL** → Save.
 3. Press play on any test episode within a few minutes.
+4. Check 5 is run twice: once with **Test stream container** left empty (Jellyfin decides),
+   once with it set to `hls` (forces the HLS-manifest path — Jellyfin 12.1 never plays this
+   directly).
+5. Jellyfin caches the resolved stream per episode for 5 minutes. After pasting a new URL,
+   play a *different* episode (there are six) or wait 5 minutes — replaying the same one
+   reuses the old URL.
+6. Jellyfin caches channel folders for 3 hours; after redeploying a changed catalogue, bump
+   `ContentVersion` in `MakoChannel.cs` or wait.
 
 ## Remove
 
