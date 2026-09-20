@@ -27,21 +27,21 @@ public class MakoChannelTests
         Assert.Equal(2, result.Items.Count);
         Assert.Equal(2, result.TotalRecordCount);
         Assert.All(result.Items, item => Assert.Equal(ChannelItemType.Folder, item.Type));
-        Assert.Equal("show|shemesh", result.Items[0].Id);
+        Assert.Equal("series|shemesh", result.Items[0].Id);
     }
 
     [Fact]
     public async Task OpeningAShowListsItsSeasons()
     {
-        ChannelItemResult result = await Open(ChannelOverStaticCatalog(), "show|shemesh");
+        ChannelItemResult result = await Open(ChannelOverStaticCatalog(), "series|shemesh");
 
-        Assert.Equal(new[] { "season|shemesh-s1", "season|shemesh-s2" }, result.Items.Select(item => item.Id));
+        Assert.Equal(new[] { "series-season|shemesh-s1", "series-season|shemesh-s2" }, result.Items.Select(item => item.Id));
     }
 
     [Fact]
     public async Task OpeningASeasonListsItsPlayableEpisodes()
     {
-        ChannelItemResult result = await Open(ChannelOverStaticCatalog(), "season|shemesh-s1");
+        ChannelItemResult result = await Open(ChannelOverStaticCatalog(), "series-season|shemesh-s1");
 
         Assert.Equal(3, result.Items.Count);
         Assert.All(result.Items, item => Assert.Equal(ChannelItemType.Media, item.Type));

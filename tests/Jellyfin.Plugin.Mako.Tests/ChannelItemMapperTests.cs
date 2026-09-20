@@ -15,8 +15,8 @@ public class ChannelItemMapperTests
         ChannelItemInfo item = ChannelItemMapper.ToFolder(show);
 
         Assert.Equal(ChannelItemType.Folder, item.Type);
-        Assert.Equal(ChannelFolderType.Container, item.FolderType);
-        Assert.Equal("show|shemesh", item.Id);
+        Assert.Equal(ChannelFolderType.Series, item.FolderType);
+        Assert.Equal("series|shemesh", item.Id);
         Assert.Equal("שמש", item.Name);
         Assert.Equal("https://img.test/p.jpg", item.ImageUrl);
         Assert.Equal("תיאור", item.Overview);
@@ -29,8 +29,8 @@ public class ChannelItemMapperTests
         ChannelItemInfo item = ChannelItemMapper.ToFolder(new Season("shemesh-s2", 2, "עונה 2"));
 
         Assert.Equal(ChannelItemType.Folder, item.Type);
-        Assert.Equal(ChannelFolderType.Container, item.FolderType);
-        Assert.Equal("season|shemesh-s2", item.Id);
+        Assert.Equal(ChannelFolderType.Season, item.FolderType);
+        Assert.Equal("series-season|shemesh-s2", item.Id);
         Assert.Equal("עונה 2", item.Name);
         Assert.Equal(2, item.IndexNumber);
     }

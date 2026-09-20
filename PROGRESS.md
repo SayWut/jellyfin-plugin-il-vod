@@ -84,6 +84,7 @@ Anything that differed from the spec or the plan, with the reason.
 
 | Date | Task | What differed | Why |
 |---|---|---|---|
+| 2026-09-21 | A8 | Show/season folders are `ChannelFolderType.Series`/`Season`, not `Container`; folder id prefixes changed; `DataVersion` 2. | Fladder cannot open a plain channel folder. The plan's Container constraint is withdrawn — see Step A live findings. |
 | 2026-09-20 | A1 | `dotnet new sln` created `Jellyfin.Plugin.Mako.slnx`, not `.sln`. | This is .NET 10's new default; the brief said either is fine. |
 | 2026-09-20 | A1 | Omitted the `<None Remove>`/`<EmbeddedResource Include>` item group for `Configuration\configPage.html` from the plugin `.csproj` (Step 4). | That file doesn't exist yet — Task 1's file list doesn't create it, and it's only added in Task 6 (`docs/plan.md`, `task-6-brief.md`). Embedding a resource that isn't on disk fails the build with CS1566. Will restore this item group in Task 6 alongside the real file. |
 | 2026-09-20 | A2 | Deleted `tests/Jellyfin.Plugin.Mako.Tests/ToolchainTests.cs`. | Per controller ruling: ToolchainTests was a smoke test; real tests now make it redundant. |
@@ -113,6 +114,9 @@ Anything that differed from the spec or the plan, with the reason.
 - `install.sh`: `ssh` swallowed a piped answer (fixed with `ssh -n`); it also exits non-zero when `mediactl restart` prints "timeout" although the service does restart — not fixed yet.
 
 - **2026-09-20 22:24 — playback works end to end through Jellyfin (simulated client, container `hls`).** Log: "probe-size limiter installed", then "limiting ffmpeg probe size to 20M for this stream"; ffmpeg ran `-analyzeduration 3000000 -probesize 20M … -codec:v:0 libx264 -codec:a:0 copy -bsf:a aac_adtstoasc`, first segment served in 8 s (HTTP 200), encoding at ~17x realtime, no abort. Video is re-encoded rather than copied (the plugin's stream description has no profile/level, so Jellyfin will not stream-copy) — cheap at 576x432, worth improving in step B. ffmpeg RSS ~450 MB while encoding. Checks 5-6 on the three real apps still to be done by the user.
+
+- **2026-09-21 — shows are now `Series`, seasons `Season`** (were plain `Container` folders), with new folder ids (`series|…`, `series-season|…`) and `DataVersion` 2. Reason: Fladder has no screen for a channel's plain folder ("ChannelFolderItem has not been implemented yet") but does for series and seasons. Verified on the server through the same API calls Fladder makes: root lists two `Series` with their Hebrew names, genres and posters and **no provider ids** (no TMDb rename); `/Shows/{id}/Seasons` reaches the plugin on demand; `/Shows/{id}/Episodes?seasonId=` returned an **empty list on the very first request** and the correct three episodes ~20 s later, once Jellyfin's refresh had linked the new items (`SeriesId`/`SeasonId`). So a show opened for the first time may show no episodes for a few seconds. This reverses the plan's "Container folders" constraint, which rested on another plugin's comment that Jellyfin's source does not bear out for 12.1 (`BaseItemManager.IsMetadataFetcherEnabled` is false for channel items).
+- `install.sh` now waits for a NEW Jellyfin process (pid change) instead of trusting `mediactl restart`'s exit code, which reports "timeout" on a slow shutdown although the service restarts.
 
 ## Open items
 

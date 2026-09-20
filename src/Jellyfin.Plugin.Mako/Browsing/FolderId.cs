@@ -13,8 +13,11 @@ public enum FolderKind
 public sealed record FolderId(FolderKind Kind, string Value)
 {
     private const char Separator = '|';
-    private const string ShowPrefix = "show";
-    private const string SeasonPrefix = "season";
+    // Jellyfin derives a channel item's identity from this id and stores the item's type with it.
+    // The prefixes changed when show and season folders became Series and Season items: an item
+    // already stored as a plain folder cannot be reloaded as a Series, so new ids were needed.
+    private const string ShowPrefix = "series";
+    private const string SeasonPrefix = "series-season";
 
     public static FolderId Root { get; } = new(FolderKind.Root, string.Empty);
 

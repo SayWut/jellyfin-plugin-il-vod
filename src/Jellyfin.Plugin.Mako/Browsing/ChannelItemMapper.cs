@@ -9,16 +9,19 @@ namespace Jellyfin.Plugin.Mako.Browsing;
 /// </summary>
 public static class ChannelItemMapper
 {
-    // Container, not Series/Season: a Series folder makes Jellyfin run its metadata
-    // providers, which would rename mako's Hebrew titles to TMDb matches.
-    private const ChannelFolderType PlainFolder = ChannelFolderType.Container;
+    // Series and Season, not plain Container folders: clients such as Fladder have no screen
+    // for a channel's plain folder ("ChannelFolderItem") but do for a series and a season.
+    // Jellyfin's TV endpoints still call the plugin on demand for channel items, and Jellyfin
+    // disables remote metadata fetchers for channel items, so mako's Hebrew titles are kept.
+    private const ChannelFolderType ShowFolder = ChannelFolderType.Series;
+    private const ChannelFolderType SeasonFolder = ChannelFolderType.Season;
 
     public static ChannelItemInfo ToFolder(Show show) => new()
     {
         Id = FolderId.ForShow(show.Id).ToString(),
         Name = show.Name,
         Type = ChannelItemType.Folder,
-        FolderType = PlainFolder,
+        FolderType = ShowFolder,
         ImageUrl = show.PosterUrl,
         Overview = show.Overview,
         Genres = show.Genres.ToList(),
@@ -29,7 +32,7 @@ public static class ChannelItemMapper
         Id = FolderId.ForSeason(season.Id).ToString(),
         Name = season.Name,
         Type = ChannelItemType.Folder,
-        FolderType = PlainFolder,
+        FolderType = SeasonFolder,
         IndexNumber = season.Number,
     };
 

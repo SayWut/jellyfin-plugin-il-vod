@@ -9,7 +9,7 @@ LOCAL_DIR="$PROJECT_ROOT/artifacts/$PLUGIN_FOLDER"
 REMOTE_PLUGINS_RELATIVE='config/jellyfin/plugins'
 REMOTE_PLUGINS_DIR='$HOME/'"$REMOTE_PLUGINS_RELATIVE"
 JELLYFIN_URL='http://localhost:8096'
-STARTUP_TIMEOUT_SECONDS=180
+STARTUP_TIMEOUT_SECONDS=300
 
 HOST="${SSH_HOST:?set SSH_HOST (see oneplus-ssh.personal.md)}"
 USER_="${SSH_USER:?set SSH_USER (see oneplus-ssh.personal.md)}"
@@ -29,12 +29,19 @@ if [[ ! "$answer" =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
-"${SSH[@]}" '$HOME/stack/mediactl restart jellyfin'
+# The bracket keeps pgrep from matching the remote shell that carries this pattern in its own command line.
+JELLYFIN_PROCESS_PATTERN='[b]in/jellyfin --datadir'
+old_pid=$("${SSH[@]}" "pgrep -f '$JELLYFIN_PROCESS_PATTERN' | head -1" || true)
 
-echo "Waiting for Jellyfin to answer..."
+# A slow shutdown makes mediactl report a timeout even though runit restarts the service
+# moments later, so its exit code is not trusted; the new process is waited for instead.
+"${SSH[@]}" '$HOME/stack/mediactl restart jellyfin' || echo "mediactl reported a slow shutdown; waiting for the new process."
+
+echo "Waiting for a new Jellyfin process to answer..."
 "${SSH[@]}" "
     deadline=\$(( \$(date +%s) + $STARTUP_TIMEOUT_SECONDS ))
-    until curl -sf -m 5 $JELLYFIN_URL/System/Info/Public >/dev/null; do
+    until new_pid=\$(pgrep -f '$JELLYFIN_PROCESS_PATTERN' | head -1) && [ -n \"\$new_pid\" ] && [ \"\$new_pid\" != '$old_pid' ] \\
+          && curl -sf -m 5 $JELLYFIN_URL/System/Info/Public >/dev/null; do
         [ \$(date +%s) -lt \$deadline ] || { echo 'Jellyfin did not come back in time.' >&2; exit 1; }
         sleep 5
     done
