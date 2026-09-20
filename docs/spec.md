@@ -116,6 +116,33 @@ Check 8 does not gate step B. Its result decides the full plugin's channel
 layout: a flat list with a genre filter if the filter exists, otherwise genre
 folders and shows together on the channel page.
 
+### 4.3 Probe-size limiter
+
+Jellyfin 12.1 adds `-probesize 1G` (the global `FFmpeg:probesize` setting) to
+every ffmpeg command it runs; `EncodingHelper` reads only that global value, so
+a plugin cannot set a per-stream probe size through any public API. mako's HLS
+segments carry an unidentifiable sparse data PID, and while it stays
+unidentified ffmpeg keeps buffering everything it reads, bounded only by
+probesize — at 1G that means the whole episode ends up in RAM and Android's
+allocator aborts the process. The plugin instead wraps Jellyfin's
+`ITranscodeManager` (`Transcoding/ProbeSizeLimitingTranscodeManager.cs`,
+installed by `Transcoding/TranscodeManagerDecoration.cs`) and rewrites the
+`-probesize` value in the ffmpeg command line to `20M`, but only when the
+`MediaSourceInfo` being started is one this plugin created
+(`MediaSourceFactory.IsMakoSource`); every other stream's command line passes
+through unchanged. Every path in the decorator fails open: if recognising or
+rewriting the stream throws, or if Core's `ITranscodeManager` registration
+does not look the way the plugin expects, the original arguments and the
+original registration are used respectively — a mistake here must never keep
+a non-mako stream from playing.
+
+This hooks a Jellyfin implementation detail, not a published extension point,
+so it costs future stability: a Jellyfin update can change or remove the seam
+without warning. If that happens `TranscodeManagerDecoration.Apply` finds
+nothing to wrap, does nothing, and the plugin loads exactly as before — it
+just stops limiting mako's probe size until the code is updated to match the
+new internals.
+
 ## 5. Step B — live mako under one pinned show
 
 The pinned show is configured by its mako page path (default
@@ -261,6 +288,10 @@ The scripts touch nothing on the phone except that one plugin folder.
    fix.
 6. A Jellyfin update changes the Channel interfaces — rebuild; the
    Jellyfin-facing code is two small classes.
+7. A Jellyfin update changes or removes the `ITranscodeManager` registration
+   the probe-size limiter (§4.3) decorates — it fails open and simply stops
+   limiting the probe size; playback correctness for mako then depends on the
+   global setting again until the decorator is updated.
 
 ## 10. Out of scope for the prototype
 

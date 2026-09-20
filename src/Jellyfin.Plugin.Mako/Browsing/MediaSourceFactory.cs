@@ -11,7 +11,13 @@ namespace Jellyfin.Plugin.Mako.Browsing;
 /// </summary>
 public static class MediaSourceFactory
 {
-    private const string SourceName = "mako";
+    /// <summary>
+    /// The <see cref="MediaSourceInfo.Name"/> every mako media source carries. This is the one
+    /// place that owns how the plugin recognises its own streams; nothing else should compare
+    /// against the literal "mako".
+    /// </summary>
+    public const string SourceName = "mako";
+
     private const string VideoCodec = "h264";
     private const string AudioCodec = "aac";
     private const int VideoStreamIndex = 0;
@@ -40,6 +46,12 @@ public static class MediaSourceFactory
         AnalyzeDurationMs = AnalyzeDurationMilliseconds,
         MediaStreams = DescribeStreams(),
     };
+
+    /// <summary>
+    /// True when <paramref name="source"/> is a media source this plugin created.
+    /// </summary>
+    public static bool IsMakoSource(MediaSourceInfo? source) =>
+        string.Equals(source?.Name, SourceName, StringComparison.Ordinal);
 
     // mako serves H.264 video with AAC audio. Telling Jellyfin so lets it copy the
     // streams instead of analysing, guessing and re-encoding them.

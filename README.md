@@ -37,3 +37,13 @@ Jellyfin, and prints the plugin's status (Active / NotSupported / Malfunctioned)
 ## Remove
 
     SSH_HOST=<ip> SSH_USER=<user> ./scripts/uninstall.sh
+
+## ffmpeg probe size
+
+Jellyfin's global `-probesize 1G` makes ffmpeg buffer mako's entire episode in RAM before
+Android aborts it, because mako's streams carry a data track ffmpeg can never identify. The
+plugin does not change the server-wide setting; instead it wraps Jellyfin's internal
+transcode manager and rewrites `-probesize` to `20M` only for the command lines it builds for
+its own streams (`Transcoding/ProbeSizeLimitingTranscodeManager.cs`). Every other stream is
+untouched, and if the wrapped seam ever disappears in a future Jellyfin release the plugin
+simply stops limiting it rather than failing to load — see `docs/spec.md` §4.3.

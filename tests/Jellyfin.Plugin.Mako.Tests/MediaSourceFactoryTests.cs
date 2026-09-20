@@ -64,4 +64,26 @@ public class MediaSourceFactoryTests
 
         Assert.Equal(3000, source.AnalyzeDurationMs);
     }
+
+    [Fact]
+    public void IsMakoSourceIsTrueForASourceThePluginCreated()
+    {
+        MediaSourceInfo source = MediaSourceFactory.Create(new StreamLink("https://cdn.test/master.m3u8", string.Empty));
+
+        Assert.True(MediaSourceFactory.IsMakoSource(source));
+    }
+
+    [Fact]
+    public void IsMakoSourceIsFalseForNull()
+    {
+        Assert.False(MediaSourceFactory.IsMakoSource(null));
+    }
+
+    [Fact]
+    public void IsMakoSourceIsFalseForASourceWithAnotherName()
+    {
+        var source = new MediaSourceInfo { Name = "some-other-plugin" };
+
+        Assert.False(MediaSourceFactory.IsMakoSource(source));
+    }
 }
