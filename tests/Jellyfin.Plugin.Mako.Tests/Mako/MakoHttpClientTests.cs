@@ -22,6 +22,7 @@ public class MakoHttpClientTests
         CapturedRequest request = Assert.Single(handler.Requests);
         Assert.Equal(MakoHttpClient.UserAgent, request.UserAgent);
         Assert.Equal(MakoHttpClient.AcceptLanguage, request.AcceptLanguage);
+        Assert.Equal(MakoHttpClient.Accept, request.Accept);
     }
 
     [Fact]

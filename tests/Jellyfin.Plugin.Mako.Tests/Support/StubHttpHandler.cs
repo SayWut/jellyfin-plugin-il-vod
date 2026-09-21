@@ -12,6 +12,7 @@ public sealed record CapturedRequest(
     Uri? RequestUri,
     string? UserAgent,
     string? AcceptLanguage,
+    string? Accept,
     string? ContentType,
     string? Body);
 
@@ -55,6 +56,7 @@ public sealed class StubHttpHandler : HttpMessageHandler
             request.RequestUri,
             HeaderValue(request.Headers, "User-Agent"),
             HeaderValue(request.Headers, "Accept-Language"),
+            HeaderValue(request.Headers, "Accept"),
             request.Content?.Headers.ContentType?.ToString(),
             body);
     }
@@ -65,7 +67,9 @@ public sealed class StubHttpHandler : HttpMessageHandler
     /// </summary>
     private static string? HeaderValue(HttpHeaders headers, string name)
     {
-        HeaderStringValues values = headers.NonValidated[name];
-        return values.Count == 0 ? null : string.Join(", ", values);
+        // The indexer throws for a header that was never sent; an absent header reads as null.
+        return headers.NonValidated.TryGetValues(name, out HeaderStringValues values) && values.Count > 0
+            ? string.Join(", ", values)
+            : null;
     }
 }

@@ -20,6 +20,10 @@ public sealed class MakoHttpClient : IMakoHttp
 
     public const string AcceptLanguage = "he-IL,he;q=0.9,en;q=0.8";
 
+    // .NET sends no Accept header unless told to; curl and the Python prototype both send this
+    // one by default, and a request without any is an easy mark for mako's bot protection.
+    public const string Accept = "*/*";
+
     /// <summary>The timeout task B10 sets on the production <c>HttpClient</c> it builds.</summary>
     public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(15);
 
@@ -139,6 +143,7 @@ public sealed class MakoHttpClient : IMakoHttp
     {
         request.Headers.TryAddWithoutValidation("User-Agent", UserAgent);
         request.Headers.TryAddWithoutValidation("Accept-Language", AcceptLanguage);
+        request.Headers.TryAddWithoutValidation("Accept", Accept);
     }
 
     private static async Task<string> ReadSuccessOrThrowAsync(HttpResponseMessage response, string url, CancellationToken cancellationToken)
