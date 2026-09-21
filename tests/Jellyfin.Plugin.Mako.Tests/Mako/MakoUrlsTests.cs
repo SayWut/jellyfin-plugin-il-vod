@@ -23,6 +23,38 @@ public class MakoUrlsTests
         Assert.Equal("https://www.mako.co.il/mako-vod-index?filter=menu&platform=mobileApp", url);
     }
 
+    /// <summary>
+    /// Season and show ids reach <see cref="MakoUrls.Page"/> straight from a folder id a client
+    /// sent, so a page path is untrusted input. Any shape that could move the request off mako's
+    /// own host — where N4's pacing and the bot-challenge back-off would no longer apply — is
+    /// refused outright rather than requested.
+    /// </summary>
+    [Theory]
+    [InlineData("@evil.example/x")]
+    [InlineData("/@evil.example/x")]
+    [InlineData("//evil.example/x")]
+    [InlineData("https://evil.example/x")]
+    [InlineData("/x://evil.example")]
+    [InlineData("mako-vod-keshet/shemesh")]
+    [InlineData("")]
+    [InlineData("/path with a space")]
+    [InlineData("/path\\with-a-backslash")]
+    [InlineData("/path\nwith-a-newline")]
+    public void PageRefusesAPagePathThatCouldLeaveMakosHost(string pagePath)
+    {
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => MakoUrls.Page(BaseUrlTemplate, pagePath));
+
+        Assert.StartsWith("not a mako page path", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PageKeepsTheRequestOnMakosOwnHost()
+    {
+        string url = MakoUrls.Page(BaseUrlTemplate, "/mako-vod-keshet/shemesh-s6");
+
+        Assert.Equal(MakoUrls.BrowseHost, new Uri(url).Host);
+    }
+
     [Fact]
     public void PlaylistUrlFillsEveryPlaceholder()
     {

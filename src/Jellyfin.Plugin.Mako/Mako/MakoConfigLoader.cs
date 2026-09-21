@@ -80,21 +80,27 @@ public sealed class MakoConfigLoader
         return false;
     }
 
+    /// <summary>
+    /// Nothing is cached until the whole chain has parsed. A config endpoint answering an HTML
+    /// error page with status 200 would otherwise sit in the 24-hour cache and break every load
+    /// for a day; and since <see cref="TryReadFreshConfig"/> needs all three documents fresh
+    /// anyway, a partially cached chain was never worth anything.
+    /// </summary>
     private async Task<MakoConfig> FetchAndParseAsync(CancellationToken cancellationToken)
     {
-        string mainJson = await FetchAndCacheAsync(MakoUrls.MainConfigUrl(_readAppVersion()), MainConfigCacheKey, cancellationToken).ConfigureAwait(false);
-        string coreJson = await FetchAndCacheAsync(MakoConfig.CoreConfigUrlOf(mainJson), CoreConfigCacheKey, cancellationToken).ConfigureAwait(false);
-        string notesJson = await FetchAndCacheAsync(MakoConfig.NotesUrlOf(coreJson), NotesConfigCacheKey, cancellationToken).ConfigureAwait(false);
+        string mainJson = await _http.GetTextAsync(MakoUrls.MainConfigUrl(_readAppVersion()), cancellationToken).ConfigureAwait(false);
+        string coreJson = await _http.GetTextAsync(MakoConfig.CoreConfigUrlOf(mainJson), cancellationToken).ConfigureAwait(false);
+        string notesJson = await _http.GetTextAsync(MakoConfig.NotesUrlOf(coreJson), cancellationToken).ConfigureAwait(false);
 
-        return MakoConfig.Parse(mainJson, coreJson, notesJson);
+        MakoConfig config = MakoConfig.Parse(mainJson, coreJson, notesJson);
+
+        Cache(MainConfigCacheKey, mainJson);
+        Cache(CoreConfigCacheKey, coreJson);
+        Cache(NotesConfigCacheKey, notesJson);
+        return config;
     }
 
-    private async Task<string> FetchAndCacheAsync(string url, string cacheKey, CancellationToken cancellationToken)
-    {
-        string json = await _http.GetTextAsync(url, cancellationToken).ConfigureAwait(false);
-        _cache.Write(cacheKey, json, Lifetime);
-        return json;
-    }
+    private void Cache(string cacheKey, string json) => _cache.Write(cacheKey, json, Lifetime);
 
     private void ForgetEntry(string cacheKey)
     {

@@ -421,6 +421,23 @@ public class StreamResolverTests
         Assert.Equal("token response is not valid JSON", exception.Message);
     }
 
+    /// <summary>
+    /// On the play path a config endpoint answering HTML with a 200 must surface as one of this
+    /// plugin's own typed failures, not as a bare <see cref="FormatException"/> Jellyfin would
+    /// turn into an HTTP 500.
+    /// </summary>
+    [Fact]
+    public async Task AConfigThatIsNotJsonSurfacesATypedExceptionOnThePlayPath()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(MainConfigUrl, "<html><body>Access Denied</body></html>");
+
+        MakoRequestException exception = await Assert.ThrowsAsync<MakoRequestException>(
+            () => CreateResolver(http).ResolveAsync(Episode, CancellationToken.None));
+
+        Assert.Equal("mako config is not valid JSON", exception.Message);
+    }
+
     private static void EnqueueConfig(SequencedResponses http, string? notesConfigJson = null)
     {
         http.Enqueue(MainConfigUrl, MainConfigJson);

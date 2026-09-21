@@ -52,6 +52,47 @@ public class MakoConfigTests
         Assert.Equal(["TESTKEY-PLAYLIST-NEW-24b"], config.PlaylistKeys);
     }
 
+    /// <summary>
+    /// A config endpoint answering HTML with status 200 must not surface the raw parser error:
+    /// <c>JsonReaderException</c>'s own message quotes the payload it choked on, and mako's config
+    /// chain carries decryption keys. Each of the three documents is named, no payload text is
+    /// repeated, and nothing is attached as an inner exception.
+    /// </summary>
+    [Theory]
+    [InlineData("main")]
+    [InlineData("core")]
+    [InlineData("notes")]
+    public void AConfigDocumentThatIsNotJsonNamesItselfAndQuotesNothing(string documentName)
+    {
+        const string htmlErrorPage = "<html><body>Access Denied for secret-account</body></html>";
+
+        FormatException exception = Assert.Throws<FormatException>(() => MakoConfig.Parse(
+            documentName == "main" ? htmlErrorPage : MainConfigJson,
+            documentName == "core" ? htmlErrorPage : CoreConfigJson,
+            documentName == "notes" ? htmlErrorPage : NotesConfigJson));
+
+        Assert.Equal($"mako {documentName} config is not valid JSON", exception.Message);
+        Assert.Null(exception.InnerException);
+    }
+
+    [Fact]
+    public void CoreConfigUrlOfAMainConfigThatIsNotJsonFailsAsAMalformedMainConfig()
+    {
+        FormatException exception = Assert.Throws<FormatException>(() => MakoConfig.CoreConfigUrlOf("<html>nope</html>"));
+
+        Assert.Equal("mako main config is not valid JSON", exception.Message);
+        Assert.Null(exception.InnerException);
+    }
+
+    [Fact]
+    public void NotesUrlOfACoreConfigThatIsNotJsonFailsAsAMalformedCoreConfig()
+    {
+        FormatException exception = Assert.Throws<FormatException>(() => MakoConfig.NotesUrlOf("<html>nope</html>"));
+
+        Assert.Equal("mako core config is not valid JSON", exception.Message);
+        Assert.Null(exception.InnerException);
+    }
+
     [Fact]
     public void AMissingFieldIsNamedInTheError()
     {

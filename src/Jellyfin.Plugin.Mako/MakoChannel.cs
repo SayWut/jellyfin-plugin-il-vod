@@ -84,12 +84,15 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
             List<ChannelItemInfo> items = await ItemsInside(folder, cancellationToken).ConfigureAwait(false);
             return new ChannelItemResult { Items = items, TotalRecordCount = items.Count };
         }
-        catch (Exception exception) when (exception is BotChallengeException or MakoRequestException)
+        catch (Exception exception) when (exception is BotChallengeException or MakoRequestException or FormatException or ArgumentException)
         {
             // Jellyfin 12.1 does not catch this itself: an uncaught exception here would turn
             // opening a folder into an HTTP 500 in the Channels view instead of an empty one.
-            // exception.Message is itself the reason (already scrubbed of any query string, per
-            // N3, by BotChallengeException/MakoRequestException/MakoUrls.RedactedUrl).
+            // FormatException is mako answering something that is not a mako page (an HTML error
+            // page with status 200); ArgumentException is a folder id whose page path MakoUrls
+            // refuses. exception.Message is itself the reason (already scrubbed of any query
+            // string, per N3, by BotChallengeException/MakoRequestException/MakoUrls.RedactedUrl,
+            // and of any payload text by MakoPages/MakoConfig).
             _logger.LogWarning(
                 exception, "mako: could not open {FolderKind} '{FolderValue}': {Reason}; showing an empty view", folder.Kind, folder.Value, exception.Message);
             return EmptyResult();

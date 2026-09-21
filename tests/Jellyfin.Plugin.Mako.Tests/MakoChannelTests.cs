@@ -125,6 +125,41 @@ public class MakoChannelTests
         Assert.NotEmpty(logger.Warnings);
     }
 
+    /// <summary>
+    /// mako answering an error page (HTML, status 200) makes the catalogue throw
+    /// <see cref="FormatException"/>. Uncaught, that is an HTTP 500 in the Channels view; it is a
+    /// browse failure like any other.
+    /// </summary>
+    [Fact]
+    public async Task APageThatIsNotValidJsonShowsAnEmptyFolderInsteadOfFailing()
+    {
+        FakeCatalog catalog = new() { BrowseFailure = new FormatException("mako page is not valid JSON") };
+        var logger = new RecordingLogger<MakoChannel>();
+
+        ChannelItemResult result = await Open(ChannelOver(catalog, logger), "series|shemesh");
+
+        Assert.Empty(result.Items);
+        Assert.Equal(0, result.TotalRecordCount);
+        Assert.NotEmpty(logger.Warnings);
+    }
+
+    /// <summary>
+    /// A folder id is client input, so the id inside it can be a page path mako's URL builder
+    /// refuses (<see cref="ArgumentException"/>) — an empty view, never a server error.
+    /// </summary>
+    [Fact]
+    public async Task ASeasonIdThatIsNotAMakoPagePathShowsAnEmptyFolderInsteadOfFailing()
+    {
+        FakeCatalog catalog = new() { BrowseFailure = new ArgumentException("not a mako page path", "pagePath") };
+        var logger = new RecordingLogger<MakoChannel>();
+
+        ChannelItemResult result = await Open(ChannelOver(catalog, logger), "series-season|@evil.example/x");
+
+        Assert.Empty(result.Items);
+        Assert.Equal(0, result.TotalRecordCount);
+        Assert.NotEmpty(logger.Warnings);
+    }
+
     [Fact]
     public async Task WarnsOnPlayWhenTheProbeSizeLimiterIsNotInstalled()
     {

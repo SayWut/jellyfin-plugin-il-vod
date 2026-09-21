@@ -47,19 +47,20 @@ public sealed class MakoCatalog : ICatalog
     public Task<IReadOnlyList<Show>> GetShowsAsync(CancellationToken cancellationToken)
     {
         PinnedShow pinned = _readPinnedShow();
-        return Task.FromResult<IReadOnlyList<Show>>([BuildShow(pinned)]);
+        IReadOnlyList<Show> shows = IsConfigured(pinned) ? [BuildShow(pinned)] : [];
+        return Task.FromResult(shows);
     }
 
     public async Task<IReadOnlyList<Season>> GetSeasonsAsync(string showId, CancellationToken cancellationToken)
     {
         PinnedShow pinned = _readPinnedShow();
-        if (showId != pinned.PagePath)
+        if (!IsConfigured(pinned) || showId != pinned.PagePath)
         {
             return [];
         }
 
         CacheLifetimes lifetimes = _readLifetimes();
-        string showJson = await _pages.GetAsync(showId, _ => lifetimes.ShowPage, cancellationToken).ConfigureAwait(false);
+        string showJson = await _pages.GetAsync(showId, ShowPageLifetimeOf(lifetimes), cancellationToken).ConfigureAwait(false);
         ShowPage showPage = MakoPages.ParseShowPage(showJson);
 
         RememberDisplayedSeason(showPage, showJson, showId, lifetimes);
@@ -132,6 +133,24 @@ public sealed class MakoCatalog : ICatalog
     }
 
     private static Show NameOnlyShow(PinnedShow pinned) => new(pinned.PagePath, pinned.Name, PosterUrl: null, Overview: null, Genres: []);
+
+    /// <summary>A fresh install has nothing pinned yet: that is "no show", not a request for the
+    /// empty page path.</summary>
+    private static bool IsConfigured(PinnedShow pinned) => !string.IsNullOrWhiteSpace(pinned.PagePath);
+
+    /// <summary>
+    /// The show page's lifetime — decided only after the page has proven to be a mako page at
+    /// all. <see cref="MakoPageSource.GetAsync"/> asks for the lifetime before it caches, so
+    /// throwing from here is what keeps an HTML error page mako answered with status 200 out of
+    /// the persisted cache for the next 12 hours. The season path's own lifetime does the same
+    /// implicitly, by parsing the page to find out whether it is the latest season.
+    /// </summary>
+    private static Func<string, TimeSpan> ShowPageLifetimeOf(CacheLifetimes lifetimes) =>
+        showPageJson =>
+        {
+            MakoPages.ParseShowPage(showPageJson);
+            return lifetimes.ShowPage;
+        };
 
     private static TimeSpan LifetimeOf(string seasonPageJson, string seasonId, CacheLifetimes lifetimes) =>
         MakoPages.IsLatestSeason(seasonPageJson, seasonId) ? lifetimes.CurrentSeason : lifetimes.PastSeason;

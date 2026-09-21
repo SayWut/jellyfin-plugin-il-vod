@@ -40,6 +40,7 @@ public sealed class StreamResolver
     private const string CaseIdProperty = "caseId";
 
     private const string NoMediaMessage = "playlist has no media";
+    private const string UnusableConfigMessage = "mako config is not valid JSON";
 
     private readonly IMakoHttp _http;
     private readonly MakoConfigLoader _config;
@@ -63,7 +64,7 @@ public sealed class StreamResolver
 
     public async Task<StreamLink> ResolveAsync(EpisodeKey episode, CancellationToken cancellationToken)
     {
-        MakoConfig config = await _config.LoadAsync(cancellationToken).ConfigureAwait(false);
+        MakoConfig config = await LoadConfigAsync(cancellationToken).ConfigureAwait(false);
         (config, string playlistJson) = await FetchPlaylistAsync(config, episode, cancellationToken).ConfigureAwait(false);
 
         PlaylistMedia media = ParseBestMedia(playlistJson);
@@ -106,8 +107,27 @@ public sealed class StreamResolver
         catch (PayloadDecryptException)
         {
             _config.Forget();
-            MakoConfig freshConfig = await _config.LoadAsync(cancellationToken).ConfigureAwait(false);
+            MakoConfig freshConfig = await LoadConfigAsync(cancellationToken).ConfigureAwait(false);
             return (freshConfig, PayloadCipher.DecryptWithAnyKey(freshConfig.PlaylistKeys, encryptedPlaylist, "playlist"));
+        }
+    }
+
+    /// <summary>
+    /// Loads mako's config chain, turning a config document that is not usable into one of this
+    /// class's own typed failures. Play is a request Jellyfin answers directly, so a bare
+    /// <see cref="FormatException"/> escaping here would be an HTTP 500 rather than a reported
+    /// playback error.
+    /// </summary>
+    /// <exception cref="MakoRequestException">mako's config chain could not be parsed.</exception>
+    private async Task<MakoConfig> LoadConfigAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _config.LoadAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (FormatException exception)
+        {
+            throw new MakoRequestException(UnusableConfigMessage, exception);
         }
     }
 

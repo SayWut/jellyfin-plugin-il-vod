@@ -1,8 +1,10 @@
+using Jellyfin.Plugin.Mako.Browsing;
 using Jellyfin.Plugin.Mako.Cache;
 using Jellyfin.Plugin.Mako.Catalog;
 using Jellyfin.Plugin.Mako.MakoApi;
 using Jellyfin.Plugin.Mako.Model;
 using Jellyfin.Plugin.Mako.Tests.Support;
+using MediaBrowser.Controller.Channels;
 
 namespace Jellyfin.Plugin.Mako.Tests.Catalog;
 
@@ -17,6 +19,9 @@ public class MakoCatalogTests
     private const string TokenKey = "TESTKEY-TOKEN-TICKET-24b";
     private const string MediaUrl = "https://cdn.example.test/master.m3u8";
     private const string DecodedTicket = "hdnea=st=1~exp=2~acl=/*~hmac=ab";
+
+    /// <summary>What mako serves when it refuses a page without admitting to it: HTML, status 200.</summary>
+    private const string HtmlErrorPage = "<html><body>Access Denied</body></html>";
 
     private static readonly PinnedShow Pinned = new(PinnedPagePath, PinnedShowName);
 
@@ -344,6 +349,56 @@ public class MakoCatalogTests
         Assert.Null(show.PosterUrl);
     }
 
+    /// <summary>
+    /// mako's page endpoint answering an HTML error page with status 200 must not poison the
+    /// persisted cache for the next 12 hours: the page is rejected before it is written, so the
+    /// user sees an empty folder now and the next open asks mako again rather than replaying the
+    /// same rubbish from disk. The channel is in the picture because the empty view is its half
+    /// of that promise.
+    /// </summary>
+    [Fact]
+    public async Task AnHtmlShowPageIsNeverCachedAndShowsAnEmptyFolder()
+    {
+        FakeMakoHttp http = new();
+        http.Respond(ShowPageUrl, HtmlErrorPage);
+        MakoChannel channel = ChannelOver(await CreateCatalogAsync(http));
+
+        Assert.Empty((await OpenFolder(channel, FolderId.ForShow(PinnedPagePath))).Items);
+        Assert.Single(http.Requests);
+
+        Assert.Empty((await OpenFolder(channel, FolderId.ForShow(PinnedPagePath))).Items);
+        Assert.Equal(2, http.Requests.Count);
+    }
+
+    [Fact]
+    public async Task AnHtmlSeasonPageIsNeverCachedAndShowsAnEmptyFolder()
+    {
+        FakeMakoHttp http = new();
+        http.Respond(SeasonOneUrl, HtmlErrorPage);
+        MakoChannel channel = ChannelOver(await CreateCatalogAsync(http));
+
+        Assert.Empty((await OpenFolder(channel, FolderId.ForSeason(SeasonOnePagePath))).Items);
+        Assert.Single(http.Requests);
+
+        Assert.Empty((await OpenFolder(channel, FolderId.ForSeason(SeasonOnePagePath))).Items);
+        Assert.Equal(2, http.Requests.Count);
+    }
+
+    /// <summary>
+    /// A fresh install has no show pinned yet (M9): that is "nothing configured", not a request
+    /// for the empty page path — which mako's URL builder would refuse anyway.
+    /// </summary>
+    [Fact]
+    public async Task AnUnsetPinnedShowPathListsNothingAndCostsNothing()
+    {
+        FakeMakoHttp http = new();
+        MakoCatalog catalog = await CreateCatalogAsync(http, pinnedShow: new PinnedShow("   ", "not configured yet"));
+
+        Assert.Empty(await catalog.GetShowsAsync(CancellationToken.None));
+        Assert.Empty(await catalog.GetSeasonsAsync("   ", CancellationToken.None));
+        Assert.Empty(http.Requests);
+    }
+
     /// <summary>A malformed episode id must surface as the catalogue's own playback-failure type,
     /// not the parser's raw <see cref="FormatException"/>, so every caller sees one exception
     /// family for "this cannot be played".</summary>
@@ -427,6 +482,14 @@ public class MakoCatalogTests
 
     private static string EncryptedTokenResponse() =>
         PayloadCipher.Encrypt(TokenKey, $$"""{ "caseId": 1, "tickets": [ { "ticket": "{{Uri.EscapeDataString(DecodedTicket)}}" } ] }""");
+
+    /// <summary>The real <see cref="MakoChannel"/> over a real catalogue, for the tests whose
+    /// subject is what a user sees when a page cannot be parsed.</summary>
+    private static MakoChannel ChannelOver(ICatalog catalog) =>
+        new(new Lazy<ICatalog>(() => catalog), new RecordingLogger<MakoChannel>());
+
+    private static Task<ChannelItemResult> OpenFolder(MakoChannel channel, FolderId folder) =>
+        channel.GetChannelItems(new InternalChannelItemQuery { FolderId = folder.ToString() }, CancellationToken.None);
 
     private static async Task<MakoCatalog> CreateCatalogAsync(
         FakeMakoHttp http, IClock? clock = null, string? pageCachePersistencePath = null, PinnedShow? pinnedShow = null)

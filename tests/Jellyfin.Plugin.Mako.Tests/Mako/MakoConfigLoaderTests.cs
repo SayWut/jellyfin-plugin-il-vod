@@ -84,6 +84,41 @@ public class MakoConfigLoaderTests
         Assert.Equal(6, http.Requests.Count);
     }
 
+    /// <summary>
+    /// A document that cannot be parsed is not a config, so it never reaches the 24-hour cache:
+    /// otherwise one HTML error page from mako would break every load for a whole day. The next
+    /// load fetches again.
+    /// </summary>
+    [Fact]
+    public async Task AConfigDocumentThatIsNotJsonIsNeverCachedSoTheNextLoadFetchesAgain()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(MainConfigUrl, "<html><body>Access Denied</body></html>");
+        MakoConfigLoader loader = new(http, new TimedCache(new FakeClock()), () => AppVersion);
+
+        await Assert.ThrowsAsync<FormatException>(() => loader.LoadAsync(CancellationToken.None));
+        Assert.Single(http.Requests);
+
+        await Assert.ThrowsAsync<FormatException>(() => loader.LoadAsync(CancellationToken.None));
+        Assert.Equal(2, http.Requests.Count);
+    }
+
+    /// <summary>The same for the last document in the chain: a notes config that parses but is
+    /// missing its keys leaves nothing behind either, so no half-loaded chain can be served.</summary>
+    [Fact]
+    public async Task ANotesConfigWithoutKeysLeavesNothingCached()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(NotesConfigUrl, """{ "notes": {} }""");
+        MakoConfigLoader loader = new(http, new TimedCache(new FakeClock()), () => AppVersion);
+
+        await Assert.ThrowsAsync<FormatException>(() => loader.LoadAsync(CancellationToken.None));
+        Assert.Equal(3, http.Requests.Count);
+
+        await Assert.ThrowsAsync<FormatException>(() => loader.LoadAsync(CancellationToken.None));
+        Assert.Equal(6, http.Requests.Count);
+    }
+
     private static FakeMakoHttp SeededHttp()
     {
         FakeMakoHttp http = new();
