@@ -203,6 +203,8 @@ Anything that differed from the spec or the plan, with the reason.
 
 ## Open items
 
+- **Follow-ups from the final re-review (2026-09-22), none of them a gate on B11:** (1) `Lazy<ICatalog>` should use `LazyThreadSafetyMode.PublicationOnly` — the default mode caches a first construction failure until Jellyfin restarts (latent: every transient failure below it is already swallowed); (2) `MakoChannel.GetChannelItems` catches `ArgumentException`/`FormatException` broadly — give the page-path refusal its own exception type so a programming error stays loud; (3) when mako answers non-JSON a good stale copy is not served (empty folder instead); (4) the two in-flight-entry tests wait 25 ms of real time; (5) folder ids are logged raw, newlines included.
+
 - mako's show index carries no genre per show (checked 2026-09-20, 654 shows). A
   genre filter in the full plugin needs each genre's list fetched separately.
 - `MakoPages`: when a page has no `allEpisodes` tab, the fallback takes the first tab with a
