@@ -278,6 +278,199 @@ public class MakoPagesTests
         Assert.Equal("mako page is not valid JSON", exception.Message);
     }
 
+    [Fact]
+    public void ParseEpisodesFailsWithAFormatExceptionOnMalformedJson()
+    {
+        FormatException exception = Assert.Throws<FormatException>(
+            () => MakoPages.ParseEpisodes("not json", ShowName, 1));
+
+        Assert.Equal("mako page is not valid JSON", exception.Message);
+    }
+
+    [Fact]
+    public void IsCurrentSeasonFailsWithAFormatExceptionOnMalformedJson()
+    {
+        FormatException exception = Assert.Throws<FormatException>(
+            () => MakoPages.IsCurrentSeason("not json", "/show/s1"));
+
+        Assert.Equal("mako page is not valid JSON", exception.Message);
+    }
+
+    [Theory]
+    [InlineData("[]")]
+    [InlineData("42")]
+    public void ParseShowPageFailsWithAFormatExceptionWhenTheRootIsNotAJsonObject(string nonObjectJson)
+    {
+        FormatException exception = Assert.Throws<FormatException>(() => MakoPages.ParseShowPage(nonObjectJson));
+
+        Assert.Equal("mako page is not a JSON object", exception.Message);
+    }
+
+    [Theory]
+    [InlineData("[]")]
+    [InlineData("42")]
+    public void ParseEpisodesFailsWithAFormatExceptionWhenTheRootIsNotAJsonObject(string nonObjectJson)
+    {
+        FormatException exception = Assert.Throws<FormatException>(
+            () => MakoPages.ParseEpisodes(nonObjectJson, ShowName, 1));
+
+        Assert.Equal("mako page is not a JSON object", exception.Message);
+    }
+
+    [Theory]
+    [InlineData("[]")]
+    [InlineData("42")]
+    public void IsCurrentSeasonFailsWithAFormatExceptionWhenTheRootIsNotAJsonObject(string nonObjectJson)
+    {
+        FormatException exception = Assert.Throws<FormatException>(
+            () => MakoPages.IsCurrentSeason(nonObjectJson, "/show/s1"));
+
+        Assert.Equal("mako page is not a JSON object", exception.Message);
+    }
+
+    [Fact]
+    public void NonObjectEntriesInSeasonsAreSkippedWithoutThrowing()
+    {
+        const string pageJson = """
+            {
+                "pageUrl": "/show/x",
+                "seasons": ["x", 42, null, true, { "seasonTitle": "עונה 1", "current": true, "pageUrl": "/show/s1" }]
+            }
+            """;
+
+        ShowPage page = MakoPages.ParseShowPage(pageJson);
+
+        Season season = Assert.Single(page.Seasons);
+        Assert.Equal("/show/s1", season.Id);
+        Assert.Equal(1, season.Number);
+        Assert.Equal("עונה 1", season.Name);
+        Assert.Equal("/show/s1", page.CurrentSeasonId);
+    }
+
+    [Fact]
+    public void NonObjectVodsEntriesAreSkippedWithoutThrowing()
+    {
+        const string pageJson = """
+            {
+                "menu": [
+                    {
+                        "id": "allEpisodes",
+                        "vods": [
+                            null,
+                            "x",
+                            42,
+                            {
+                                "componentLayout": "vod",
+                                "title": "תקין",
+                                "itemVcmId": "vcm-1",
+                                "channelId": "chan-1",
+                                "galleryChannelId": "gal-1",
+                                "extraInfo": "פרק 1@01.01.20"
+                            }
+                        ]
+                    }
+                ]
+            }
+            """;
+
+        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(pageJson, ShowName, 1);
+
+        Episode kept = Assert.Single(episodes);
+        Assert.Equal("תקין", kept.Name);
+    }
+
+    [Fact]
+    public void PosterIsNullWhenHeroPicsIsAnObjectInsteadOfAnArray()
+    {
+        const string pageJson = """{ "hero": { "description": "x", "pics": { "not": "an array" } } }""";
+
+        ShowPage page = MakoPages.ParseShowPage(pageJson);
+
+        Assert.Null(page.PosterUrl);
+    }
+
+    [Fact]
+    public void PosterIsNullWhenHeroPicsIsAStringInsteadOfAnArray()
+    {
+        const string pageJson = """{ "hero": { "description": "x", "pics": "not an array" } }""";
+
+        ShowPage page = MakoPages.ParseShowPage(pageJson);
+
+        Assert.Null(page.PosterUrl);
+    }
+
+    [Fact]
+    public void ThumbnailIsNullWhenAnEpisodesPicsIsAStringInsteadOfAnArray()
+    {
+        const string pageJson = """
+            {
+                "menu": [
+                    {
+                        "id": "allEpisodes",
+                        "vods": [
+                            {
+                                "componentLayout": "vod",
+                                "title": "פרק",
+                                "itemVcmId": "vcm-1",
+                                "channelId": "chan-1",
+                                "galleryChannelId": "gal-1",
+                                "pics": "not an array"
+                            }
+                        ]
+                    }
+                ]
+            }
+            """;
+
+        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(pageJson, ShowName, 1);
+
+        Assert.Null(episodes[0].ThumbnailUrl);
+    }
+
+    [Fact]
+    public void ExtraInfoAsANumberFallsBackToPositionWithNoAirDate()
+    {
+        const string pageJson = """
+            {
+                "menu": [
+                    {
+                        "id": "allEpisodes",
+                        "vods": [
+                            {
+                                "componentLayout": "vod",
+                                "title": "פרק",
+                                "itemVcmId": "vcm-1",
+                                "channelId": "chan-1",
+                                "galleryChannelId": "gal-1",
+                                "extraInfo": 5
+                            }
+                        ]
+                    }
+                ]
+            }
+            """;
+
+        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(pageJson, ShowName, 1);
+
+        Assert.Equal(1, episodes[0].Number);
+        Assert.Null(episodes[0].AirDate);
+    }
+
+    [Fact]
+    public void SeasonTitleAsANumberIsNumberedByItsPosition()
+    {
+        const string pageJson = """
+            {
+                "pageUrl": "/show/x",
+                "seasons": [{ "seasonTitle": 6, "pageUrl": "/show/s6" }]
+            }
+            """;
+
+        ShowPage page = MakoPages.ParseShowPage(pageJson);
+
+        Assert.Equal(1, page.Seasons[0].Number);
+    }
+
     private static string SingleEpisodePageJson(string extraInfo) =>
         $$"""
         {

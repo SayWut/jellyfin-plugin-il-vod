@@ -28,7 +28,7 @@ public static class MakoPages
     public static ShowPage ParseShowPage(string pageJson)
     {
         using JsonDocument document = ParseDocument(pageJson);
-        JsonElement root = document.RootElement;
+        JsonElement root = RequireObjectRoot(document.RootElement);
 
         return new ShowPage(
             Overview: TryGetNestedString(root, "hero", "description"),
@@ -40,7 +40,8 @@ public static class MakoPages
     public static IReadOnlyList<Episode> ParseEpisodes(string pageJson, string showName, int seasonNumber)
     {
         using JsonDocument document = ParseDocument(pageJson);
-        JsonElement? episodeEntries = FindEpisodesTab(document.RootElement);
+        JsonElement root = RequireObjectRoot(document.RootElement);
+        JsonElement? episodeEntries = FindEpisodesTab(root);
         if (episodeEntries is null)
         {
             return [];
@@ -63,7 +64,7 @@ public static class MakoPages
     public static bool IsCurrentSeason(string pageJson, string seasonPagePath)
     {
         using JsonDocument document = ParseDocument(pageJson);
-        JsonElement root = document.RootElement;
+        JsonElement root = RequireObjectRoot(document.RootElement);
 
         if (!TryGetArray(root, "seasons", out JsonElement seasons))
         {
@@ -74,8 +75,7 @@ public static class MakoPages
         {
             if (TryGetString(entry, "pageUrl") == seasonPagePath)
             {
-                return entry.TryGetProperty("current", out JsonElement current)
-                    && current.ValueKind == JsonValueKind.True;
+                return TryGetBoolean(entry, "current");
             }
         }
 
@@ -94,6 +94,17 @@ public static class MakoPages
         }
     }
 
+    /// <exception cref="FormatException"><paramref name="root"/> is not a JSON object.</exception>
+    private static JsonElement RequireObjectRoot(JsonElement root)
+    {
+        if (root.ValueKind != JsonValueKind.Object)
+        {
+            throw new FormatException("mako page is not a JSON object");
+        }
+
+        return root;
+    }
+
     private static IReadOnlyList<Season> ParseSeasons(JsonElement root)
     {
         if (!TryGetArray(root, "seasons", out JsonElement seasonEntries))
@@ -104,6 +115,13 @@ public static class MakoPages
         List<Season> seasons = [];
         foreach (JsonElement entry in seasonEntries.EnumerateArray())
         {
+            // mako interleaves non-season placeholders elsewhere on its pages; tolerate the
+            // same here rather than assume every array entry is a season object.
+            if (entry.ValueKind != JsonValueKind.Object)
+            {
+                continue;
+            }
+
             string? title = TryGetString(entry, "seasonTitle");
             string id = TryGetString(entry, "pageUrl") ?? string.Empty;
             int number = SeasonNumberFrom(title, position: seasons.Count + 1);
@@ -122,7 +140,7 @@ public static class MakoPages
 
         foreach (JsonElement entry in seasons.EnumerateArray())
         {
-            if (entry.TryGetProperty("current", out JsonElement current) && current.ValueKind == JsonValueKind.True)
+            if (TryGetBoolean(entry, "current"))
             {
                 return TryGetString(entry, "pageUrl");
             }
@@ -219,7 +237,7 @@ public static class MakoPages
     }
 
     private static string? PosterUrlOf(JsonElement root) =>
-        root.TryGetProperty("hero", out JsonElement hero) ? FirstStringIn(hero, "pics", "picUrl") : null;
+        TryGetObject(root, "hero", out JsonElement hero) ? FirstStringIn(hero, "pics", "picUrl") : null;
 
     private static string? FirstStringIn(JsonElement parent, string arrayName, string propertyName)
     {
@@ -234,14 +252,35 @@ public static class MakoPages
     private static string? PageUrlOf(JsonElement root) => TryGetString(root, "pageUrl");
 
     private static string? TryGetNestedString(JsonElement root, string parentName, string propertyName) =>
-        root.TryGetProperty(parentName, out JsonElement parent) ? TryGetString(parent, propertyName) : null;
+        TryGetObject(root, parentName, out JsonElement parent) ? TryGetString(parent, propertyName) : null;
 
+    // Every read of a mako page property goes through one of the four guarded accessors below:
+    // a wrongly-typed or missing property degrades to null/false/empty instead of throwing
+    // (JsonElement.TryGetProperty throws InvalidOperationException on a non-object element).
     private static string? TryGetString(JsonElement element, string propertyName) =>
         element.ValueKind == JsonValueKind.Object
         && element.TryGetProperty(propertyName, out JsonElement value)
         && value.ValueKind == JsonValueKind.String
             ? value.GetString()
             : null;
+
+    private static bool TryGetBoolean(JsonElement element, string propertyName) =>
+        element.ValueKind == JsonValueKind.Object
+        && element.TryGetProperty(propertyName, out JsonElement value)
+        && value.ValueKind == JsonValueKind.True;
+
+    private static bool TryGetObject(JsonElement element, string propertyName, out JsonElement value)
+    {
+        if (element.ValueKind == JsonValueKind.Object
+            && element.TryGetProperty(propertyName, out value)
+            && value.ValueKind == JsonValueKind.Object)
+        {
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
 
     private static bool TryGetArray(JsonElement element, string propertyName, out JsonElement array)
     {
