@@ -1,5 +1,6 @@
 using Jellyfin.Plugin.Mako.Browsing;
 using Jellyfin.Plugin.Mako.Catalog;
+using Jellyfin.Plugin.Mako.MakoApi;
 using Jellyfin.Plugin.Mako.Model;
 using Jellyfin.Plugin.Mako.Transcoding;
 using MediaBrowser.Controller.Channels;
@@ -18,7 +19,7 @@ namespace Jellyfin.Plugin.Mako;
 public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
 {
     private const string ChannelName = "mako";
-    private const string ContentVersion = "3";
+    private const string ContentVersion = "4";
     private const string ChannelDescription = "mako 12+ VOD, fetched on demand.";
     private const string ChannelHomePageUrl = "https://www.mako.co.il/mako-vod";
 
@@ -63,13 +64,26 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
         FolderId? folder = TryParseFolderId(query.FolderId);
         if (folder is null)
         {
-            return new ChannelItemResult { Items = [], TotalRecordCount = 0 };
+            return EmptyResult();
         }
 
         _logger.LogInformation("mako: folder opened: {FolderKind} '{FolderValue}'", folder.Kind, folder.Value);
 
-        List<ChannelItemInfo> items = await ItemsInside(folder, cancellationToken).ConfigureAwait(false);
-        return new ChannelItemResult { Items = items, TotalRecordCount = items.Count };
+        try
+        {
+            List<ChannelItemInfo> items = await ItemsInside(folder, cancellationToken).ConfigureAwait(false);
+            return new ChannelItemResult { Items = items, TotalRecordCount = items.Count };
+        }
+        catch (Exception exception) when (exception is BotChallengeException or MakoRequestException)
+        {
+            // Jellyfin 12.1 does not catch this itself: an uncaught exception here would turn
+            // opening a folder into an HTTP 500 in the Channels view instead of an empty one.
+            // exception.Message is itself the reason (already scrubbed of any query string, per
+            // N3, by BotChallengeException/MakoRequestException/MakoUrls.RedactedUrl).
+            _logger.LogWarning(
+                exception, "mako: could not open {FolderKind} '{FolderValue}': {Reason}; showing an empty view", folder.Kind, folder.Value, exception.Message);
+            return EmptyResult();
+        }
     }
 
     public async Task<IEnumerable<MediaSourceInfo>> GetChannelItemMediaInfo(string id, CancellationToken cancellationToken)
@@ -93,6 +107,8 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
             _logger.LogWarning(ProbeSizeLimiterNotInstalledWarning);
         }
     }
+
+    private static ChannelItemResult EmptyResult() => new() { Items = [], TotalRecordCount = 0 };
 
     private FolderId? TryParseFolderId(string? rawFolderId)
     {

@@ -3,8 +3,8 @@
 A Jellyfin Channel plugin that shows mako 12+ VOD inside Jellyfin. It fetches only what a
 user opens or plays — nothing is downloaded, synced or crawled. Separate from `stack/`.
 
-Status: **step A prototype** — two hard-coded shows, no mako calls. See `docs/spec.md` for
-the design and `docs/plan.md` for the tasks.
+Status: **step B** — a live catalogue for one pinned mako show, fetched on demand. See
+`docs/spec.md` for the design and `docs/plan-step-b.md` for the tasks.
 
 ## Build
 
@@ -20,19 +20,30 @@ Needs the .NET 10 SDK.
 Copies the plugin into `~/config/jellyfin/plugins/Mako_0.1.0.0/`, asks before restarting
 Jellyfin, and prints the plugin's status (Active / NotSupported / Malfunctioned).
 
-## Test a stream (step A)
+## Set the pinned show
 
-1. Sign a URL: `python3 mako12_vod.py "שמש" --episode 1 --resolve` and copy `masterM3U8`.
-2. Dashboard → Plugins → Mako → paste it into **Test stream URL** → Save.
-3. Press play on any test episode within a few minutes.
-4. Check 5 is run twice: once with **Test stream container** left empty (Jellyfin decides),
-   once with it set to `hls` (forces the HLS-manifest path — Jellyfin 12.1 never plays this
-   directly).
-5. Jellyfin caches the resolved stream per episode for 5 minutes. After pasting a new URL,
-   play a *different* episode (there are six) or wait 5 minutes — replaying the same one
-   reuses the old URL.
-6. Jellyfin caches channel folders for 3 hours; after redeploying a changed catalogue, bump
-   `ContentVersion` in `MakoChannel.cs` or wait.
+Dashboard → Plugins → Mako has three settings:
+
+- **Pinned show path** — mako's own page path for the show this channel shows, e.g.
+  `/mako-vod-keshet/shemesh` (the default). Find it from the show's URL on
+  `www.mako.co.il/mako-vod-...`.
+- **Pinned show name** — the name shown for the show. mako's own show page carries no
+  reliable title of its own.
+- **App version** — the app version reported to mako, matching what mako's own Android app
+  sends.
+
+The four cache lifetimes (show page, past season, current season, resolved stream link) are
+config-file-only (spec §5.3) — there is no settings-page control for them, since changing
+them is rare enough not to need one.
+
+mako's page text (and its own config files) are cached to `mako-cache.json` in the plugin's
+data folder, so a Jellyfin restart does not cause a wave of refetches; delete that file to
+force everything to be refetched. A resolved stream link is never written to it, or anywhere
+else on disk (N3) — it lives in memory for 5 minutes only.
+
+Jellyfin caches channel folders for 3 hours on its own; after redeploying a change that
+alters what an episode item carries, bump `ContentVersion` in `MakoChannel.cs` (and, if the
+item's own shape changed, `ChannelItemMapper.EpisodeShapeRevision`) or wait.
 
 ## Remove
 

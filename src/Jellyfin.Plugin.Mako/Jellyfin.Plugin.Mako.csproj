@@ -29,4 +29,10 @@
     <EmbeddedResource Include="Configuration\configPage.html" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Lets the test project build/resolve the DI graph (AddMakoServices) and its two named
+         cache wrapper types without making any of it a public plugin API. -->
+    <InternalsVisibleTo Include="Jellyfin.Plugin.Mako.Tests" />
+  </ItemGroup>
+
 </Project>

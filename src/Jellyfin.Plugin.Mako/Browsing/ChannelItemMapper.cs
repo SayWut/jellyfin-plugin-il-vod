@@ -21,7 +21,7 @@ public static class ChannelItemMapper
     /// holds only when this is newer than its copy, so bump it whenever <see cref="ToPlayable"/>
     /// starts sending something Jellyfin must persist (last: the placeholder source path).
     /// </summary>
-    public static readonly DateTime EpisodeShapeRevision = new(2026, 9, 22, 0, 0, 0, DateTimeKind.Utc);
+    public static readonly DateTime EpisodeShapeRevision = new(2026, 9, 23, 0, 0, 0, DateTimeKind.Utc);
 
     public static ChannelItemInfo ToFolder(Show show) => new()
     {
@@ -56,6 +56,7 @@ public static class ChannelItemMapper
         PremiereDate = episode.AirDate,
         RunTimeTicks = episode.Duration?.Ticks,
         DateModified = EpisodeShapeRevision,
+        ImageUrl = episode.ThumbnailUrl,
         MediaSources = [MediaSourceFactory.CreatePlaceholder(episode.Id)],
     };
 }

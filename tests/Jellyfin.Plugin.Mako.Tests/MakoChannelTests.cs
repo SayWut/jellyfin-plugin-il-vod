@@ -1,4 +1,7 @@
 using Jellyfin.Plugin.Mako.Catalog;
+using Jellyfin.Plugin.Mako.MakoApi;
+using Jellyfin.Plugin.Mako.Model;
+using Jellyfin.Plugin.Mako.Tests.Support;
 using Jellyfin.Plugin.Mako.Tests.Transcoding;
 using Jellyfin.Plugin.Mako.Transcoding;
 using MediaBrowser.Controller.Channels;
@@ -10,11 +13,12 @@ namespace Jellyfin.Plugin.Mako.Tests;
 [Collection(ProbeSizeLimiterStatusCollection.Name)]
 public class MakoChannelTests
 {
-    private const string PastedUrl = "https://example.test/master.m3u8";
-    private const string PastedContainer = "hls";
+    private const string ResolvedUrl = "https://example.test/master.m3u8";
+    private const string ResolvedContainer = "hls";
 
-    private static MakoChannel ChannelOverStaticCatalog()
-        => new(new StaticCatalog(() => PastedUrl, () => PastedContainer), NullLogger<MakoChannel>.Instance);
+    private static readonly StreamLink ResolvedLink = new(ResolvedUrl, ResolvedContainer, StreamDescription.MakoDefault);
+
+    private static MakoChannel ChannelOver(FakeCatalog catalog) => new(catalog, NullLogger<MakoChannel>.Instance);
 
     private static Task<ChannelItemResult> Open(MakoChannel channel, string? folderId)
         => channel.GetChannelItems(new InternalChannelItemQuery { FolderId = folderId }, CancellationToken.None);
@@ -22,7 +26,7 @@ public class MakoChannelTests
     [Fact]
     public async Task OpeningTheChannelListsTheShowsAsFolders()
     {
-        ChannelItemResult result = await Open(ChannelOverStaticCatalog(), folderId: null);
+        ChannelItemResult result = await Open(ChannelOver(new FakeCatalog()), folderId: null);
 
         Assert.Equal(2, result.Items.Count);
         Assert.Equal(2, result.TotalRecordCount);
@@ -33,7 +37,7 @@ public class MakoChannelTests
     [Fact]
     public async Task OpeningAShowListsItsSeasons()
     {
-        ChannelItemResult result = await Open(ChannelOverStaticCatalog(), "series|shemesh");
+        ChannelItemResult result = await Open(ChannelOver(new FakeCatalog()), "series|shemesh");
 
         Assert.Equal(new[] { "series-season|shemesh-s1", "series-season|shemesh-s2" }, result.Items.Select(item => item.Id));
     }
@@ -41,7 +45,7 @@ public class MakoChannelTests
     [Fact]
     public async Task OpeningASeasonListsItsPlayableEpisodes()
     {
-        ChannelItemResult result = await Open(ChannelOverStaticCatalog(), "series-season|shemesh-s1");
+        ChannelItemResult result = await Open(ChannelOver(new FakeCatalog()), "series-season|shemesh-s1");
 
         Assert.Equal(3, result.Items.Count);
         Assert.All(result.Items, item => Assert.Equal(ChannelItemType.Media, item.Type));
@@ -50,11 +54,12 @@ public class MakoChannelTests
     [Fact]
     public async Task PressingPlayResolvesTheStreamAtThatMoment()
     {
-        IEnumerable<MediaSourceInfo> sources = await ChannelOverStaticCatalog()
-            .GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
+        FakeCatalog catalog = new() { StreamLink = ResolvedLink };
+
+        IEnumerable<MediaSourceInfo> sources = await ChannelOver(catalog).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
 
         MediaSourceInfo source = Assert.Single(sources);
-        Assert.Equal(PastedUrl, source.Path);
+        Assert.Equal(ResolvedUrl, source.Path);
     }
 
     [Fact]
@@ -70,21 +75,48 @@ public class MakoChannelTests
     }
 
     [Fact]
-    public async Task PressingPlayWithNoPastedUrlThrowsStreamUnavailable()
+    public async Task PressingPlayWithNoResolvableStreamPropagatesStreamUnavailable()
     {
-        var channel = new MakoChannel(new StaticCatalog(() => string.Empty, () => PastedContainer), NullLogger<MakoChannel>.Instance);
+        FakeCatalog catalog = new() { StreamLinkFailure = new StreamUnavailableException("no stream available") };
 
         await Assert.ThrowsAsync<StreamUnavailableException>(
-            () => channel.GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None));
+            () => ChannelOver(catalog).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None));
     }
 
     [Fact]
     public async Task OpeningAFolderWithAGarbageIdReturnsAnEmptyResultInsteadOfThrowing()
     {
-        ChannelItemResult result = await Open(ChannelOverStaticCatalog(), "garbage");
+        ChannelItemResult result = await Open(ChannelOver(new FakeCatalog()), "garbage");
 
         Assert.Empty(result.Items);
         Assert.Equal(0, result.TotalRecordCount);
+    }
+
+    [Fact]
+    public async Task ABotChallengeWhileBrowsingShowsAnEmptyFolderInsteadOfFailing()
+    {
+        FakeCatalog catalog = new() { BrowseFailure = new BotChallengeException("https://www.mako.co.il/mako-vod/shemesh?query=secret") };
+        var logger = new RecordingLogger<MakoChannel>();
+
+        ChannelItemResult result = await Open(new MakoChannel(catalog, logger), folderId: null);
+
+        Assert.Empty(result.Items);
+        Assert.Equal(0, result.TotalRecordCount);
+        Assert.Contains(logger.Warnings, message => message.Contains("bot challenge", StringComparison.OrdinalIgnoreCase));
+        Assert.DoesNotContain(logger.Lines, line => line.Contains("query=secret", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task AMakoRequestFailureWhileBrowsingAShowShowsAnEmptyFolderInsteadOfFailing()
+    {
+        FakeCatalog catalog = new() { BrowseFailure = new MakoRequestException("HTTP 500 for www.mako.co.il/mako-vod/shemesh") };
+        var logger = new RecordingLogger<MakoChannel>();
+
+        ChannelItemResult result = await Open(new MakoChannel(catalog, logger), "series|shemesh");
+
+        Assert.Empty(result.Items);
+        Assert.Equal(0, result.TotalRecordCount);
+        Assert.NotEmpty(logger.Warnings);
     }
 
     [Fact]
@@ -95,9 +127,9 @@ public class MakoChannelTests
         try
         {
             var logger = new RecordingLogger<MakoChannel>();
-            var channel = new MakoChannel(new StaticCatalog(() => PastedUrl, () => PastedContainer), logger);
+            FakeCatalog catalog = new() { StreamLink = ResolvedLink };
 
-            await channel.GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
+            await new MakoChannel(catalog, logger).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
 
             Assert.Contains(logger.Warnings, message => message.Contains("NOT installed", StringComparison.Ordinal));
         }
@@ -115,9 +147,9 @@ public class MakoChannelTests
         try
         {
             var logger = new RecordingLogger<MakoChannel>();
-            var channel = new MakoChannel(new StaticCatalog(() => PastedUrl, () => PastedContainer), logger);
+            FakeCatalog catalog = new() { StreamLink = ResolvedLink };
 
-            await channel.GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
+            await new MakoChannel(catalog, logger).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
 
             Assert.Empty(logger.Warnings);
         }

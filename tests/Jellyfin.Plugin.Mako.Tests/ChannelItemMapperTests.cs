@@ -100,4 +100,21 @@ public class ChannelItemMapperTests
 
         Assert.Equal(ChannelItemMapper.EpisodeShapeRevision, item.DateModified);
     }
+
+    [Fact]
+    public void TheShapeRevisionIsPinnedToTheStepBIdAndThumbnailChange()
+    {
+        Assert.Equal(new DateTime(2026, 9, 23, 0, 0, 0, DateTimeKind.Utc), ChannelItemMapper.EpisodeShapeRevision);
+    }
+
+    [Fact]
+    public void EpisodeCarriesItsThumbnailUrlAsTheImageUrl()
+    {
+        var episode = new Episode(
+            "shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", AirDate: null, Duration: null, ThumbnailUrl: "https://img.test/thumb.jpg");
+
+        ChannelItemInfo item = ChannelItemMapper.ToPlayable(episode);
+
+        Assert.Equal("https://img.test/thumb.jpg", item.ImageUrl);
+    }
 }
