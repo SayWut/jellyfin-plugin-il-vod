@@ -57,11 +57,7 @@ public sealed class TimedCache
             string json = File.ReadAllText(path);
             return JsonSerializer.Deserialize<Dictionary<string, CacheEntry>>(json) ?? [];
         }
-        catch (JsonException)
-        {
-            return [];
-        }
-        catch (IOException)
+        catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
         {
             return [];
         }
@@ -75,8 +71,33 @@ public sealed class TimedCache
         }
 
         string temporaryPath = $"{_persistencePath}.tmp";
-        File.WriteAllText(temporaryPath, JsonSerializer.Serialize(_entries));
-        File.Move(temporaryPath, _persistencePath, overwrite: true);
+        try
+        {
+            File.WriteAllText(temporaryPath, JsonSerializer.Serialize(_entries));
+            File.Move(temporaryPath, _persistencePath, overwrite: true);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            // An unwritable cache path must never take the caller down with it; the value just
+            // written is still there in memory for this process's lifetime.
+            DeleteIfExists(temporaryPath);
+        }
+    }
+
+    private static void DeleteIfExists(string path)
+    {
+        try
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            // Best-effort tidy-up only: the same unwritable location that failed the write is
+            // free to fail this too.
+        }
     }
 
     private readonly record struct CacheEntry(string Value, DateTimeOffset ExpiresAt);

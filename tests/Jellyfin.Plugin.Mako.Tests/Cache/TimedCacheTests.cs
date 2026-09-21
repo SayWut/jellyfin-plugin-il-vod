@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using Jellyfin.Plugin.Mako.Cache;
 using Jellyfin.Plugin.Mako.Tests.Support;
 
@@ -99,12 +100,68 @@ public class TimedCacheTests : IDisposable
     }
 
     [Fact]
-    public void MemoryOnlyCacheWritesNoFile()
+    public void AMemoryOnlyCacheRoundTripsWithinItself()
     {
         TimedCache cache = new(new FakeClock());
 
         cache.Write("show:shemesh", "page-body", TimeSpan.FromHours(12));
+        CacheRead read = cache.Read("show:shemesh");
 
-        Assert.False(File.Exists(_persistencePath));
+        Assert.True(read.IsFresh);
+        Assert.Equal("page-body", read.Value);
+    }
+
+    [Fact]
+    public void ASecondMemoryOnlyCacheDoesNotSeeTheFirstsWrites()
+    {
+        FakeClock clock = new();
+        TimedCache first = new(clock);
+        first.Write("show:shemesh", "page-body", TimeSpan.FromHours(12));
+
+        TimedCache second = new(clock);
+        CacheRead read = second.Read("show:shemesh");
+
+        Assert.False(read.HasValue);
+    }
+
+    [Fact]
+    [SupportedOSPlatform("linux")]
+    public void AnUnreadablePersistenceFileMeansAnEmptyCache()
+    {
+        File.WriteAllText(_persistencePath, "{}");
+        File.SetUnixFileMode(_persistencePath, UnixFileMode.None);
+
+        TimedCache cache = new(new FakeClock(), _persistencePath);
+        CacheRead read = cache.Read("show:shemesh");
+
+        Assert.False(read.HasValue);
+
+        // Restore permissions so the fixture's Dispose() can delete the file.
+        File.SetUnixFileMode(_persistencePath, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+    }
+
+    [Fact]
+    public void WritingToAnUnwritablePersistenceLocationDoesNotThrowAndKeepsTheValueInMemory()
+    {
+        // A directory can never be replaced by a file, so writing here always fails on disk —
+        // without ever throwing out of Write(), and without losing the value from memory.
+        string directoryAsPersistencePath = Directory.CreateTempSubdirectory().FullName;
+        TimedCache cache = new(new FakeClock(), directoryAsPersistencePath);
+
+        cache.Write("show:shemesh", "page-body", TimeSpan.FromHours(12));
+        CacheRead read = cache.Read("show:shemesh");
+
+        Assert.True(read.IsFresh);
+        Assert.Equal("page-body", read.Value);
+
+        // The .tmp file may or may not remain, depending on how far the failed write got;
+        // either way is fine, this only tidies up after the test.
+        string leftoverTemporaryFile = $"{directoryAsPersistencePath}.tmp";
+        if (File.Exists(leftoverTemporaryFile))
+        {
+            File.Delete(leftoverTemporaryFile);
+        }
+
+        Directory.Delete(directoryAsPersistencePath);
     }
 }
