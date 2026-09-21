@@ -7,4 +7,5 @@ public sealed record Episode(
     int Number,
     string Name,
     DateTime? AirDate,
-    TimeSpan? Duration);
+    TimeSpan? Duration,
+    string? ThumbnailUrl);

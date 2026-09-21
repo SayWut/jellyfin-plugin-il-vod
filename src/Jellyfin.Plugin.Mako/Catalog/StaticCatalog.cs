@@ -86,6 +86,7 @@ public sealed class StaticCatalog : ICatalog
                 number,
                 $"פרק בדיקה {number}",
                 AirDate: null,
-                Duration: TestEpisodeDuration))
+                Duration: TestEpisodeDuration,
+                ThumbnailUrl: null))
             .ToList();
 }

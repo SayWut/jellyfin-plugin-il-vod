@@ -41,7 +41,7 @@ public class ChannelItemMapperTests
     public void EpisodeBecomesAPlayableVideoWithSeasonAndEpisodeNumbers()
     {
         var airDate = new DateTime(1997, 12, 25, 0, 0, 0, DateTimeKind.Utc);
-        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", airDate, TimeSpan.FromMinutes(25));
+        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", airDate, TimeSpan.FromMinutes(25), ThumbnailUrl: null);
 
         ChannelItemInfo item = ChannelItemMapper.ToPlayable(episode);
 
@@ -60,7 +60,7 @@ public class ChannelItemMapperTests
     [Fact]
     public void EpisodeWithNoDurationHasNoRunTimeTicks()
     {
-        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", AirDate: null, Duration: null);
+        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", AirDate: null, Duration: null, ThumbnailUrl: null);
 
         ChannelItemInfo item = ChannelItemMapper.ToPlayable(episode);
 
@@ -70,7 +70,7 @@ public class ChannelItemMapperTests
     [Fact]
     public void EpisodeCarriesAPlaceholderFilePathSoClientsSeeItAsOnDisk()
     {
-        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", AirDate: null, Duration: null);
+        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", AirDate: null, Duration: null, ThumbnailUrl: null);
 
         ChannelItemInfo item = ChannelItemMapper.ToPlayable(episode);
 
@@ -94,7 +94,7 @@ public class ChannelItemMapperTests
     [Fact]
     public void EpisodeIsStampedWithTheShapeRevisionSoJellyfinReSavesOlderCopies()
     {
-        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", AirDate: null, Duration: null);
+        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", AirDate: null, Duration: null, ThumbnailUrl: null);
 
         ChannelItemInfo item = ChannelItemMapper.ToPlayable(episode);
 
