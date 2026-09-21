@@ -19,8 +19,9 @@ tasks.
 
 ## Where things stand
 
-Design approved 2026-09-20. Step A (static plugin) is being built. Step B (live
-mako calls) has no plan yet — it is written after the step A gate in task A8.
+Design approved 2026-09-20. **Step A passed its gate on 2026-09-21: the static plugin
+browses and plays on web, Android TV and Fladder** (`docs/step-a-results.md`). Step B
+(live mako calls) is next and has no plan yet.
 
 ## Step A — static plugin
 
@@ -33,7 +34,7 @@ mako calls) has no plan yet — it is written after the step A gate in task A8.
 | A5 | The channel | agent | `done` | MakoChannel implements IChannel + IRequiresMediaInfoCallback (not ISupportsLatestMedia); folders on open, stream on play. All 26 tests passing. |
 | A6 | Plugin identity, the one setting, and wiring | agent | `done` | Plugin, PluginConfiguration, PluginServiceRegistrator, configPage.html and build.yaml added; settings page embedded and DI wiring registers ICatalog/IChannel. All 28 tests passing. |
 | A7 | Build, install and uninstall scripts, and the README | agent | `done` | `scripts/build.sh` verified: `artifacts/Mako_0.1.0.0/` contains exactly `Jellyfin.Plugin.Mako.dll` and a valid `meta.json`, no stray `MediaBrowser.*`/`Jellyfin.*` dlls; `artifacts/` confirmed git-ignored. `install.sh`/`uninstall.sh` only syntax-checked (`bash -n`), never run — they touch the phone, which is task A8. `dotnet test` still 28/28. |
-| A8 | Install on the phone, run the step A checks, decide the gate | agent + user | `wip` | Changes the running server: one plugin folder, one Jellyfin restart. Needs the user's go-ahead and the user at the three apps. |
+| A8 | Install on the phone, run the step A checks, decide the gate | agent + user | `done` | Changes the running server: one plugin folder, one Jellyfin restart. Needs the user's go-ahead and the user at the three apps. |
 | A9 | Limit ffmpeg probe size for mako streams only | agent | `done` | `Transcoding/ProbeSizeLimiter.cs` (pure string rewrite), `MediaSourceFactory.IsMakoSource`, `Transcoding/ProbeSizeLimitingTranscodeManager.cs` (decorates `ITranscodeManager`, fails open) and `Transcoding/TranscodeManagerDecoration.cs` (installs it, fails safe if Core's registration isn't the expected shape) added and wired from `PluginServiceRegistrator`. TDD: 15 new tests added (55/55 total), `StreamState` constructed directly in tests (real ctor, nulls for the two collaborators, `MediaSource` set — verified against the real 12.1.0 assembly by reflection). **Fix round 1** (review): fail-open path now has a test; `Apply` returns `bool` and records the outcome in `Transcoding/ProbeSizeLimiterStatus.IsInstalled`, which `MakoChannel` checks on every play and logs a warning when false (`ProbeSizeLimitingTranscodeManager`'s constructor logs an information line when it installs successfully); `IsMakoSource` now also requires `Protocol == Http` and `IsRemote` so a local file named "mako" cannot match; `Apply` preserves the original registration's `ServiceLifetime`; `Dispose()` is idempotent; 9 more tests added (64/64 total, including "last of two type registrations wins" and "disposing the container disposes the container-built inner"). Awaits the live retest on the phone (task A8's OPEN item). |
 
 ## Step B — live mako under one pinned show
