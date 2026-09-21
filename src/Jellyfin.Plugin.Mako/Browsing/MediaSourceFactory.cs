@@ -28,6 +28,11 @@ public static class MediaSourceFactory
     // streams is analysed for up to 200 seconds before ffmpeg outputs anything.
     private const int AnalyzeDurationMilliseconds = 3000;
 
+    // A directory that does not exist: Jellyfin judges "on disk" from the text of a path
+    // and never opens it, and nothing must ever be found there.
+    private const string PlaceholderDirectory = "/nonexistent/jellyfin-plugin-mako";
+    private const string PlaceholderExtension = ".mkv";
+
     // Id is left unset on purpose: Jellyfin assigns the item's own GUID, and its HLS
     // endpoint parses the media source id as a GUID. Any other value breaks playback.
     public static MediaSourceInfo Create(StreamLink link) => new()
@@ -45,6 +50,21 @@ public static class MediaSourceFactory
         RequiresOpening = false,
         AnalyzeDurationMs = AnalyzeDurationMilliseconds,
         MediaStreams = DescribeStreams(),
+    };
+
+    /// <summary>
+    /// A stand-in source given to Jellyfin at browse time. Its file-like path makes Jellyfin
+    /// report the episode as being on disk, which some clients (Fladder) require before they
+    /// allow playback. Because it is a <see cref="MediaSourceType.Placeholder"/>, Jellyfin
+    /// neither probes it nor offers it to clients: at play time they only ever receive the
+    /// real stream from <see cref="Create"/>.
+    /// </summary>
+    public static MediaSourceInfo CreatePlaceholder(string episodeId) => new()
+    {
+        Path = $"{PlaceholderDirectory}/{episodeId}{PlaceholderExtension}",
+        Protocol = MediaProtocol.File,
+        Type = MediaSourceType.Placeholder,
+        IsRemote = false,
     };
 
     /// <summary>

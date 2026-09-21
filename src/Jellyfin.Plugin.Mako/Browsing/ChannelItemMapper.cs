@@ -16,6 +16,13 @@ public static class ChannelItemMapper
     private const ChannelFolderType ShowFolder = ChannelFolderType.Series;
     private const ChannelFolderType SeasonFolder = ChannelFolderType.Season;
 
+    /// <summary>
+    /// When the shape of an episode item last changed. Jellyfin re-saves an item it already
+    /// holds only when this is newer than its copy, so bump it whenever <see cref="ToPlayable"/>
+    /// starts sending something Jellyfin must persist (last: the placeholder source path).
+    /// </summary>
+    public static readonly DateTime EpisodeShapeRevision = new(2026, 9, 22, 0, 0, 0, DateTimeKind.Utc);
+
     public static ChannelItemInfo ToFolder(Show show) => new()
     {
         Id = FolderId.ForShow(show.Id).ToString(),
@@ -48,5 +55,7 @@ public static class ChannelItemMapper
         IndexNumber = episode.Number,
         PremiereDate = episode.AirDate,
         RunTimeTicks = episode.Duration?.Ticks,
+        DateModified = EpisodeShapeRevision,
+        MediaSources = [MediaSourceFactory.CreatePlaceholder(episode.Id)],
     };
 }

@@ -2,6 +2,8 @@ using Jellyfin.Plugin.Mako.Browsing;
 using Jellyfin.Plugin.Mako.Model;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Model.Channels;
+using MediaBrowser.Model.Dto;
+using MediaBrowser.Model.MediaInfo;
 
 namespace Jellyfin.Plugin.Mako.Tests;
 
@@ -63,5 +65,39 @@ public class ChannelItemMapperTests
         ChannelItemInfo item = ChannelItemMapper.ToPlayable(episode);
 
         Assert.Null(item.RunTimeTicks);
+    }
+
+    [Fact]
+    public void EpisodeCarriesAPlaceholderFilePathSoClientsSeeItAsOnDisk()
+    {
+        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", AirDate: null, Duration: null);
+
+        ChannelItemInfo item = ChannelItemMapper.ToPlayable(episode);
+
+        MediaSourceInfo placeholder = Assert.Single(item.MediaSources);
+        Assert.Equal(MediaSourceType.Placeholder, placeholder.Type);
+        Assert.Equal(MediaProtocol.File, placeholder.Protocol);
+        Assert.False(placeholder.IsRemote);
+        Assert.DoesNotContain("://", placeholder.Path, StringComparison.Ordinal);
+        Assert.EndsWith("shemesh-s1-e1.mkv", placeholder.Path, StringComparison.Ordinal);
+        Assert.False(File.Exists(placeholder.Path));
+    }
+
+    [Fact]
+    public void PlaceholderIsNeverMistakenForAMakoStream()
+    {
+        MediaSourceInfo placeholder = MediaSourceFactory.CreatePlaceholder("shemesh-s1-e1");
+
+        Assert.False(MediaSourceFactory.IsMakoSource(placeholder));
+    }
+
+    [Fact]
+    public void EpisodeIsStampedWithTheShapeRevisionSoJellyfinReSavesOlderCopies()
+    {
+        var episode = new Episode("shemesh-s1-e1", "שמש", 1, 1, "שמש בעל הנס", AirDate: null, Duration: null);
+
+        ChannelItemInfo item = ChannelItemMapper.ToPlayable(episode);
+
+        Assert.Equal(ChannelItemMapper.EpisodeShapeRevision, item.DateModified);
     }
 }

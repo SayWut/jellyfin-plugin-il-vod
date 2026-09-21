@@ -18,7 +18,7 @@ namespace Jellyfin.Plugin.Mako;
 public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
 {
     private const string ChannelName = "mako";
-    private const string ContentVersion = "2";
+    private const string ContentVersion = "3";
     private const string ChannelDescription = "mako 12+ VOD, fetched on demand.";
     private const string ChannelHomePageUrl = "https://www.mako.co.il/mako-vod";
 

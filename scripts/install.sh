@@ -10,6 +10,8 @@ REMOTE_PLUGINS_RELATIVE='config/jellyfin/plugins'
 REMOTE_PLUGINS_DIR='$HOME/'"$REMOTE_PLUGINS_RELATIVE"
 JELLYFIN_URL='http://localhost:8096'
 STARTUP_TIMEOUT_SECONDS=300
+STATUS_QUERY_RETRIES=6
+STATUS_QUERY_RETRY_DELAY_SECONDS=5
 
 HOST="${SSH_HOST:?set SSH_HOST (see oneplus-ssh.personal.md)}"
 USER_="${SSH_USER:?set SSH_USER (see oneplus-ssh.personal.md)}"
@@ -52,7 +54,10 @@ MAKO_STATUS_QUERY='.[] | select(.Name == "Mako") | "\(.Name) \(.Version): \(.Sta
 if ! plugin_status=$("${SSH[@]}" "
     set -o pipefail
     . \"\$HOME/stack.env\"; . \"\$HOME/stack/lib/api.sh\"
-    curl -sS -f -m 20 -H \"\$(jellyfin_auth \"\$JELLYFIN_KEY\")\" \"$JELLYFIN_URL/Plugins\" \
+    # While starting, Jellyfin briefly serves a startup page and then replaces that listener
+    # with the real one, so the API can refuse connections for a moment after first answering.
+    curl -sS -f -m 20 --retry $STATUS_QUERY_RETRIES --retry-delay $STATUS_QUERY_RETRY_DELAY_SECONDS --retry-all-errors \
+        -H \"\$(jellyfin_auth \"\$JELLYFIN_KEY\")\" \"$JELLYFIN_URL/Plugins\" \
         | jq -r '$MAKO_STATUS_QUERY'
 "); then
     echo "Could not read /Plugins from Jellyfin (is JELLYFIN_KEY valid?)." >&2
