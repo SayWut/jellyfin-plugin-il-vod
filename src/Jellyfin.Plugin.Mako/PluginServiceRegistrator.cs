@@ -86,7 +86,12 @@ internal static class MakoServiceCollectionExtensions
             () => PinnedShowFrom(configuration()),
             () => CacheLifetimesFrom(configuration())));
 
-        services.AddSingleton<IChannel, MakoChannel>();
+        // Lazy, not ICatalog: Jellyfin constructs every IChannel before any plugin instance
+        // exists (see MakoChannel's own remarks), and building the catalogue reads the data
+        // folder and the configuration — both of which throw until Plugin.Instance is set.
+        services.AddSingleton<IChannel>(provider => new MakoChannel(
+            new Lazy<ICatalog>(provider.GetRequiredService<ICatalog>),
+            provider.GetRequiredService<ILogger<MakoChannel>>()));
     }
 
     /// <summary>

@@ -14,8 +14,18 @@ namespace Jellyfin.Plugin.Mako;
 
 /// <summary>
 /// The mako channel as Jellyfin sees it. Jellyfin calls in only when a user opens a folder
-/// or presses play; this class never does work on its own.
+/// or presses play; this class never does work on its own — not even in its constructor.
 /// </summary>
+/// <remarks>
+/// Jellyfin 12.1 constructs every <see cref="IChannel"/> while the server is still starting and
+/// long before any plugin instance exists: <c>ApplicationHost.InitializeServices</c> calls
+/// <c>SetStaticProperties</c>, which resolves <c>IChannelManager</c>, whose constructor
+/// materialises <c>IEnumerable&lt;IChannel&gt;</c> — all of it before <c>FindParts</c> calls
+/// <c>CreatePlugins</c> and <c>Plugin.Instance</c> is set. An exception from here does not
+/// disable the plugin; it stops the server from booting. That is why the catalogue arrives as a
+/// <see cref="Lazy{T}"/>: building it reads the plugin's data folder and configuration, so it may
+/// only happen on the first user action, never at construction.
+/// </remarks>
 public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
 {
     private const string ChannelName = "mako";
@@ -26,10 +36,10 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
     private const string ProbeSizeLimiterNotInstalledWarning =
         "mako: the ffmpeg probe-size limiter is NOT installed (Jellyfin's ITranscodeManager registration changed); playback will likely fail";
 
-    private readonly ICatalog _catalog;
+    private readonly Lazy<ICatalog> _catalog;
     private readonly ILogger<MakoChannel> _logger;
 
-    public MakoChannel(ICatalog catalog, ILogger<MakoChannel> logger)
+    public MakoChannel(Lazy<ICatalog> catalog, ILogger<MakoChannel> logger)
     {
         _catalog = catalog;
         _logger = logger;
@@ -91,7 +101,7 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
         _logger.LogInformation("mako: play pressed: '{EpisodeId}'", id);
         WarnIfProbeSizeLimiterIsNotInstalled();
 
-        StreamLink link = await _catalog.GetStreamLinkAsync(id, cancellationToken).ConfigureAwait(false);
+        StreamLink link = await _catalog.Value.GetStreamLinkAsync(id, cancellationToken).ConfigureAwait(false);
         return [MediaSourceFactory.Create(link)];
     }
 
@@ -125,18 +135,19 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
 
     private async Task<List<ChannelItemInfo>> ItemsInside(FolderId folder, CancellationToken cancellationToken)
     {
+        ICatalog catalog = _catalog.Value;
         switch (folder.Kind)
         {
             case FolderKind.Root:
-                IReadOnlyList<Show> shows = await _catalog.GetShowsAsync(cancellationToken).ConfigureAwait(false);
+                IReadOnlyList<Show> shows = await catalog.GetShowsAsync(cancellationToken).ConfigureAwait(false);
                 return shows.Select(ChannelItemMapper.ToFolder).ToList();
 
             case FolderKind.Show:
-                IReadOnlyList<Season> seasons = await _catalog.GetSeasonsAsync(folder.Value, cancellationToken).ConfigureAwait(false);
+                IReadOnlyList<Season> seasons = await catalog.GetSeasonsAsync(folder.Value, cancellationToken).ConfigureAwait(false);
                 return seasons.Select(ChannelItemMapper.ToFolder).ToList();
 
             case FolderKind.Season:
-                IReadOnlyList<Episode> episodes = await _catalog.GetEpisodesAsync(folder.Value, cancellationToken).ConfigureAwait(false);
+                IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync(folder.Value, cancellationToken).ConfigureAwait(false);
                 return episodes.Select(ChannelItemMapper.ToPlayable).ToList();
 
             default:

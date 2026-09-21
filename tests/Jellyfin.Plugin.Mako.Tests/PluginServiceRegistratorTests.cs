@@ -62,11 +62,88 @@ public sealed class PluginServiceRegistratorTests
         Assert.True(File.Exists(Path.Combine(dataFolder.Path, "mako-cache.json")));
     }
 
+    /// <summary>
+    /// What Jellyfin 12.1 itself does at startup, reproduced exactly: <c>ApplicationHost</c>'s
+    /// <c>SetStaticProperties</c> resolves <c>IChannelManager</c>, whose <c>ChannelManager</c>
+    /// constructor materialises <c>IEnumerable&lt;IChannel&gt;</c> with <c>.ToArray()</c> — and
+    /// all of that runs BEFORE <c>FindParts</c> calls <c>CreatePlugins</c>, so
+    /// <c>Plugin.Instance</c> does not exist yet and both delegates below throw exactly as the
+    /// real ones would. An exception escaping here does not disable the plugin; it stops the
+    /// server from starting at all. Constructing the channel must therefore touch nothing.
+    /// </summary>
+    [Fact]
+    public void ConstructingTheChannelBeforeThePluginInstanceExistsDoesNotThrow()
+    {
+        using ServiceProvider provider = BuildProviderWithoutAPluginInstance();
+
+        IChannel[] channels = provider.GetServices<IChannel>().ToArray();
+
+        Assert.Single(channels.OfType<MakoChannel>());
+    }
+
+    /// <summary>
+    /// Jellyfin's daily <c>RefreshChannels</c> task reads these off every channel it constructed,
+    /// and its channel-entity refresh can run before a plugin's own configuration is reachable —
+    /// so none of them may reach into the graph either.
+    /// </summary>
+    [Fact]
+    public void TheChannelsOwnDescriptionIsReadableBeforeThePluginInstanceExists()
+    {
+        using ServiceProvider provider = BuildProviderWithoutAPluginInstance();
+        MakoChannel channel = provider.GetServices<IChannel>().OfType<MakoChannel>().Single();
+
+        Assert.Equal("mako", channel.Name);
+        Assert.NotEmpty(channel.Description);
+        Assert.NotEmpty(channel.DataVersion);
+        Assert.NotNull(channel.GetChannelFeatures());
+        Assert.Empty(channel.GetSupportedChannelImages());
+        Assert.True(channel.IsEnabledFor("x"));
+    }
+
+    /// <summary>
+    /// The other half of the same rule: deferring construction must not mean never constructing.
+    /// The first user action builds the whole graph — and only then is the data folder read.
+    /// </summary>
+    [Fact]
+    public async Task TheFirstUserActionBuildsTheGraphAndReadsTheDataFolder()
+    {
+        using TemporaryDirectory dataFolder = new();
+        int dataFolderReads = 0;
+        ServiceCollection services = new();
+        services.AddLogging();
+        services.AddMakoServices(
+            () =>
+            {
+                dataFolderReads++;
+                return dataFolder.Path;
+            },
+            () => new PluginConfiguration());
+        using ServiceProvider provider = services.BuildServiceProvider();
+        IChannel channel = provider.GetServices<IChannel>().OfType<MakoChannel>().Single();
+        Assert.Equal(0, dataFolderReads);
+
+        ChannelItemResult result = await channel.GetChannelItems(new InternalChannelItemQuery { FolderId = null }, CancellationToken.None);
+
+        Assert.Equal(new PluginConfiguration().PinnedShowName, Assert.Single(result.Items).Name);
+        Assert.True(dataFolderReads > 0);
+    }
+
     private static ServiceProvider BuildProvider(string dataFolder)
     {
         ServiceCollection services = new();
         services.AddLogging();
         services.AddMakoServices(() => dataFolder, () => new PluginConfiguration());
+        return services.BuildServiceProvider();
+    }
+
+    /// <summary>Both delegates fail the way the real ones do before <c>Plugin.Instance</c> is set.</summary>
+    private static ServiceProvider BuildProviderWithoutAPluginInstance()
+    {
+        ServiceCollection services = new();
+        services.AddLogging();
+        services.AddMakoServices(
+            dataFolder: () => throw new InvalidOperationException("The Mako plugin has not been loaded yet."),
+            configuration: () => throw new InvalidOperationException("The Mako plugin has not been loaded yet."));
         return services.BuildServiceProvider();
     }
 

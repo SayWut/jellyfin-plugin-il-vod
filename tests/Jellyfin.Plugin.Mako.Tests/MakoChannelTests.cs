@@ -6,6 +6,7 @@ using Jellyfin.Plugin.Mako.Tests.Transcoding;
 using Jellyfin.Plugin.Mako.Transcoding;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Model.Dto;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Jellyfin.Plugin.Mako.Tests;
@@ -18,7 +19,12 @@ public class MakoChannelTests
 
     private static readonly StreamLink ResolvedLink = new(ResolvedUrl, ResolvedContainer, StreamDescription.MakoDefault);
 
-    private static MakoChannel ChannelOver(FakeCatalog catalog) => new(catalog, NullLogger<MakoChannel>.Instance);
+    private static MakoChannel ChannelOver(FakeCatalog catalog) => ChannelOver(catalog, NullLogger<MakoChannel>.Instance);
+
+    /// <summary>The catalogue reaches the channel as a <see cref="Lazy{T}"/> so constructing the
+    /// channel touches nothing — see <c>PluginServiceRegistratorTests</c> for why.</summary>
+    private static MakoChannel ChannelOver(FakeCatalog catalog, ILogger<MakoChannel> logger) =>
+        new(new Lazy<ICatalog>(() => catalog), logger);
 
     private static Task<ChannelItemResult> Open(MakoChannel channel, string? folderId)
         => channel.GetChannelItems(new InternalChannelItemQuery { FolderId = folderId }, CancellationToken.None);
@@ -98,7 +104,7 @@ public class MakoChannelTests
         FakeCatalog catalog = new() { BrowseFailure = new BotChallengeException("https://www.mako.co.il/mako-vod/shemesh?query=secret") };
         var logger = new RecordingLogger<MakoChannel>();
 
-        ChannelItemResult result = await Open(new MakoChannel(catalog, logger), folderId: null);
+        ChannelItemResult result = await Open(ChannelOver(catalog, logger), folderId: null);
 
         Assert.Empty(result.Items);
         Assert.Equal(0, result.TotalRecordCount);
@@ -112,7 +118,7 @@ public class MakoChannelTests
         FakeCatalog catalog = new() { BrowseFailure = new MakoRequestException("HTTP 500 for www.mako.co.il/mako-vod/shemesh") };
         var logger = new RecordingLogger<MakoChannel>();
 
-        ChannelItemResult result = await Open(new MakoChannel(catalog, logger), "series|shemesh");
+        ChannelItemResult result = await Open(ChannelOver(catalog, logger), "series|shemesh");
 
         Assert.Empty(result.Items);
         Assert.Equal(0, result.TotalRecordCount);
@@ -129,7 +135,7 @@ public class MakoChannelTests
             var logger = new RecordingLogger<MakoChannel>();
             FakeCatalog catalog = new() { StreamLink = ResolvedLink };
 
-            await new MakoChannel(catalog, logger).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
+            await ChannelOver(catalog, logger).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
 
             Assert.Contains(logger.Warnings, message => message.Contains("NOT installed", StringComparison.Ordinal));
         }
@@ -149,7 +155,7 @@ public class MakoChannelTests
             var logger = new RecordingLogger<MakoChannel>();
             FakeCatalog catalog = new() { StreamLink = ResolvedLink };
 
-            await new MakoChannel(catalog, logger).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
+            await ChannelOver(catalog, logger).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
 
             Assert.Empty(logger.Warnings);
         }
