@@ -53,6 +53,53 @@ public class MakoHttpClientTests
     }
 
     [Fact]
+    public async Task ARequestQueuedBehindABackOffThatStartsWhileWaitingIsRefusedWithoutTouchingTheNetwork()
+    {
+        StubHttpHandler handler = new();
+        RequestPacer pacer = CreatePacer();
+        MakoHttpClient client = CreateClient(handler, pacer);
+
+        // "A" holds the pacer's one turn directly, so "B" (through the client) must queue behind
+        // it. B's own pre-check sees no back-off yet — it only starts once B is already waiting.
+        IDisposable heldTurn = await pacer.EnterAsync(CancellationToken.None);
+        Task<string> queuedRequest = client.GetTextAsync(BrowsePageUrl, CancellationToken.None);
+
+        pacer.BackOff();
+        heldTurn.Dispose();
+
+        await Assert.ThrowsAsync<BotChallengeException>(() => queuedRequest);
+        Assert.Empty(handler.Requests);
+    }
+
+    [Fact]
+    public async Task AProtocolRelativeRedirectToTheBotChallengeHostIsDetected()
+    {
+        StubHttpHandler handler = new();
+        handler.Enqueue(RedirectResponse("//validate.perfdrive.com/challenge"));
+        RequestPacer pacer = CreatePacer();
+        MakoHttpClient client = CreateClient(handler, pacer);
+
+        await Assert.ThrowsAsync<BotChallengeException>(
+            () => client.GetTextAsync(BrowsePageUrl, CancellationToken.None));
+
+        Assert.True(pacer.IsBackingOff);
+    }
+
+    [Fact]
+    public async Task ADifferentlyCasedBotChallengeHostIsDetected()
+    {
+        StubHttpHandler handler = new();
+        handler.Enqueue(RedirectResponse("https://VALIDATE.PERFDRIVE.COM/challenge"));
+        RequestPacer pacer = CreatePacer();
+        MakoHttpClient client = CreateClient(handler, pacer);
+
+        await Assert.ThrowsAsync<BotChallengeException>(
+            () => client.GetTextAsync(BrowsePageUrl, CancellationToken.None));
+
+        Assert.True(pacer.IsBackingOff);
+    }
+
+    [Fact]
     public async Task RequestsToOtherHostsAreNotPacedOrRefused()
     {
         StubHttpHandler handler = new();
@@ -97,6 +144,71 @@ public class MakoHttpClientTests
         Assert.Contains("www.mako.co.il/mako-vod-keshet/shemesh", exception.Message, StringComparison.Ordinal);
         Assert.DoesNotContain("platform=mobileApp", exception.Message, StringComparison.Ordinal);
         Assert.DoesNotContain('?', exception.Message);
+    }
+
+    [Fact]
+    public async Task TooManyRedirectsNamesTheLastHopNotTheFirst()
+    {
+        StubHttpHandler handler = new();
+        for (int hopNumber = 1; hopNumber <= 6; hopNumber++)
+        {
+            handler.Enqueue(RedirectResponse($"https://www.mako.co.il/mako-vod-keshet/hop-{hopNumber}"));
+        }
+
+        MakoHttpClient client = CreateClient(handler);
+
+        MakoRequestException exception = await Assert.ThrowsAsync<MakoRequestException>(
+            () => client.GetTextAsync(BrowsePageUrl, CancellationToken.None));
+
+        Assert.Equal(6, handler.Requests.Count);
+        Assert.Contains("hop-6", exception.Message, StringComparison.Ordinal);
+        Assert.DoesNotContain("mako-vod-keshet/shemesh", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ATransportFailureNeverNamesTheQueryEvenInTheInnerException()
+    {
+        const string UrlWithMarker = "https://www.mako.co.il/mako-vod-keshet/shemesh?hdnea=SECRET";
+        StubHttpHandler handler = new();
+        handler.EnqueueException(new HttpRequestException($"connection reset while calling {UrlWithMarker}"));
+        MakoHttpClient client = CreateClient(handler);
+
+        MakoRequestException exception = await Assert.ThrowsAsync<MakoRequestException>(
+            () => client.GetTextAsync(UrlWithMarker, CancellationToken.None));
+
+        Assert.DoesNotContain("hdnea=SECRET", exception.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task AMissingLocationHeaderNeverNamesTheQuery()
+    {
+        const string UrlWithMarker = "https://www.mako.co.il/mako-vod-keshet/shemesh?hdnea=SECRET";
+        StubHttpHandler handler = new();
+        handler.Enqueue(new HttpResponseMessage(HttpStatusCode.Found));
+        MakoHttpClient client = CreateClient(handler);
+
+        MakoRequestException exception = await Assert.ThrowsAsync<MakoRequestException>(
+            () => client.GetTextAsync(UrlWithMarker, CancellationToken.None));
+
+        Assert.DoesNotContain("hdnea=SECRET", exception.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task TooManyRedirectsNeverNamesTheQuery()
+    {
+        const string UrlWithMarker = "https://www.mako.co.il/mako-vod-keshet/shemesh?hdnea=SECRET";
+        StubHttpHandler handler = new();
+        for (int hopNumber = 1; hopNumber <= 6; hopNumber++)
+        {
+            handler.Enqueue(RedirectResponse($"https://www.mako.co.il/mako-vod-keshet/hop-{hopNumber}?hdnea=SECRET"));
+        }
+
+        MakoHttpClient client = CreateClient(handler);
+
+        MakoRequestException exception = await Assert.ThrowsAsync<MakoRequestException>(
+            () => client.GetTextAsync(UrlWithMarker, CancellationToken.None));
+
+        Assert.DoesNotContain("hdnea=SECRET", exception.ToString(), StringComparison.Ordinal);
     }
 
     [Fact]

@@ -44,6 +44,34 @@ public class MakoConfigLoaderTests
     }
 
     [Fact]
+    public async Task ConcurrentColdLoadsShareOneFetchChain()
+    {
+        FakeMakoHttp http = SeededHttp();
+        TaskCompletionSource mainConfigGate = http.GateResponseTo(MainConfigUrl);
+        MakoConfigLoader loader = new(http, new TimedCache(new FakeClock()), () => AppVersion);
+
+        // Both calls start cold: the second reaches the loader's gate while the first is still
+        // waiting on its (held-open) main-config request, proving they share one fetch rather
+        // than racing mako for two.
+        Task<MakoConfig> firstLoad = loader.LoadAsync(CancellationToken.None);
+        Task<MakoConfig> secondLoad = loader.LoadAsync(CancellationToken.None);
+
+        mainConfigGate.SetResult();
+        MakoConfig firstConfig = await firstLoad;
+        MakoConfig secondConfig = await secondLoad;
+
+        Assert.Equal(3, http.Requests.Count);
+        // MakoConfig's own record equality falls back to reference equality for PlaylistKeys (an
+        // IReadOnlyList<string>, which List<string> does not override) — compare field by field.
+        Assert.Equal(firstConfig.AppId, secondConfig.AppId);
+        Assert.Equal(firstConfig.BaseUrlTemplate, secondConfig.BaseUrlTemplate);
+        Assert.Equal(firstConfig.PlaylistUrlTemplate, secondConfig.PlaylistUrlTemplate);
+        Assert.Equal(firstConfig.TokenUrl, secondConfig.TokenUrl);
+        Assert.Equal(firstConfig.TokenKey, secondConfig.TokenKey);
+        Assert.Equal(firstConfig.PlaylistKeys, secondConfig.PlaylistKeys);
+    }
+
+    [Fact]
     public async Task AfterForgetTheConfigIsFetchedAgain()
     {
         FakeMakoHttp http = SeededHttp();

@@ -5,16 +5,29 @@ namespace Jellyfin.Plugin.Mako.Tests.Support;
 /// <summary>
 /// A hand-written fake of <c>IMakoHttp</c>: responses, bot challenges and failures programmed per
 /// URL, and a record of every URL asked for, so callers above the HTTP boundary — starting with
-/// <c>MakoConfigLoader</c> — can be tested without a real network.
+/// <c>MakoConfigLoader</c> — can be tested without a real network. <see cref="GateResponseTo"/>
+/// lets a test hold one response open so it can start a second, overlapping call before the first
+/// completes.
 /// </summary>
 public sealed class FakeMakoHttp : IMakoHttp
 {
     private readonly Dictionary<string, string> _responses = [];
     private readonly HashSet<string> _challengedUrls = [];
     private readonly HashSet<string> _failingUrls = [];
+    private readonly Dictionary<string, TaskCompletionSource> _gates = [];
     private readonly List<string> _requests = [];
+    private readonly object _requestsLock = new();
 
-    public IReadOnlyList<string> Requests => _requests;
+    public IReadOnlyList<string> Requests
+    {
+        get
+        {
+            lock (_requestsLock)
+            {
+                return [.. _requests];
+            }
+        }
+    }
 
     public string? LastPostBody { get; private set; }
 
@@ -24,34 +37,57 @@ public sealed class FakeMakoHttp : IMakoHttp
 
     public void Fail(string url) => _failingUrls.Add(url);
 
-    public Task<string> GetTextAsync(string url, CancellationToken cancellationToken)
+    /// <summary>
+    /// Makes the response to <paramref name="url"/> wait until the returned source is completed,
+    /// so a test can prove two calls overlapped instead of assuming it from timing.
+    /// </summary>
+    public TaskCompletionSource GateResponseTo(string url)
     {
-        _requests.Add(url);
-        return ResolveAsync(url);
+        TaskCompletionSource gate = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        _gates[url] = gate;
+        return gate;
     }
 
-    public Task<string> PostTextAsync(string url, string body, string contentType, CancellationToken cancellationToken)
+    public async Task<string> GetTextAsync(string url, CancellationToken cancellationToken)
     {
-        _requests.Add(url);
+        RecordRequest(url);
+        return await ResolveAsync(url).ConfigureAwait(false);
+    }
+
+    public async Task<string> PostTextAsync(string url, string body, string contentType, CancellationToken cancellationToken)
+    {
+        RecordRequest(url);
         LastPostBody = body;
-        return ResolveAsync(url);
+        return await ResolveAsync(url).ConfigureAwait(false);
     }
 
-    private Task<string> ResolveAsync(string url)
+    private void RecordRequest(string url)
     {
+        lock (_requestsLock)
+        {
+            _requests.Add(url);
+        }
+    }
+
+    private async Task<string> ResolveAsync(string url)
+    {
+        if (_gates.TryGetValue(url, out TaskCompletionSource? gate))
+        {
+            await gate.Task.ConfigureAwait(false);
+        }
+
         if (_challengedUrls.Contains(url))
         {
-            return Task.FromException<string>(new BotChallengeException(url));
+            throw new BotChallengeException(url);
         }
 
         if (_failingUrls.Contains(url))
         {
-            Uri uri = new(url);
-            return Task.FromException<string>(new MakoRequestException($"HTTP 500 for {uri.Host}{uri.AbsolutePath}"));
+            throw new MakoRequestException($"HTTP 500 for {MakoUrls.RedactedUrl(url)}");
         }
 
         return _responses.TryGetValue(url, out string? body)
-            ? Task.FromResult(body)
-            : Task.FromException<string>(new KeyNotFoundException($"FakeMakoHttp has no response configured for '{url}'"));
+            ? body
+            : throw new KeyNotFoundException($"FakeMakoHttp has no response configured for '{url}'");
     }
 }

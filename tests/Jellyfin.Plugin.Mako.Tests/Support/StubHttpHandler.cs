@@ -22,12 +22,15 @@ public sealed record CapturedRequest(
 /// </summary>
 public sealed class StubHttpHandler : HttpMessageHandler
 {
-    private readonly Queue<HttpResponseMessage> _responses = new();
+    private readonly Queue<Func<HttpResponseMessage>> _responses = new();
     private readonly List<CapturedRequest> _requests = [];
 
     public IReadOnlyList<CapturedRequest> Requests => _requests;
 
-    public void Enqueue(HttpResponseMessage response) => _responses.Enqueue(response);
+    public void Enqueue(HttpResponseMessage response) => _responses.Enqueue(() => response);
+
+    /// <summary>Makes the next request throw <paramref name="exception"/> instead of getting a response — simulating a transport failure.</summary>
+    public void EnqueueException(Exception exception) => _responses.Enqueue(() => throw exception);
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
@@ -38,7 +41,7 @@ public sealed class StubHttpHandler : HttpMessageHandler
             throw new InvalidOperationException("StubHttpHandler has no queued response left for this request.");
         }
 
-        return _responses.Dequeue();
+        return _responses.Dequeue()();
     }
 
     private static async Task<CapturedRequest> CaptureAsync(HttpRequestMessage request, CancellationToken cancellationToken)

@@ -6,7 +6,10 @@ namespace Jellyfin.Plugin.Mako.MakoApi;
 /// Keeps at most one request to <see cref="MakoUrls.BrowseHost"/> in flight and spaces consecutive
 /// requests by <see cref="MinimumGap"/>, and tracks the back-off a bot challenge starts (N4). Time
 /// comes from an injected <see cref="IClock"/> and the actual waiting from an injected delay
-/// function, so a test can move both without a real clock or a real wait.
+/// function, so a test can move both without a real clock or a real wait. Whether it is backing
+/// off is decided again inside <see cref="EnterAsync"/>, after exclusive access is acquired — not
+/// only by a caller's own <see cref="IsBackingOff"/> pre-check — so a caller already queued when a
+/// concurrent request starts the back-off is refused too, instead of slipping through right after.
 /// </summary>
 public sealed class RequestPacer
 {
@@ -21,7 +24,15 @@ public sealed class RequestPacer
     private readonly SemaphoreSlim _oneAtATime = new(1, 1);
 
     private DateTimeOffset? _lastExitAt;
-    private DateTimeOffset? _backOffUntil;
+
+    /// <summary>
+    /// UTC ticks of the moment back-off ends, or 0 for "never backed off". A plain
+    /// <c>DateTimeOffset?</c> field would not be safe to write and read from different threads
+    /// without a lock — it is wider than one machine word, so a concurrent reader could observe a
+    /// torn value. A single <c>long</c>, read and written through <see cref="Interlocked"/>, cannot
+    /// tear.
+    /// </summary>
+    private long _backOffUntilUtcTicks;
 
     public RequestPacer(IClock clock, Func<TimeSpan, CancellationToken, Task> delay)
     {
@@ -29,19 +40,27 @@ public sealed class RequestPacer
         _delay = delay;
     }
 
-    public bool IsBackingOff => _backOffUntil is { } until && _clock.UtcNow < until;
+    public bool IsBackingOff => IsBackingOffAt(_clock.UtcNow);
 
-    public void BackOff() => _backOffUntil = _clock.UtcNow + BackOffDuration;
+    public void BackOff() =>
+        Interlocked.Exchange(ref _backOffUntilUtcTicks, (_clock.UtcNow + BackOffDuration).UtcTicks);
 
     /// <summary>
     /// Waits for exclusive access and for the gap since the last request to have passed, then
-    /// grants it. Dispose the result to let the next caller in and start its own gap.
+    /// grants it — unless backing off is still true once access is granted, in which case it
+    /// throws <see cref="BackOffRefusalException"/> instead. Dispose the result to let the next
+    /// caller in and start its own gap.
     /// </summary>
     public async Task<IDisposable> EnterAsync(CancellationToken cancellationToken)
     {
         await _oneAtATime.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
+            if (IsBackingOff)
+            {
+                throw new BackOffRefusalException();
+            }
+
             TimeSpan remainingGap = RemainingGap();
             if (remainingGap > TimeSpan.Zero)
             {
@@ -55,6 +74,12 @@ public sealed class RequestPacer
             _oneAtATime.Release();
             throw;
         }
+    }
+
+    private bool IsBackingOffAt(DateTimeOffset now)
+    {
+        long backOffUntilUtcTicks = Interlocked.Read(ref _backOffUntilUtcTicks);
+        return backOffUntilUtcTicks != 0 && now.UtcTicks < backOffUntilUtcTicks;
     }
 
     private TimeSpan RemainingGap()

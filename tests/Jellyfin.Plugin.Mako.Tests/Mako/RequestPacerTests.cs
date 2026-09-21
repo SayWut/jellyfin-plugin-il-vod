@@ -63,6 +63,23 @@ public class RequestPacerTests
     }
 
     [Fact]
+    public async Task ACallerAlreadyWaitingForATurnIsRefusedIfBackOffStartsBeforeItsTurnBegins()
+    {
+        RequestPacer pacer = new(new FakeClock(), NoDelay);
+
+        IDisposable holderOfTheTurn = await pacer.EnterAsync(CancellationToken.None);
+        Task<IDisposable> waitingEntry = pacer.EnterAsync(CancellationToken.None);
+        Assert.False(waitingEntry.IsCompleted);
+
+        // The back-off starts while the second caller is already queued — its own IsBackingOff
+        // pre-check (made before it started waiting) could not have seen this coming.
+        pacer.BackOff();
+        holderOfTheTurn.Dispose();
+
+        await Assert.ThrowsAsync<BackOffRefusalException>(() => waitingEntry);
+    }
+
+    [Fact]
     public void BackingOffEndsAfterFiveMinutes()
     {
         FakeClock clock = new();

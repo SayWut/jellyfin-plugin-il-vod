@@ -59,13 +59,31 @@ public sealed class MakoHttpClient : IMakoHttp
             return await SendWithRedirectsAsync(requestFactory, url, cancellationToken).ConfigureAwait(false);
         }
 
+        using IDisposable turn = await EnterPacedTurnOrThrowAsync(url, cancellationToken).ConfigureAwait(false);
+        return await SendWithRedirectsAsync(requestFactory, url, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// A cheap pre-check refuses outright when already backing off, without even joining the
+    /// pacer's queue. But the pacer decides again for itself once it grants exclusive access
+    /// (<see cref="RequestPacer.EnterAsync"/>) — a caller can start waiting before a concurrent
+    /// request starts the back-off, and the pre-check alone would let it through right after.
+    /// </summary>
+    private async Task<IDisposable> EnterPacedTurnOrThrowAsync(string url, CancellationToken cancellationToken)
+    {
         if (_pacer.IsBackingOff)
         {
             throw new BotChallengeException(url);
         }
 
-        using IDisposable turn = await _pacer.EnterAsync(cancellationToken).ConfigureAwait(false);
-        return await SendWithRedirectsAsync(requestFactory, url, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            return await _pacer.EnterAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (BackOffRefusalException)
+        {
+            throw new BotChallengeException(url);
+        }
     }
 
     private async Task<string> SendWithRedirectsAsync(Func<string, HttpRequestMessage> requestFactory, string url, CancellationToken cancellationToken)
@@ -83,7 +101,7 @@ public sealed class MakoHttpClient : IMakoHttp
             currentUrl = ResolveRedirectOrThrow(response, currentUrl);
         }
 
-        throw new MakoRequestException($"too many redirects for {HostAndPath(url)}");
+        throw new MakoRequestException($"too many redirects for {MakoUrls.RedactedUrl(currentUrl)}");
     }
 
     private async Task<HttpResponseMessage> SendOnceAsync(Func<string, HttpRequestMessage> requestFactory, string url, CancellationToken cancellationToken)
@@ -98,13 +116,24 @@ public sealed class MakoHttpClient : IMakoHttp
         }
         catch (HttpRequestException exception)
         {
-            throw new MakoRequestException($"request failed for {HostAndPath(url)}", exception);
+            throw new MakoRequestException($"request failed for {MakoUrls.RedactedUrl(url)}", RedactIfItNamesTheUrl(exception, url));
         }
         catch (TaskCanceledException exception) when (!cancellationToken.IsCancellationRequested)
         {
-            throw new MakoRequestException($"request timed out for {HostAndPath(url)}", exception);
+            throw new MakoRequestException($"request timed out for {MakoUrls.RedactedUrl(url)}", RedactIfItNamesTheUrl(exception, url));
         }
     }
+
+    /// <summary>
+    /// The inner exception a transport failure carries is attached for its diagnostic value, but
+    /// nothing guarantees its own message never quotes the URL it was trying to reach — including
+    /// the query string (N3). If it does, it is replaced with a copy whose message has the raw URL
+    /// swapped for its redacted form, rather than passed through unexamined.
+    /// </summary>
+    private static Exception RedactIfItNamesTheUrl(Exception exception, string url) =>
+        exception.Message.Contains(url, StringComparison.Ordinal)
+            ? new MakoRequestException(exception.Message.Replace(url, MakoUrls.RedactedUrl(url), StringComparison.Ordinal))
+            : exception;
 
     private static void AddAppHeaders(HttpRequestMessage request)
     {
@@ -116,7 +145,7 @@ public sealed class MakoHttpClient : IMakoHttp
     {
         if (!response.IsSuccessStatusCode)
         {
-            throw new MakoRequestException($"HTTP {(int)response.StatusCode} for {HostAndPath(url)}");
+            throw new MakoRequestException($"HTTP {(int)response.StatusCode} for {MakoUrls.RedactedUrl(url)}");
         }
 
         return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -127,7 +156,7 @@ public sealed class MakoHttpClient : IMakoHttp
         Uri? location = response.Headers.Location;
         if (location is null)
         {
-            throw new MakoRequestException($"redirect without a Location header for {HostAndPath(currentUrl)}");
+            throw new MakoRequestException($"redirect without a Location header for {MakoUrls.RedactedUrl(currentUrl)}");
         }
 
         Uri resolved = location.IsAbsoluteUri ? location : new Uri(new Uri(currentUrl), location);
@@ -142,15 +171,9 @@ public sealed class MakoHttpClient : IMakoHttp
     }
 
     private void LogRequest(HttpMethod method, string url) =>
-        _logger.LogInformation("mako: request {Method} {HostAndPath}", method, HostAndPath(url));
+        _logger.LogInformation("mako: request {Method} {HostAndPath}", method, MakoUrls.RedactedUrl(url));
 
     private static bool IsBrowseHost(string url) => new Uri(url).Host == MakoUrls.BrowseHost;
 
     private static bool IsRedirect(HttpStatusCode statusCode) => (int)statusCode is >= 300 and < 400;
-
-    private static string HostAndPath(string url)
-    {
-        Uri uri = new(url);
-        return $"{uri.Host}{uri.AbsolutePath}";
-    }
 }
