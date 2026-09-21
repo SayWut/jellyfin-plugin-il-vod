@@ -74,7 +74,7 @@ public sealed class StaticCatalog : ICatalog
         }
 
         string container = _readTestStreamContainer();
-        return Task.FromResult(new StreamLink(url.Trim(), container.Trim()));
+        return Task.FromResult(new StreamLink(url.Trim(), container.Trim(), StreamDescription.MakoDefault));
     }
 
     private static IReadOnlyList<Episode> EpisodesOf(Season season)

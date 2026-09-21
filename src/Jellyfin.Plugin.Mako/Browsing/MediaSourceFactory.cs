@@ -24,6 +24,16 @@ public static class MediaSourceFactory
     private const int AudioStreamIndex = 1;
     private const int StereoChannels = 2;
 
+    // mako serves planar 8-bit H.264 in an MP4-style (length-prefixed, not Annex B) bitstream;
+    // telling Jellyfin so up front lets it copy the video instead of probing for these.
+    private const string VideoPixelFormat = "yuv420p";
+    private const int VideoBitDepth = 8;
+    private const string VideoNalLengthSize = "0";
+
+    // mako serves AAC-LC audio at a fixed sample rate.
+    private const int AudioSampleRate = 48000;
+    private const string AudioProfile = "LC";
+
     // The value Jellyfin itself uses for live streams. Without it, a source with unknown
     // streams is analysed for up to 200 seconds before ffmpeg outputs anything.
     private const int AnalyzeDurationMilliseconds = 3000;
@@ -49,7 +59,7 @@ public static class MediaSourceFactory
         SupportsProbing = true,
         RequiresOpening = false,
         AnalyzeDurationMs = AnalyzeDurationMilliseconds,
-        MediaStreams = DescribeStreams(),
+        MediaStreams = DescribeStreams(link.Description),
     };
 
     /// <summary>
@@ -81,9 +91,36 @@ public static class MediaSourceFactory
 
     // mako serves H.264 video with AAC audio. Telling Jellyfin so lets it copy the
     // streams instead of analysing, guessing and re-encoding them.
-    private static MediaStream[] DescribeStreams() =>
+    private static MediaStream[] DescribeStreams(StreamDescription description) =>
     [
-        new MediaStream { Type = MediaStreamType.Video, Codec = VideoCodec, Index = VideoStreamIndex },
-        new MediaStream { Type = MediaStreamType.Audio, Codec = AudioCodec, Index = AudioStreamIndex, Channels = StereoChannels },
+        DescribeVideoStream(description),
+        DescribeAudioStream(),
     ];
+
+    private static MediaStream DescribeVideoStream(StreamDescription description) => new()
+    {
+        Type = MediaStreamType.Video,
+        Codec = VideoCodec,
+        Index = VideoStreamIndex,
+        Width = description.Width,
+        Height = description.Height,
+        BitRate = description.BitsPerSecond,
+        Profile = description.VideoProfile,
+        Level = description.VideoLevel,
+        IsInterlaced = false,
+        PixelFormat = VideoPixelFormat,
+        BitDepth = VideoBitDepth,
+        IsAVC = true,
+        NalLengthSize = VideoNalLengthSize,
+    };
+
+    private static MediaStream DescribeAudioStream() => new()
+    {
+        Type = MediaStreamType.Audio,
+        Codec = AudioCodec,
+        Index = AudioStreamIndex,
+        Channels = StereoChannels,
+        SampleRate = AudioSampleRate,
+        Profile = AudioProfile,
+    };
 }

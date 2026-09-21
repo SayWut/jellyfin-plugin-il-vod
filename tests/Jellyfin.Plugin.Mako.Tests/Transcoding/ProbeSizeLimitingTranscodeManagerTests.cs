@@ -18,7 +18,8 @@ public class ProbeSizeLimitingTranscodeManagerTests
         var recorder = new CallRecorder();
         var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
         var sut = new ProbeSizeLimitingTranscodeManager(fake, NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
-        StreamState state = StreamStateFor(MediaSourceFactory.Create(new StreamLink("https://cdn.test/master.m3u8", "hls")));
+        StreamState state = StreamStateFor(
+            MediaSourceFactory.Create(new StreamLink("https://cdn.test/master.m3u8", "hls", StreamDescription.MakoDefault)));
 
         await sut.StartFfMpeg(state, "out.ts", OriginalArguments, Guid.NewGuid(), TranscodingJobType.Hls, new CancellationTokenSource());
 
