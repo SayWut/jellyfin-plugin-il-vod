@@ -5,20 +5,6 @@ using Jellyfin.Plugin.Mako.Model;
 
 namespace Jellyfin.Plugin.Mako.Catalog;
 
-/// <summary>The one show step B plays, and the folder name a user sees for it.</summary>
-public sealed record PinnedShow(string PagePath, string Name);
-
-/// <summary>How long each kind of mako page or stream link may be served from cache before a user
-/// action is allowed to refetch it (spec §2).</summary>
-public sealed record CacheLifetimes(TimeSpan ShowPage, TimeSpan PastSeason, TimeSpan CurrentSeason, TimeSpan StreamLink)
-{
-    public static CacheLifetimes Default { get; } = new(
-        ShowPage: TimeSpan.FromHours(12),
-        PastSeason: TimeSpan.FromDays(7),
-        CurrentSeason: TimeSpan.FromHours(6),
-        StreamLink: TimeSpan.FromMinutes(5));
-}
-
 /// <summary>
 /// The pinned show's live catalogue (spec §5.2): every method answers only what the single user
 /// action calling it requires, and nothing here ever fetches ahead of that action (N1) —
@@ -37,17 +23,10 @@ public sealed class MakoCatalog : ICatalog
     private readonly Func<PinnedShow> _readPinnedShow;
     private readonly Func<CacheLifetimes> _readLifetimes;
 
-    /// <param name="clock">
-    /// Not read directly: <paramref name="streamLinks"/> already carries the same clock it was
-    /// constructed with, which is what actually decides freshness. Accepted here anyway so a
-    /// caller wiring this catalog's dependencies (task B10) can pass the one plugin-wide
-    /// <see cref="IClock"/> everywhere without a special case for this class.
-    /// </param>
     public MakoCatalog(
         MakoPageSource pages,
         StreamResolver resolver,
         TimedCache streamLinks,
-        IClock clock,
         Func<PinnedShow> readPinnedShow,
         Func<CacheLifetimes> readLifetimes)
     {
@@ -60,16 +39,15 @@ public sealed class MakoCatalog : ICatalog
 
     /// <summary>
     /// Exactly one <see cref="Show"/> built from the pinned setting alone. Only ever peeks at the
-    /// page cache — never fetches — so opening the channel costs mako nothing.
+    /// page cache — never fetches — so opening the channel costs mako nothing. A cached page that
+    /// fails to parse (spec content changed under an old cache entry, or plain corruption) falls
+    /// back to the name-only show instead of failing the whole channel root: a stale copy is
+    /// served indefinitely by design (N2/spec §5.4), so a parse error here must never be fatal.
     /// </summary>
     public Task<IReadOnlyList<Show>> GetShowsAsync(CancellationToken cancellationToken)
     {
         PinnedShow pinned = _readPinnedShow();
-        Show show = _pages.TryGetCached(pinned.PagePath, out string? cachedShowJson)
-            ? Enrich(pinned, cachedShowJson)
-            : new Show(pinned.PagePath, pinned.Name, PosterUrl: null, Overview: null, Genres: []);
-
-        return Task.FromResult<IReadOnlyList<Show>>([show]);
+        return Task.FromResult<IReadOnlyList<Show>>([BuildShow(pinned)]);
     }
 
     public async Task<IReadOnlyList<Season>> GetSeasonsAsync(string showId, CancellationToken cancellationToken)
@@ -84,10 +62,7 @@ public sealed class MakoCatalog : ICatalog
         string showJson = await _pages.GetAsync(showId, _ => lifetimes.ShowPage, cancellationToken).ConfigureAwait(false);
         ShowPage showPage = MakoPages.ParseShowPage(showJson);
 
-        if (showPage.CurrentSeasonId is string currentSeasonId)
-        {
-            _pages.Remember(currentSeasonId, showJson, lifetimes.CurrentSeason);
-        }
+        RememberDisplayedSeason(showPage, showJson, showId, lifetimes);
 
         return showPage.Seasons;
     }
@@ -112,19 +87,54 @@ public sealed class MakoCatalog : ICatalog
             return DeserializeStreamLink(cached.Value!);
         }
 
-        StreamLink link = await _resolver.ResolveAsync(EpisodeKey.Parse(episodeId), cancellationToken).ConfigureAwait(false);
+        EpisodeKey episode = ParseEpisodeIdOrThrow(episodeId);
+        StreamLink link = await _resolver.ResolveAsync(episode, cancellationToken).ConfigureAwait(false);
         _streamLinks.Write(episodeId, SerializeStreamLink(link), _readLifetimes().StreamLink);
         return link;
     }
 
-    private static Show Enrich(PinnedShow pinned, string cachedShowJson)
+    /// <summary>
+    /// The page just fetched under <paramref name="fetchedPagePath"/> also carries the episodes of
+    /// whichever season it displays (<see cref="ShowPage.DisplayedSeasonId"/>). Caching it again
+    /// under that season's own id — at that season's own lifetime, latest or past — means opening
+    /// the displayed season next costs nothing. Skipped when the two ids already coincide: nothing
+    /// would be gained by overwriting the very entry <see cref="MakoPageSource.GetAsync"/> just
+    /// wrote, and doing so would silently replace the show page's own (12h) lifetime with a
+    /// season's (6h or 7d) one.
+    /// </summary>
+    private void RememberDisplayedSeason(ShowPage showPage, string showJson, string fetchedPagePath, CacheLifetimes lifetimes)
     {
-        ShowPage showPage = MakoPages.ParseShowPage(cachedShowJson);
-        return new Show(pinned.PagePath, pinned.Name, showPage.PosterUrl, showPage.Overview, Genres: []);
+        if (showPage.DisplayedSeasonId is not string displayedSeasonId || displayedSeasonId == fetchedPagePath)
+        {
+            return;
+        }
+
+        TimeSpan displayedSeasonLifetime = LifetimeOf(showJson, displayedSeasonId, lifetimes);
+        _pages.Remember(displayedSeasonId, showJson, displayedSeasonLifetime);
     }
 
+    private Show BuildShow(PinnedShow pinned)
+    {
+        if (!_pages.TryGetCached(pinned.PagePath, out string? cachedShowJson))
+        {
+            return NameOnlyShow(pinned);
+        }
+
+        try
+        {
+            ShowPage showPage = MakoPages.ParseShowPage(cachedShowJson);
+            return new Show(pinned.PagePath, pinned.Name, showPage.PosterUrl, showPage.Overview, Genres: []);
+        }
+        catch (FormatException)
+        {
+            return NameOnlyShow(pinned);
+        }
+    }
+
+    private static Show NameOnlyShow(PinnedShow pinned) => new(pinned.PagePath, pinned.Name, PosterUrl: null, Overview: null, Genres: []);
+
     private static TimeSpan LifetimeOf(string seasonPageJson, string seasonId, CacheLifetimes lifetimes) =>
-        MakoPages.IsCurrentSeason(seasonPageJson, seasonId) ? lifetimes.CurrentSeason : lifetimes.PastSeason;
+        MakoPages.IsLatestSeason(seasonPageJson, seasonId) ? lifetimes.CurrentSeason : lifetimes.PastSeason;
 
     /// <summary>The season number comes from the fetched page's own <c>seasons[]</c> entry for
     /// <paramref name="seasonId"/>, never from the caller — falls back to 1 when the page carries
@@ -133,6 +143,23 @@ public sealed class MakoCatalog : ICatalog
     {
         Season? season = MakoPages.ParseShowPage(seasonPageJson).Seasons.FirstOrDefault(candidate => candidate.Id == seasonId);
         return season?.Number ?? FallbackSeasonNumber;
+    }
+
+    /// <exception cref="StreamUnavailableException">
+    /// <paramref name="episodeId"/> is not a well-formed <see cref="EpisodeKey"/> — surfaced as the
+    /// catalogue's own exception type rather than the parser's raw <see cref="FormatException"/>,
+    /// so every caller of <see cref="ICatalog"/> sees one family of playback failures.
+    /// </exception>
+    private static EpisodeKey ParseEpisodeIdOrThrow(string episodeId)
+    {
+        try
+        {
+            return EpisodeKey.Parse(episodeId);
+        }
+        catch (FormatException exception)
+        {
+            throw new StreamUnavailableException($"mako episode id '{episodeId}' is not playable", exception);
+        }
     }
 
     private static string SerializeStreamLink(StreamLink link) => JsonSerializer.Serialize(link);

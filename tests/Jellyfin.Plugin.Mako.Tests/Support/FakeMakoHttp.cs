@@ -2,6 +2,9 @@ using Jellyfin.Plugin.Mako.MakoApi;
 
 namespace Jellyfin.Plugin.Mako.Tests.Support;
 
+/// <summary>One request <see cref="FakeMakoHttp"/> saw: its HTTP method and the exact URL asked for.</summary>
+public readonly record struct RecordedCall(string Method, string Url);
+
 /// <summary>
 /// A hand-written fake of <c>IMakoHttp</c>: responses, bot challenges and failures programmed per
 /// URL, and a record of every URL asked for, so callers above the HTTP boundary — starting with
@@ -11,11 +14,15 @@ namespace Jellyfin.Plugin.Mako.Tests.Support;
 /// </summary>
 public sealed class FakeMakoHttp : IMakoHttp
 {
+    private const string GetMethod = "GET";
+    private const string PostMethod = "POST";
+
     private readonly Dictionary<string, string> _responses = [];
     private readonly HashSet<string> _challengedUrls = [];
     private readonly HashSet<string> _failingUrls = [];
     private readonly Dictionary<string, TaskCompletionSource> _gates = [];
     private readonly List<string> _requests = [];
+    private readonly List<RecordedCall> _calls = [];
     private readonly object _requestsLock = new();
 
     public IReadOnlyList<string> Requests
@@ -25,6 +32,19 @@ public sealed class FakeMakoHttp : IMakoHttp
             lock (_requestsLock)
             {
                 return [.. _requests];
+            }
+        }
+    }
+
+    /// <summary>Every request seen, with its method — unlike <see cref="Requests"/>, lets a test
+    /// tell the token endpoint's POST apart from an ordinary page GET.</summary>
+    public IReadOnlyList<RecordedCall> Calls
+    {
+        get
+        {
+            lock (_requestsLock)
+            {
+                return [.. _calls];
             }
         }
     }
@@ -50,22 +70,23 @@ public sealed class FakeMakoHttp : IMakoHttp
 
     public async Task<string> GetTextAsync(string url, CancellationToken cancellationToken)
     {
-        RecordRequest(url);
+        RecordRequest(GetMethod, url);
         return await ResolveAsync(url).ConfigureAwait(false);
     }
 
     public async Task<string> PostTextAsync(string url, string body, string contentType, CancellationToken cancellationToken)
     {
-        RecordRequest(url);
+        RecordRequest(PostMethod, url);
         LastPostBody = body;
         return await ResolveAsync(url).ConfigureAwait(false);
     }
 
-    private void RecordRequest(string url)
+    private void RecordRequest(string method, string url)
     {
         lock (_requestsLock)
         {
             _requests.Add(url);
+            _calls.Add(new RecordedCall(method, url));
         }
     }
 

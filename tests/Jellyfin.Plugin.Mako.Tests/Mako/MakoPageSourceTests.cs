@@ -163,6 +163,51 @@ public class MakoPageSourceTests
         Assert.Single(http.Requests);
     }
 
+    /// <summary>N4: at most one request to the bot-protected host at a time — two overlapping
+    /// reads of the same uncached page must coalesce into one request.</summary>
+    [Fact]
+    public async Task ConcurrentReadsOfAnUncachedPageShareOneRequest()
+    {
+        FakeMakoHttp http = new();
+        TaskCompletionSource gate = http.GateResponseTo(ShowPageUrl);
+        http.Respond(ShowPageUrl, ShowPageJson);
+        MakoPageSource pages = await CreatePageSourceAsync(http);
+
+        Task<string> first = pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, CancellationToken.None);
+        Task<string> second = pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, CancellationToken.None);
+        gate.SetResult();
+        string[] results = await Task.WhenAll(first, second);
+
+        Assert.Equal(ShowPageJson, results[0]);
+        Assert.Equal(ShowPageJson, results[1]);
+        Assert.Single(http.Requests);
+    }
+
+    /// <summary>A failed in-flight fetch must not poison the coalescing entry forever: once it
+    /// settles (with a failure both waiters observe), the entry is cleared and a later call
+    /// dispatches its own fresh request rather than being silently stuck.</summary>
+    [Fact]
+    public async Task AFailedInFlightFetchDoesNotPoisonLaterCalls()
+    {
+        FakeMakoHttp http = new();
+        TaskCompletionSource gate = http.GateResponseTo(ShowPageUrl);
+        http.Fail(ShowPageUrl);
+        MakoPageSource pages = await CreatePageSourceAsync(http);
+
+        Task<string> first = pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, CancellationToken.None);
+        Task<string> second = pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, CancellationToken.None);
+        gate.SetResult();
+
+        await Assert.ThrowsAsync<MakoRequestException>(() => first);
+        await Assert.ThrowsAsync<MakoRequestException>(() => second);
+        Assert.Single(http.Requests);
+
+        await Assert.ThrowsAsync<MakoRequestException>(
+            () => pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, CancellationToken.None));
+
+        Assert.Equal(2, http.Requests.Count);
+    }
+
     private static async Task<MakoPageSource> CreatePageSourceAsync(
         FakeMakoHttp http,
         IClock? clock = null,

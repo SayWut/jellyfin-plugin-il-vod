@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Jellyfin.Plugin.Mako.Cache;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,14 @@ public sealed class MakoPageSource
     private readonly MakoConfigLoader _config;
     private readonly TimedCache _cache;
     private readonly ILogger<MakoPageSource> _logger;
+
+    /// <summary>
+    /// One fetch in flight per page path (N4: at most one request to the bot-protected host at a
+    /// time). A second caller for the same uncached path joins the same <see cref="Task{TResult}"/>
+    /// instead of starting its own request; the entry is removed once that fetch settles, success
+    /// or failure, so a failure never poisons a later call into forever reusing it.
+    /// </summary>
+    private readonly ConcurrentDictionary<string, Task<string>> _inFlightFetches = new();
 
     public MakoPageSource(IMakoHttp http, MakoConfigLoader config, TimedCache cache, ILogger<MakoPageSource> logger)
     {
@@ -43,9 +52,12 @@ public sealed class MakoPageSource
             return cached.Value!;
         }
 
+        Task<string> fetch = _inFlightFetches.GetOrAdd(
+            pagePath,
+            _ => FetchAndCacheAsync(pagePath, cacheKey, lifetimeOf, cancellationToken));
         try
         {
-            return await FetchAndCacheAsync(pagePath, cacheKey, lifetimeOf, cancellationToken).ConfigureAwait(false);
+            return await fetch.ConfigureAwait(false);
         }
         catch (Exception exception) when (exception is BotChallengeException or MakoRequestException)
         {
@@ -56,6 +68,10 @@ public sealed class MakoPageSource
 
             _logger.LogWarning(exception, "mako: serving a stale copy of {PagePath} after mako refused a refetch", pagePath);
             return cached.Value!;
+        }
+        finally
+        {
+            _inFlightFetches.TryRemove(new KeyValuePair<string, Task<string>>(pagePath, fetch));
         }
     }
 

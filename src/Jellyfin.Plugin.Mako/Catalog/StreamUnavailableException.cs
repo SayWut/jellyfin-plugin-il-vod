@@ -6,4 +6,9 @@ public sealed class StreamUnavailableException : Exception
         : base(message)
     {
     }
+
+    public StreamUnavailableException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

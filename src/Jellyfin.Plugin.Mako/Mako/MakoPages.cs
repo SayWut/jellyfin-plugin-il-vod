@@ -31,10 +31,11 @@ public static class MakoPages
         JsonElement root = RequireObjectRoot(document.RootElement);
 
         return new ShowPage(
+            PagePath: PageUrlOf(root),
             Overview: TryGetNestedString(root, "hero", "description"),
             PosterUrl: PosterUrlOf(root),
             Seasons: ParseSeasons(root),
-            CurrentSeasonId: CurrentSeasonIdOf(root));
+            DisplayedSeasonId: DisplayedSeasonIdOf(root));
     }
 
     public static IReadOnlyList<Episode> ParseEpisodes(string pageJson, string showName, int seasonNumber)
@@ -61,25 +62,26 @@ public static class MakoPages
         return episodes;
     }
 
-    public static bool IsCurrentSeason(string pageJson, string seasonPagePath)
+    /// <summary>
+    /// True when <paramref name="seasonPagePath"/> names the HIGHEST-numbered season in this
+    /// page's own <c>seasons[]</c> — the season actually airing, as opposed to whichever season
+    /// the page happens to be showing (<see cref="ShowPage.DisplayedSeasonId"/>): mako marks a
+    /// past season's own page as its "current" (displayed) season too, so that flag alone cannot
+    /// tell latest from past. No <c>seasons</c> array at all → true (a single-season show has
+    /// nothing to be behind).
+    /// </summary>
+    public static bool IsLatestSeason(string pageJson, string seasonPagePath)
     {
         using JsonDocument document = ParseDocument(pageJson);
         JsonElement root = RequireObjectRoot(document.RootElement);
 
-        if (!TryGetArray(root, "seasons", out JsonElement seasons))
+        if (!TryGetArray(root, "seasons", out _))
         {
             return true;
         }
 
-        foreach (JsonElement entry in seasons.EnumerateArray())
-        {
-            if (TryGetString(entry, "pageUrl") == seasonPagePath)
-            {
-                return TryGetBoolean(entry, "current");
-            }
-        }
-
-        return false;
+        Season? latestSeason = ParseSeasons(root).MaxBy(season => season.Number);
+        return latestSeason?.Id == seasonPagePath;
     }
 
     private static JsonDocument ParseDocument(string pageJson)
@@ -131,7 +133,7 @@ public static class MakoPages
         return seasons;
     }
 
-    private static string? CurrentSeasonIdOf(JsonElement root)
+    private static string? DisplayedSeasonIdOf(JsonElement root)
     {
         if (!TryGetArray(root, "seasons", out JsonElement seasons))
         {

@@ -17,7 +17,14 @@ namespace Jellyfin.Plugin.Mako.Tests.Catalog;
 public class OnDemandRequestBudgetTests
 {
     private const string AppVersion = "43.0";
-    private const string PinnedPagePath = "/mako-vod-keshet/shemesh-s6";
+
+    // The real default: the pinned page is the show's own landing path, which is NOT the same as
+    // whichever season page it happens to display (that is DisplayedSeasonPath below). Serving
+    // the show-page fixture's JSON at this distinct url is what makes the "current season" row of
+    // the table below a genuine test of MakoCatalog.Remember-ing under a different cache key,
+    // rather than a same-key overwrite that would pass even if nothing were remembered at all.
+    private const string PinnedPagePath = "/mako-vod-keshet/shemesh";
+    private const string DisplayedSeasonPath = "/mako-vod-keshet/shemesh-s6";
     private const string PinnedShowName = "שמש";
     private const string SeasonOnePagePath = "/mako-vod-keshet/shemesh-s1";
     private const string NewPlaylistKey = "TESTKEY-PLAYLIST-NEW-24b";
@@ -45,7 +52,7 @@ public class OnDemandRequestBudgetTests
     private static readonly string NotesConfigUrl = MakoConfig.NotesUrlOf(CoreConfigJson);
     private static readonly MakoConfig ParsedConfig = MakoConfig.Parse(MainConfigJson, CoreConfigJson, NotesConfigJson);
 
-    private static readonly string ShowPageUrl = MakoUrls.Page(ParsedConfig.BaseUrlTemplate, PinnedPagePath);
+    private static readonly string PinnedPageUrl = MakoUrls.Page(ParsedConfig.BaseUrlTemplate, PinnedPagePath);
     private static readonly string SeasonOneUrl = MakoUrls.Page(ParsedConfig.BaseUrlTemplate, SeasonOnePagePath);
 
     private static readonly EpisodeKey ProtectedEpisode =
@@ -65,12 +72,13 @@ public class OnDemandRequestBudgetTests
         await catalog.GetShowsAsync(CancellationToken.None);
         Assert.Equal(0, BrowseHostRequestCount(http));
 
-        // | GetSeasonsAsync(show) | 1 (the show page) |
+        // | GetSeasonsAsync(show) | 1 (the show page, fetched under the PINNED path) |
         await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
         Assert.Equal(1, BrowseHostRequestCount(http));
 
-        // | GetEpisodesAsync(current season) | 1 (served from the remembered show page) |
-        await catalog.GetEpisodesAsync(PinnedPagePath, CancellationToken.None);
+        // | GetEpisodesAsync(current season) | 1 (served from the show page, remembered under the
+        // DISPLAYED season's own — different — path) |
+        await catalog.GetEpisodesAsync(DisplayedSeasonPath, CancellationToken.None);
         Assert.Equal(1, BrowseHostRequestCount(http));
 
         // | GetEpisodesAsync(season 1) | 2 |
@@ -91,6 +99,10 @@ public class OnDemandRequestBudgetTests
         Assert.Equal(1, RequestCountTo(http, TokenUrl));
         Assert.Equal(1, RequestCountTo(http, FinalMediaUrl));
         Assert.Equal(FinalMediaUrl, link.Url);
+
+        // The token endpoint is POSTed to; every other request (pages, playlist, the CDN) is a GET.
+        Assert.Contains(http.Calls, call => call.Method == "POST" && call.Url == TokenUrl);
+        Assert.All(http.Calls.Where(call => call.Url != TokenUrl), call => Assert.Equal("GET", call.Method));
 
         // | same episode again within 5 min | unchanged |
         StreamLink again = await catalog.GetStreamLinkAsync(ProtectedEpisode.ToString(), CancellationToken.None);
@@ -113,12 +125,17 @@ public class OnDemandRequestBudgetTests
         {
             Assert.DoesNotContain(http.Requests, url => url.Contains(untouchedSeasonSlug, StringComparison.Ordinal));
         }
+
+        // Positive control: the same matcher style DOES find the season that was actually opened,
+        // so the assertions above are proven to be checking something real rather than passing
+        // vacuously because the matcher itself never matches anything.
+        Assert.Contains(http.Requests, url => url.Contains("shemesh-s1", StringComparison.Ordinal));
     }
 
     private static FakeMakoHttp SeededHttp()
     {
         FakeMakoHttp http = new();
-        http.Respond(ShowPageUrl, ShowPageJson);
+        http.Respond(PinnedPageUrl, ShowPageJson);
         http.Respond(SeasonOneUrl, SeasonOnePageJson);
         http.Respond(PlaylistUrl, EncryptedProtectedPlaylist());
         http.Respond(TokenUrl, EncryptedTokenResponse());
@@ -151,23 +168,23 @@ public class OnDemandRequestBudgetTests
         FakeClock clock = new();
         TimedCache pageCache = new(clock);
         TimedCache streamLinkCache = new(clock);
-        MakoConfigLoader config = await WarmedConfigLoaderAsync(http, clock);
+        MakoConfigLoader config = await WarmedConfigLoaderAsync(http);
         MakoPageSource pages = new(http, config, pageCache, new RecordingLogger<MakoPageSource>());
         StreamResolver resolver = new(http, config, CreateDevice(), () => AppVersion, new RecordingLogger<StreamResolver>());
 
-        return new MakoCatalog(pages, resolver, streamLinkCache, clock, () => Pinned, () => CacheLifetimes.Default);
+        return new MakoCatalog(pages, resolver, streamLinkCache, () => Pinned, () => CacheLifetimes.Default);
     }
 
     /// <summary>
-    /// Loads the config chain through a throwaway <see cref="FakeMakoHttp"/> into a cache shared
-    /// with the returned loader, so the config chain — which itself touches
+    /// Loads the config chain through a throwaway <see cref="FakeMakoHttp"/> into a cache with its
+    /// own dedicated clock, so the config chain — which itself touches
     /// <see cref="MakoUrls.BrowseHost"/> for the notes document — never counts against the budget
     /// this test pins, matching a plugin whose config is already 24h-fresh by the time a user
     /// opens a folder.
     /// </summary>
-    private static async Task<MakoConfigLoader> WarmedConfigLoaderAsync(IMakoHttp http, IClock clock)
+    private static async Task<MakoConfigLoader> WarmedConfigLoaderAsync(IMakoHttp http)
     {
-        TimedCache configCache = new(clock);
+        TimedCache configCache = new(new FakeClock());
         FakeMakoHttp warmUpHttp = new();
         warmUpHttp.Respond(MainConfigUrl, MainConfigJson);
         warmUpHttp.Respond(CoreConfigUrl, CoreConfigJson);

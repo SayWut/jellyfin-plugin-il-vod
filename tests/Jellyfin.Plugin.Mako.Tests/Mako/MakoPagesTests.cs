@@ -32,11 +32,19 @@ public class MakoPagesTests
     }
 
     [Fact]
-    public void TheCurrentSeasonIdComesFromTheSeasonMarkedCurrent()
+    public void TheDisplayedSeasonIdComesFromTheSeasonMarkedCurrent()
     {
         ShowPage page = MakoPages.ParseShowPage(ShowPageJson);
 
-        Assert.Equal("/mako-vod-keshet/shemesh-s6", page.CurrentSeasonId);
+        Assert.Equal("/mako-vod-keshet/shemesh-s6", page.DisplayedSeasonId);
+    }
+
+    [Fact]
+    public void ThePagePathIsThePagesOwnTopLevelUrl()
+    {
+        ShowPage page = MakoPages.ParseShowPage(ShowPageJson);
+
+        Assert.Equal("/mako-vod-keshet/shemesh-s6", page.PagePath);
     }
 
     [Fact]
@@ -85,7 +93,8 @@ public class MakoPagesTests
         Assert.Equal("/show/only", season.Id);
         Assert.Equal(1, season.Number);
         Assert.Equal("עונה 1", season.Name);
-        Assert.Equal("/show/only", page.CurrentSeasonId);
+        Assert.Equal("/show/only", page.DisplayedSeasonId);
+        Assert.Equal("/show/only", page.PagePath);
     }
 
     [Fact]
@@ -246,28 +255,42 @@ public class MakoPagesTests
         Assert.Equal("פרק יחיד", kept.Name);
     }
 
+    /// <summary>
+    /// The season-1 fixture's own <c>seasons[]</c> marks the season the PAGE IS SHOWING as
+    /// <c>current: true</c> (that would be season 1, since this is season 1's page) — but the
+    /// same fixture's <c>seasons[]</c> also lists seasons up to 6, so the LATEST (highest
+    /// numbered) season on this page is season 6, not season 1.
+    /// </summary>
     [Fact]
-    public void IsCurrentSeasonIsTrueForTheSeasonMarkedCurrent()
+    public void IsLatestSeasonIsFalseForTheDisplayedSeasonWhenAHigherNumberedSeasonExists()
     {
-        bool isCurrent = MakoPages.IsCurrentSeason(SeasonOnePageJson, "/mako-vod-keshet/shemesh-s1");
+        bool isLatest = MakoPages.IsLatestSeason(SeasonOnePageJson, "/mako-vod-keshet/shemesh-s1");
 
-        Assert.True(isCurrent);
+        Assert.False(isLatest);
     }
 
     [Fact]
-    public void IsCurrentSeasonIsFalseForAnotherSeasonInTheSamePage()
+    public void IsLatestSeasonIsTrueForTheHighestNumberedSeasonInTheSamePage()
     {
-        bool isCurrent = MakoPages.IsCurrentSeason(SeasonOnePageJson, "/mako-vod-keshet/shemesh-s2");
+        bool isLatest = MakoPages.IsLatestSeason(SeasonOnePageJson, "/mako-vod-keshet/shemesh-s6");
 
-        Assert.False(isCurrent);
+        Assert.True(isLatest);
     }
 
     [Fact]
-    public void IsCurrentSeasonIsTrueWhenThePageHasNoSeasonsArray()
+    public void IsLatestSeasonIsFalseForASeasonThatIsNeitherDisplayedNorHighestNumbered()
     {
-        bool isCurrent = MakoPages.IsCurrentSeason("""{ "pageUrl": "/show/only" }""", "/show/only");
+        bool isLatest = MakoPages.IsLatestSeason(SeasonOnePageJson, "/mako-vod-keshet/shemesh-s2");
 
-        Assert.True(isCurrent);
+        Assert.False(isLatest);
+    }
+
+    [Fact]
+    public void IsLatestSeasonIsTrueWhenThePageHasNoSeasonsArray()
+    {
+        bool isLatest = MakoPages.IsLatestSeason("""{ "pageUrl": "/show/only" }""", "/show/only");
+
+        Assert.True(isLatest);
     }
 
     [Fact]
@@ -288,10 +311,10 @@ public class MakoPagesTests
     }
 
     [Fact]
-    public void IsCurrentSeasonFailsWithAFormatExceptionOnMalformedJson()
+    public void IsLatestSeasonFailsWithAFormatExceptionOnMalformedJson()
     {
         FormatException exception = Assert.Throws<FormatException>(
-            () => MakoPages.IsCurrentSeason("not json", "/show/s1"));
+            () => MakoPages.IsLatestSeason("not json", "/show/s1"));
 
         Assert.Equal("mako page is not valid JSON", exception.Message);
     }
@@ -320,10 +343,10 @@ public class MakoPagesTests
     [Theory]
     [InlineData("[]")]
     [InlineData("42")]
-    public void IsCurrentSeasonFailsWithAFormatExceptionWhenTheRootIsNotAJsonObject(string nonObjectJson)
+    public void IsLatestSeasonFailsWithAFormatExceptionWhenTheRootIsNotAJsonObject(string nonObjectJson)
     {
         FormatException exception = Assert.Throws<FormatException>(
-            () => MakoPages.IsCurrentSeason(nonObjectJson, "/show/s1"));
+            () => MakoPages.IsLatestSeason(nonObjectJson, "/show/s1"));
 
         Assert.Equal("mako page is not a JSON object", exception.Message);
     }
@@ -344,7 +367,7 @@ public class MakoPagesTests
         Assert.Equal("/show/s1", season.Id);
         Assert.Equal(1, season.Number);
         Assert.Equal("עונה 1", season.Name);
-        Assert.Equal("/show/s1", page.CurrentSeasonId);
+        Assert.Equal("/show/s1", page.DisplayedSeasonId);
     }
 
     [Fact]
