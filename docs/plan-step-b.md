@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- **N1 — on demand.** A request to mako happens only because a user opened a folder or pressed play. No scheduled task, no background service, no hosted service, no `ISupportsLatestMedia`, no `ISupportsMediaProbe`. Opening a show never fetches all of its seasons. The request budget is spec §2's table; Task B8 has a test that counts requests per user action — it is the definition of done for N1.
+- **N1 — on demand.** A request to mako happens only because a user opened a folder or pressed play. No scheduled task, no background service, no hosted service, no `ISupportsLatestMedia`, no `ISupportsMediaProbe`. Opening a show never fetches all of its seasons. The request budget is spec §2's table; Task B9 has a test that counts requests per user action — it is the definition of done for N1.
 - **N2 — cached.** Re-opening a show or season inside the cache lifetime makes no request. Lifetimes: config 24 h; show page 12 h; past season 7 days; current season 6 h; resolved stream link 5 min, memory only, never on disk.
 - **N3 — play-time URLs.** A signed URL is never persisted and never logged in full (log the host and path, not the query string).
 - **N4 — gentle.** At most one request to `www.mako.co.il` in flight; consecutive requests spaced by at least 750 ms; a redirect to `validate.perfdrive.com` is a `BotChallengeException`, followed by a 5-minute back-off during which no request is sent to `www.mako.co.il`.
