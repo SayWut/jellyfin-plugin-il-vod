@@ -43,7 +43,7 @@ Plan: `docs/plan-step-b.md` (written 2026-09-21, awaiting the user's approval). 
 
 | Task | Title | Driver | Status | Notes |
 |---|---|---|---|---|
-| B1 | Clock and timed cache | agent | `todo` | |
+| B1 | Clock and timed cache | agent | `done` | `Cache/IClock`, `SystemClock`, `CacheRead`, `TimedCache` (stale-after-lifetime reads, atomic JSON persistence via `.tmp` + `File.Move`, thread-safe). 8 new tests (75/75 total). |
 | B2 | Payload cipher | agent | `todo` | |
 | B3 | URL rules and the config model | agent | `todo` | |
 | B4 | The HTTP boundary, pacing, and the config loader | agent | `todo` | |
