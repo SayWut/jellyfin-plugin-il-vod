@@ -39,6 +39,8 @@ public sealed class StreamResolver
     private const string TicketProperty = "ticket";
     private const string CaseIdProperty = "caseId";
 
+    private const string NoMediaMessage = "playlist has no media";
+
     private readonly IMakoHttp _http;
     private readonly MakoConfigLoader _config;
     private readonly DeviceIdentity _device;
@@ -109,42 +111,53 @@ public sealed class StreamResolver
         }
     }
 
-    /// <exception cref="MakoRequestException">The playlist's <c>media</c> array is missing or empty.</exception>
+    /// <exception cref="MakoRequestException">
+    /// The playlist is not valid JSON, or its <c>media</c> array is missing, not an array, empty,
+    /// or contains no entry usable as a stream (a JSON object with a non-empty string <c>url</c>).
+    /// </exception>
     private static PlaylistMedia ParseBestMedia(string playlistJson)
     {
-        using JsonDocument document = JsonDocument.Parse(playlistJson);
+        using JsonDocument document = ParseJsonOrThrow(playlistJson, "playlist");
         JsonElement root = document.RootElement;
 
-        if (!TryGetArray(root, MediaProperty, out JsonElement mediaEntries) || mediaEntries.GetArrayLength() == 0)
+        if (!TryGetArray(root, MediaProperty, out JsonElement mediaEntries)
+            || HighestWeightUsableMedia(mediaEntries) is not { } bestMedia)
         {
-            throw new MakoRequestException("playlist has no media");
+            throw new MakoRequestException(NoMediaMessage);
         }
 
-        JsonElement bestMedia = HighestWeightMedia(mediaEntries);
-        return new PlaylistMedia(
-            Url: TryGetString(bestMedia, MediaUrlProperty) ?? string.Empty,
-            Cdn: TryGetString(bestMedia, MediaCdnProperty) ?? string.Empty,
-            Protected: IsProtectedContent(root));
+        return new PlaylistMedia(bestMedia.Url, bestMedia.Cdn, IsProtectedContent(root));
     }
 
-    /// <summary>Ties keep the first entry, since only a strictly higher weight ever replaces it.</summary>
-    private static JsonElement HighestWeightMedia(JsonElement mediaEntries)
+    /// <summary>
+    /// Entries that are not JSON objects, or have no non-empty string <c>url</c>, are ignored
+    /// entirely when choosing — never surfaced as a playable stream with an empty URL. Ties among
+    /// the remaining entries keep the first, since only a strictly higher weight ever replaces it.
+    /// </summary>
+    private static UsableMedia? HighestWeightUsableMedia(JsonElement mediaEntries)
     {
-        JsonElement best = mediaEntries[0];
-        int bestWeight = CdnWeightOf(best);
+        UsableMedia? best = null;
 
-        foreach (JsonElement candidate in mediaEntries.EnumerateArray().Skip(1))
+        foreach (JsonElement candidate in mediaEntries.EnumerateArray())
         {
-            int candidateWeight = CdnWeightOf(candidate);
-            if (candidateWeight > bestWeight)
+            if (TryReadUsableMedia(candidate) is not { } usable)
             {
-                best = candidate;
-                bestWeight = candidateWeight;
+                continue;
+            }
+
+            if (best is not { } current || usable.Weight > current.Weight)
+            {
+                best = usable;
             }
         }
 
         return best;
     }
+
+    private static UsableMedia? TryReadUsableMedia(JsonElement media) =>
+        TryGetString(media, MediaUrlProperty) is { Length: > 0 } url
+            ? new UsableMedia(url, TryGetString(media, MediaCdnProperty) ?? string.Empty, CdnWeightOf(media))
+            : null;
 
     /// <summary><c>cdnLB</c> is a JSON string holding a weight; an unparseable one counts as 0.</summary>
     private static int CdnWeightOf(JsonElement media) =>
@@ -190,10 +203,11 @@ public sealed class StreamResolver
         return body.ToJsonString();
     }
 
+    /// <exception cref="MakoRequestException">The token response is not valid JSON.</exception>
     /// <exception cref="EntitlementDeniedException">The token response carries no ticket (N5).</exception>
     private static string ExtractTicketOrThrow(string tokenJson, string episodeId)
     {
-        using JsonDocument document = JsonDocument.Parse(tokenJson);
+        using JsonDocument document = ParseJsonOrThrow(tokenJson, "token response");
         JsonElement root = document.RootElement;
 
         if (TryGetArray(root, TicketsProperty, out JsonElement tickets)
@@ -287,5 +301,25 @@ public sealed class StreamResolver
         return false;
     }
 
+    /// <summary>
+    /// Parses mako's decrypted JSON, never letting a malformed payload surface as a raw
+    /// <see cref="JsonException"/> — or quote the payload itself in the exception message (N3
+    /// extends naturally to "never the plaintext either", not just the signed URL).
+    /// </summary>
+    /// <exception cref="MakoRequestException"><paramref name="json"/> is not valid JSON.</exception>
+    private static JsonDocument ParseJsonOrThrow(string json, string what)
+    {
+        try
+        {
+            return JsonDocument.Parse(json);
+        }
+        catch (JsonException)
+        {
+            throw new MakoRequestException($"{what} is not valid JSON");
+        }
+    }
+
     private readonly record struct PlaylistMedia(string Url, string Cdn, bool Protected);
+
+    private readonly record struct UsableMedia(string Url, string Cdn, int Weight);
 }

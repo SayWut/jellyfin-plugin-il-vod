@@ -54,6 +54,66 @@ public class DeviceIdentityTests : IDisposable
         Assert.Matches(ExpectedFormat, id);
     }
 
+    [Fact]
+    public void AFileContainingGarbageIsReplacedWithAFreshValidId()
+    {
+        string filePath = NewTemporaryFilePath();
+        File.WriteAllText(filePath, "garbage");
+
+        string id = new DeviceIdentity(filePath).Get();
+
+        Assert.Matches(ExpectedFormat, id);
+        Assert.Equal(id, new DeviceIdentity(filePath).Get());
+    }
+
+    [Fact]
+    public void AnIdWithUppercaseHexIsReplacedWithAFreshValidId()
+    {
+        string filePath = NewTemporaryFilePath();
+        File.WriteAllText(filePath, "A1" + new string('A', 23));
+
+        string id = new DeviceIdentity(filePath).Get();
+
+        Assert.Matches(ExpectedFormat, id);
+        Assert.Equal(id, new DeviceIdentity(filePath).Get());
+    }
+
+    [Fact]
+    public void AnIdOneCharacterShortIsReplacedWithAFreshValidId()
+    {
+        string filePath = NewTemporaryFilePath();
+        File.WriteAllText(filePath, "A1" + new string('a', 22));
+
+        string id = new DeviceIdentity(filePath).Get();
+
+        Assert.Matches(ExpectedFormat, id);
+        Assert.Equal(id, new DeviceIdentity(filePath).Get());
+    }
+
+    [Fact]
+    public void WhitespaceOnlyContentIsReplacedWithAFreshValidId()
+    {
+        string filePath = NewTemporaryFilePath();
+        File.WriteAllText(filePath, "   \n\t  ");
+
+        string id = new DeviceIdentity(filePath).Get();
+
+        Assert.Matches(ExpectedFormat, id);
+        Assert.Equal(id, new DeviceIdentity(filePath).Get());
+    }
+
+    [Fact]
+    public void AValidIdSurroundedByWhitespaceIsAcceptedTrimmed()
+    {
+        const string validId = "A10123456789abcdef0123456";
+        string filePath = NewTemporaryFilePath();
+        File.WriteAllText(filePath, $"  {validId}\n");
+
+        string id = new DeviceIdentity(filePath).Get();
+
+        Assert.Equal(validId, id);
+    }
+
     private string NewTemporaryFilePath()
     {
         string filePath = Path.Combine(Path.GetTempPath(), $"mako-device-identity-tests-{Guid.NewGuid():N}.id");

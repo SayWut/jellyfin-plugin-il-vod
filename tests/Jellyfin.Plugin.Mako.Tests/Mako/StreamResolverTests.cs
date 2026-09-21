@@ -234,6 +234,193 @@ public class StreamResolverTests
         Assert.DoesNotContain(logger.Lines, line => line.Contains("hmac=ab", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public async Task EntriesWithoutAUsableUrlAreIgnoredWhenChoosingMedia()
+    {
+        string playlistJson =
+            $$"""
+            {
+              "media": [ { "cdnLB": "90" }, { "url": "{{MediaUrl}}", "cdn": "AWS", "cdnLB": "10" } ],
+              "videoDetails": { "extraParams": { "protectedContent": false } }
+            }
+            """;
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
+        http.Respond(MediaUrl, MasterPlaylistText);
+
+        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+
+        Assert.Equal(MediaUrl, link.Url);
+    }
+
+    [Fact]
+    public async Task NonObjectMediaEntriesFailWithTheSameExceptionAsAnEmptyArray()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, """{ "media": ["x", 42, null] }"""));
+
+        MakoRequestException exception = await Assert.ThrowsAsync<MakoRequestException>(
+            () => CreateResolver(http).ResolveAsync(Episode, CancellationToken.None));
+
+        Assert.Equal("playlist has no media", exception.Message);
+    }
+
+    [Fact]
+    public async Task AMediaPropertyThatIsNotAnArrayFailsTheSameWay()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, """{ "media": "not-an-array" }"""));
+
+        MakoRequestException exception = await Assert.ThrowsAsync<MakoRequestException>(
+            () => CreateResolver(http).ResolveAsync(Episode, CancellationToken.None));
+
+        Assert.Equal("playlist has no media", exception.Message);
+    }
+
+    [Fact]
+    public async Task AMissingMediaPropertyFailsTheSameWay()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, """{ "videoDetails": {} }"""));
+
+        MakoRequestException exception = await Assert.ThrowsAsync<MakoRequestException>(
+            () => CreateResolver(http).ResolveAsync(Episode, CancellationToken.None));
+
+        Assert.Equal("playlist has no media", exception.Message);
+    }
+
+    [Fact]
+    public async Task ATieInCdnWeightKeepsTheFirstEntry()
+    {
+        const string firstUrl = "https://cdn.example.test/first.m3u8";
+        const string secondUrl = "https://cdn.example.test/second.m3u8";
+        string playlistJson =
+            $$"""
+            {
+              "media": [
+                { "url": "{{firstUrl}}", "cdn": "first", "cdnLB": "50" },
+                { "url": "{{secondUrl}}", "cdn": "second", "cdnLB": "50" }
+              ],
+              "videoDetails": { "extraParams": { "protectedContent": false } }
+            }
+            """;
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
+        http.Respond(firstUrl, MasterPlaylistText);
+
+        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+
+        Assert.Equal(firstUrl, link.Url);
+    }
+
+    [Fact]
+    public async Task AnUnparseableCdnWeightCountsAsZero()
+    {
+        const string garbageWeightUrl = "https://cdn.example.test/garbage-weight.m3u8";
+        const string realWeightUrl = "https://cdn.example.test/real-weight.m3u8";
+        string playlistJson =
+            $$"""
+            {
+              "media": [
+                { "url": "{{garbageWeightUrl}}", "cdn": "g", "cdnLB": "abc" },
+                { "url": "{{realWeightUrl}}", "cdn": "r", "cdnLB": "1" }
+              ],
+              "videoDetails": { "extraParams": { "protectedContent": false } }
+            }
+            """;
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
+        http.Respond(realWeightUrl, MasterPlaylistText);
+
+        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+
+        Assert.Equal(realWeightUrl, link.Url);
+    }
+
+    [Fact]
+    public async Task NoVideoDetailsAtAllIsTreatedAsUnprotected()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, $$"""{ "media": [ { "url": "{{MediaUrl}}", "cdn": "cdn1", "cdnLB": "50" } ] }"""));
+        http.Respond(MediaUrl, MasterPlaylistText);
+
+        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+
+        Assert.Equal(MediaUrl, link.Url);
+        Assert.Null(http.LastPostBody);
+    }
+
+    [Fact]
+    public async Task VideoDetailsWithoutExtraParamsIsTreatedAsUnprotected()
+    {
+        string playlistJson =
+            $$"""
+            {
+              "media": [ { "url": "{{MediaUrl}}", "cdn": "cdn1", "cdnLB": "50" } ],
+              "videoDetails": {}
+            }
+            """;
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
+        http.Respond(MediaUrl, MasterPlaylistText);
+
+        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+
+        Assert.Equal(MediaUrl, link.Url);
+        Assert.Null(http.LastPostBody);
+    }
+
+    [Fact]
+    public async Task ANumericCaseIdIsReadAsText()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, EncryptedPlaylist(MediaUrl, isProtected: true));
+        http.Respond(TokenUrl, PayloadCipher.Encrypt(TokenKey, """{"caseId":4,"tickets":[]}"""));
+
+        EntitlementDeniedException exception = await Assert.ThrowsAsync<EntitlementDeniedException>(
+            () => CreateResolver(http).ResolveAsync(Episode, CancellationToken.None));
+
+        Assert.Equal("4", exception.CaseId);
+    }
+
+    [Fact]
+    public async Task AMissingTicketsKeyFailsWithEntitlementDenied()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, EncryptedPlaylist(MediaUrl, isProtected: true));
+        http.Respond(TokenUrl, PayloadCipher.Encrypt(TokenKey, """{"caseId":"9"}"""));
+
+        EntitlementDeniedException exception = await Assert.ThrowsAsync<EntitlementDeniedException>(
+            () => CreateResolver(http).ResolveAsync(Episode, CancellationToken.None));
+
+        Assert.Equal("9", exception.CaseId);
+    }
+
+    [Fact]
+    public async Task InvalidPlaylistJsonSurfacesATypedException()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, "not json at all"));
+
+        MakoRequestException exception = await Assert.ThrowsAsync<MakoRequestException>(
+            () => CreateResolver(http).ResolveAsync(Episode, CancellationToken.None));
+
+        Assert.Equal("playlist is not valid JSON", exception.Message);
+    }
+
+    [Fact]
+    public async Task InvalidTokenResponseJsonSurfacesATypedException()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, EncryptedPlaylist(MediaUrl, isProtected: true));
+        http.Respond(TokenUrl, PayloadCipher.Encrypt(TokenKey, "not json at all"));
+
+        MakoRequestException exception = await Assert.ThrowsAsync<MakoRequestException>(
+            () => CreateResolver(http).ResolveAsync(Episode, CancellationToken.None));
+
+        Assert.Equal("token response is not valid JSON", exception.Message);
+    }
+
     private static void EnqueueConfig(SequencedResponses http, string? notesConfigJson = null)
     {
         http.Enqueue(MainConfigUrl, MainConfigJson);
