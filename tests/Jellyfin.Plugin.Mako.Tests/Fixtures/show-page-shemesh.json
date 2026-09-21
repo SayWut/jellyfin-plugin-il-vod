@@ -1,0 +1,144 @@
+{
+  "channelName": "עונה 6",
+  "pageUrl": "/mako-vod-keshet/shemesh-s6",
+  "seasons": [
+    {
+      "seasonTitle": "עונה 1",
+      "current": false,
+      "pageUrl": "/mako-vod-keshet/shemesh-s1"
+    },
+    {
+      "seasonTitle": "עונה 2",
+      "current": false,
+      "pageUrl": "/mako-vod-keshet/shemesh-s2"
+    },
+    {
+      "seasonTitle": "עונה 3",
+      "current": false,
+      "pageUrl": "/mako-vod-keshet/shemesh-s3"
+    },
+    {
+      "seasonTitle": "עונה 4",
+      "current": false,
+      "pageUrl": "/mako-vod-keshet/shemesh-s4"
+    },
+    {
+      "seasonTitle": "עונה 5",
+      "current": false,
+      "pageUrl": "/mako-vod-keshet/shemesh-s5"
+    },
+    {
+      "seasonTitle": "עונה 6",
+      "current": true,
+      "pageUrl": "/mako-vod-keshet/shemesh-s6"
+    }
+  ],
+  "hero": {
+    "description": "העלילה מתמקדת בבית הקפה \"האימפריה של שמש\" שמנוהל ע\"י נחום שמש, ובשבעת חבריו: אתי הילל המלצרית, ששי, הטבח הלא המבריק במיוחד, עוגן, הבלונדינית הקלאסית, ישעיהו טנצר, העו\"ד חמדן המכונה \"טנצר המניאק\" וכמובן בר, בנה של רקפת השכנה, שהוא בעצם המבוגר האחראי היחיד במקום",
+    "extraInfo": "6 עונות",
+    "logo": "https://img.mako.co.il/2022/05/17/Shemesh_LOGO_E.png",
+    "pics": [
+      {
+        "picUrl": "https://img.mako.co.il/2025/06/09/Shemesh_e_nologo.jpg"
+      },
+      {
+        "picUrl": "https://img.mako.co.il/2025/04/01/Shemesh_1_e_NoLogo_re.jpg"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "id": "allEpisodes",
+      "buttonText": "פרקים",
+      "vods": [
+        {
+          "componentLayout": "vod",
+          "title": "חתונה מאוחרת",
+          "itemVcmId": "e625dae41e065910VgnVCM200000650a10acRCRD",
+          "channelId": "fcded9f9f6c35910VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "e625dae41e065910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s6/VOD-e625dae41e06591026.htm",
+          "extraInfo": "פרק 1@03.01.04",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/03/20/Shemesh6_01_VOD_autoOrient_i.jpg"
+            }
+          ]
+        },
+        {
+          "componentLayout": "ad",
+          "index": 1,
+          "iu": "/242748299/makoTV/vod_keshet/shemesh/mobile_monster1_300X250/",
+          "sizes": "{fluid, 300x250, 336x280}"
+        },
+        {
+          "componentLayout": "vod",
+          "title": "אל אל ישראל",
+          "itemVcmId": "1035dae41e065910VgnVCM200000650a10acRCRD",
+          "channelId": "fcded9f9f6c35910VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "1035dae41e065910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s6/VOD-1035dae41e06591026.htm",
+          "extraInfo": "פרק 2@10.01.04",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/03/20/Shemesh6_2_VOD_autoOrient_i.jpg"
+            }
+          ]
+        },
+        {
+          "componentLayout": "vod",
+          "title": "גבר זר אצלי באמבטיה",
+          "itemVcmId": "daf6dae41e065910VgnVCM200000650a10acRCRD",
+          "channelId": "fcded9f9f6c35910VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "daf6dae41e065910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s6/VOD-daf6dae41e06591026.htm",
+          "extraInfo": "פרק 3@17.01.04",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/03/20/Shemesh6_3_VOD_autoOrient_i.jpg"
+            }
+          ]
+        },
+        {
+          "componentLayout": "vod",
+          "title": "חילופי עונות",
+          "itemVcmId": "a865dae41e065910VgnVCM200000650a10acRCRD",
+          "channelId": "fcded9f9f6c35910VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "a865dae41e065910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s6/VOD-a865dae41e06591026.htm",
+          "extraInfo": "פרק 4@24.01.04",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/03/20/Shemesh6_4_VOD_autoOrient_i.jpg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shorts",
+      "buttonText": "קטעים קצרים",
+      "vods": [
+        {
+          "componentLayout": "vod",
+          "title": "פתיח שמש",
+          "itemVcmId": "c2bde2460f0e8910VgnVCM200000650a10acRCRD",
+          "channelId": "ed39769c32866910VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "c2bde2460f0e8910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s6/short/Video-c2bde2460f0e891026.htm",
+          "extraInfo": "מתוך פרק 1@03.01.04",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/08/18/Shemesh6_10_autoOrient_i.jpg"
+            }
+          ],
+          "duration": "00:36"
+        }
+      ]
+    },
+    {
+      "id": "credits",
+      "buttonText": "קרדיטים"
+    }
+  ]
+}

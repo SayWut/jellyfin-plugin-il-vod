@@ -1,0 +1,195 @@
+{
+  "channelName": "עונה 1",
+  "pageUrl": "/mako-vod-keshet/shemesh-s1",
+  "seasons": [
+    {
+      "seasonTitle": "עונה 1",
+      "current": true,
+      "pageUrl": "/mako-vod-keshet/shemesh-s1"
+    },
+    {
+      "seasonTitle": "עונה 2",
+      "current": false,
+      "pageUrl": "/mako-vod-keshet/shemesh-s2"
+    },
+    {
+      "seasonTitle": "עונה 3",
+      "current": false,
+      "pageUrl": "/mako-vod-keshet/shemesh-s3"
+    },
+    {
+      "seasonTitle": "עונה 4",
+      "current": false,
+      "pageUrl": "/mako-vod-keshet/shemesh-s4"
+    },
+    {
+      "seasonTitle": "עונה 5",
+      "current": false,
+      "pageUrl": "/mako-vod-keshet/shemesh-s5"
+    },
+    {
+      "seasonTitle": "עונה 6",
+      "current": false,
+      "pageUrl": "/mako-vod-keshet/shemesh-s6"
+    }
+  ],
+  "hero": {
+    "description": "העלילה מתמקדת בבית הקפה \"האימפריה של שמש\" שמנוהל ע\"י נחום שמש, ובשבעת חבריו: אתי הילל המלצרית, ששי, הטבח הלא המבריק במיוחד, עוגן, הבלונדינית הקלאסית, ישעיהו טנצר, העו\"ד חמדן המכונה \"טנצר המניאק\" וכמובן בר, בנה של רקפת השכנה, שהוא בעצם המבוגר האחראי היחיד במקום",
+    "extraInfo": "6 עונות",
+    "logo": "https://img.mako.co.il/2022/05/17/Shemesh_LOGO_E.png",
+    "pics": [
+      {
+        "picUrl": "https://img.mako.co.il/2025/06/09/Shemesh_e_nologo.jpg"
+      },
+      {
+        "picUrl": "https://img.mako.co.il/2025/04/01/Shemesh_1_e_NoLogo_re.jpg"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "id": "allEpisodes",
+      "buttonText": "פרקים",
+      "vods": [
+        {
+          "componentLayout": "vod",
+          "title": "שמש בעל הנס",
+          "itemVcmId": "d13f539206c35910VgnVCM200000650a10acRCRD",
+          "channelId": "4e091bfd191d0810VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "d13f539206c35910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s1/VOD-d13f539206c3591026.htm",
+          "extraInfo": "פרק 1@25.12.97",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/03/04/Shemesh_01_251297_VOD_autoOrient._autoOrient_i.jpg"
+            }
+          ]
+        },
+        {
+          "componentLayout": "ad",
+          "index": 1,
+          "iu": "/242748299/makoTV/vod_keshet/shemesh/mobile_monster1_300X250/",
+          "sizes": "{fluid, 300x250, 336x280}"
+        },
+        {
+          "componentLayout": "vod",
+          "title": "סובלנות",
+          "itemVcmId": "ab68276277c35910VgnVCM200000650a10acRCRD",
+          "channelId": "4e091bfd191d0810VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "ab68276277c35910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s1/VOD-ab68276277c3591026.htm",
+          "extraInfo": "פרק 2@01.01.98",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/03/03/Shemesh_02_010198_VOD_autoOrient_i.jpg"
+            }
+          ]
+        },
+        {
+          "componentLayout": "vod",
+          "title": "הנחליאלי",
+          "itemVcmId": "2c67276277c35910VgnVCM200000650a10acRCRD",
+          "channelId": "4e091bfd191d0810VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "2c67276277c35910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s1/VOD-2c67276277c3591026.htm",
+          "extraInfo": "פרק 3@08.01.98",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/03/04/Shemesh_03_080198_VOD_autoOrient_i.jpg"
+            }
+          ]
+        },
+        {
+          "componentLayout": "vod",
+          "title": "דיאטה",
+          "itemVcmId": "14d7276277c35910VgnVCM200000650a10acRCRD",
+          "channelId": "4e091bfd191d0810VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "14d7276277c35910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s1/VOD-14d7276277c3591026.htm",
+          "extraInfo": "פרק 4@15.01.98",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/03/04/Shemesh_04_150198_VOD_autoOrient_i.jpg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shorts",
+      "buttonText": "קטעים קצרים",
+      "vods": [
+        {
+          "componentLayout": "vod",
+          "title": "בר בג'ינגל על אימפריית השמש",
+          "itemVcmId": "53a6db1d8dfa6910VgnVCM200000650a10acRCRD",
+          "channelId": "6c9afa7cf0866910VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "53a6db1d8dfa6910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s1/short/Video-53a6db1d8dfa691026.htm",
+          "extraInfo": "08.05.25",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/05/08/Shemesh_06_080525_Jingle_Bar_autoOrient_i.jpg"
+            }
+          ],
+          "duration": "01:12"
+        },
+        {
+          "componentLayout": "ad",
+          "index": 1,
+          "iu": "/242748299/makoTV/vod_keshet/shemesh/mobile_monster1_300X250/",
+          "sizes": "{fluid, 300x250, 336x280}"
+        },
+        {
+          "componentLayout": "vod",
+          "title": "שמש וסיגל שחמון מתאהבים",
+          "itemVcmId": "e85f78de1fa96910VgnVCM200000650a10acRCRD",
+          "channelId": "6c9afa7cf0866910VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "e85f78de1fa96910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s1/short/Video-e85f78de1fa9691026.htm",
+          "extraInfo": "04.05.25",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/05/04/Shemesh_18_210598_Sigal_autoOrient_i.jpg"
+            }
+          ],
+          "duration": "01:33"
+        },
+        {
+          "componentLayout": "vod",
+          "title": "בר מפתיע את הילדה שמאוהב בה עם גיל ססובר",
+          "itemVcmId": "777647541da96910VgnVCM200000650a10acRCRD",
+          "channelId": "6c9afa7cf0866910VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "777647541da96910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s1/short/Video-777647541da9691026.htm",
+          "extraInfo": "04.05.25",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/05/04/Shemesh_15_090498_BarMeoav_autoOrient_i.jpg"
+            }
+          ],
+          "duration": "01:39"
+        },
+        {
+          "componentLayout": "vod",
+          "title": "שמש שר מזרחית כדי להרשים את אתי",
+          "itemVcmId": "c15247541da96910VgnVCM200000650a10acRCRD",
+          "channelId": "6c9afa7cf0866910VgnVCM200000650a10acRCRD",
+          "galleryChannelId": "c15247541da96910VgnVCM200000650a10acRCRD",
+          "pageUrl": "/mako-vod-keshet/shemesh-s1/short/Video-c15247541da9691026.htm",
+          "extraInfo": "04.05.25",
+          "pics": [
+            {
+              "picUrl": "https://img.mako.co.il/2025/05/04/Shemesh_03_080198_CLIP_autoOrient_i.jpg"
+            }
+          ],
+          "duration": "00:49"
+        }
+      ]
+    },
+    {
+      "id": "credits",
+      "buttonText": "קרדיטים"
+    }
+  ]
+}

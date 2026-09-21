@@ -1,0 +1,7 @@
+{
+  "sources": {
+    "playlist": "https://www.mako.co.il/AjaxPage?jspName=playlist12.jsp&vcmid=%VCM_ID%&videoChannelId=%CHANNEL_ID%&galleryChannelId=%GALLERY_ID%&consumer=%CONSUMER%&appId=makoTV",
+    "token": "https://mass.mako.co.il/ClicksStatistics/entitlementsServicesV2.jsp?et=egt",
+    "notes": "https://www.mako.co.il/collab/services/notesConfig.json"
+  }
+}

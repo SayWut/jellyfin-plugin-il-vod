@@ -1,6 +1,6 @@
 # Jellyfin mako plugin — prototype design
 
-Date: 2026-09-20. Status: approved in conversation, awaiting written review.
+Date: 2026-09-20; step B section revised 2026-09-21 after step A. Status: step A done; step B awaiting review.
 
 ## 1. What this is
 
@@ -154,98 +154,152 @@ surfacing only as unexplained playback crashes.
 
 ## 5. Step B — live mako under one pinned show
 
-The pinned show is configured by its mako page path (default
-`/mako-vod-keshet/shemesh`). There is no catalogue, genre list or search. The
-"Test stream URL" setting is removed.
+Step A passed its gate on 2026-09-21 (`docs/step-a-results.md`). Step B replaces
+the static catalogue with live mako calls for **one pinned show**, configured by
+its mako page path (default `/mako-vod-keshet/shemesh`). There is no catalogue,
+genre list or search yet. The two step A test settings ("Test stream URL", "Test
+stream container") are removed.
+
+### 5.0 What step A settled, and step B keeps
+
+- Shows are `ChannelFolderType.Series`, seasons `ChannelFolderType.Season`. Jellyfin's
+  TV endpoints (`/Shows/{id}/Seasons`, `/Shows/{id}/Episodes?seasonId=`) reach the
+  plugin on demand for channel items, and remote metadata fetchers are disabled for
+  channel items, so mako's Hebrew titles stay.
+- Every episode carries a `MediaSourceType.Placeholder` source with a non-existent
+  file path, so Jellyfin reports `LocationType: FileSystem` (Fladder plays nothing
+  else). Jellyfin drops placeholder sources at play time.
+- The real media source leaves `Id` empty, names itself `mako`, is remote HTTP with
+  container `hls` (Jellyfin only adds the `aac_adtstoasc` filter its fMP4 output
+  needs when the source container is `ts`/`aac`/`hls`), and sets `AnalyzeDurationMs`.
+- The probe-size limiter (§4.3) stays.
+- Jellyfin 12.1 never direct-plays an HLS manifest; every play goes through ffmpeg
+  on the phone. The goal is a stream **copy**, not a re-encode (§5.2).
 
 ### 5.1 Structure
 
 ```
-jellyfin-plugin-mako/
-├── README.md
-├── docs/spec.md, docs/plan.md
-├── build.yaml
-├── Jellyfin.Plugin.Mako.sln
-├── src/Jellyfin.Plugin.Mako/
-│   ├── Plugin.cs                 plugin identity and settings
-│   ├── MakoChannel.cs            Jellyfin-facing: folder opened → items; play → URL
-│   ├── Catalog/
-│   │   ├── ICatalog.cs           contents of a folder; stream link of an episode
-│   │   ├── StaticCatalog.cs      step A
-│   │   ├── MakoCatalog.cs        step B: mako answers → Show / Season / Episode
-│   │   └── CachedCatalog.cs      wraps an ICatalog; answers from cache when fresh
-│   ├── Mako/
-│   │   ├── MakoHttpClient.cs     the only class that talks to mako: headers, pacing, challenge detection
-│   │   ├── MakoPages.cs          page JSON → seasons, episodes (parsing only)
-│   │   ├── MakoConfig.cs         the three config files: AES keys, app id, endpoints
-│   │   ├── PayloadCipher.cs      AES-192-CBC encrypt / decrypt
-│   │   └── StreamResolver.cs     playlist → decrypt → token if protected → final URL
-│   ├── Cache/TimedCache.cs       key → value with expiry; knows nothing about mako
-│   └── Model/                    Show, Season, Episode, StreamLink
-├── tests/Jellyfin.Plugin.Mako.Tests/
-│   └── fixtures/                 saved mako responses
-└── scripts/build.sh, install.sh, uninstall.sh
+src/Jellyfin.Plugin.Mako/
+├── Plugin.cs, PluginServiceRegistrator.cs, MakoChannel.cs
+├── Configuration/                PinnedShowPath, cache durations, app version
+├── Model/                        Show, Season, Episode, StreamLink (+ StreamDescription)
+├── Browsing/                     FolderId, ChannelItemMapper, MediaSourceFactory
+├── Transcoding/                  probe-size limiter (unchanged)
+├── Catalog/
+│   ├── ICatalog.cs
+│   └── MakoCatalog.cs            mako answers → Show / Season / Episode / StreamLink
+├── Mako/
+│   ├── IMakoHttp.cs / MakoHttpClient.cs   the only class that talks to mako: headers, pacing, challenge detection
+│   ├── MakoUrls.cs               the page-URL template rule and the playlist URL template
+│   ├── MakoConfig.cs / MakoConfigLoader.cs  the three config files: endpoints, app id, AES keys
+│   ├── MakoPageSource.cs         a page's JSON text, from the cache when fresh, else from mako; stale copy on a bot challenge
+│   ├── MakoPages.cs              page JSON → seasons, episodes, show overview (parsing only)
+│   ├── EpisodeKey.cs             the three playback ids packed into one episode id
+│   ├── PayloadCipher.cs          AES-192-CBC encrypt / decrypt
+│   ├── StreamResolver.cs         playlist → decrypt → token if protected → final URL
+│   ├── MasterPlaylist.cs         HLS master text → resolution, bandwidth, codecs
+│   └── DeviceIdentity.cs         the synthesized device id, created once and kept
+└── Cache/
+    ├── IClock.cs / SystemClock.cs
+    └── TimedCache.cs             key → value with expiry and stale reads; knows nothing about mako
 ```
 
-`MakoChannel` reaches content only through `ICatalog`. Step B swaps the
-catalogue behind that interface; the Jellyfin-facing code does not change.
-`ICatalog` is shaped so that both channel layouts in §4.2 check 8 fit it.
+`StaticCatalog` and its two settings are deleted. `MakoChannel` does not change
+shape: it still reaches content only through `ICatalog`.
 
-### 5.2 Behaviour taken from the API notes
+### 5.2 Behaviour
 
-- Browse URLs carry `platform=mobileApp`; headers are a mobile `User-Agent` and
-  `Accept-Language: he-IL`.
-- Season number is parsed from `seasonTitle`, never from the URL slug.
-- Episodes are the `allEpisodes` tab only. Blank placeholder entries are
-  skipped. Episode number is the 1-based position in the list. The air date is
-  parsed from `extraInfo`.
-- The playlist body is Base64 AES-192-CBC, IV `theExact16Chars=`, key `note1_n`
-  with `note1_o` as fallback. The token body uses key `note3`.
-- The media entry with the highest `cdnLB` is used (`cdnLB` is a string).
-- If `protectedContent` is false no token is requested. Otherwise the decoded
-  ticket is appended with `?` or `&`.
-- The device id is synthesized once and kept in the plugin's data folder.
-- App version (`43.0`) is one setting.
+Browse:
+- Browse URLs use the config's `baseUrl` template (`https://www.mako.co.il%PAGE_URL%&platform=mobileApp`;
+  if the result has no `?`, the first `&` becomes `?`). Headers: a mobile
+  `User-Agent` and `Accept-Language: he-IL,he;q=0.9,en;q=0.8`.
+- The channel root lists one show — the pinned one. Its name comes from a setting
+  (default `שמש`): mako's show page carries no reliable title (`channelName` is the
+  current season's name). Its overview is `hero.description`, its poster `hero.pics[0].picUrl`.
+- Opening the show fetches the show page once: `seasons[]` gives every season
+  (`seasonTitle`, `pageUrl`), and the page's own `menu` holds the **current** season's
+  episodes. The show page has the same shape as a season page, so it is also stored in
+  the page cache under the current season's path: opening that season costs nothing.
+- Season number is the integer in `seasonTitle` ("עונה 6" → 6), never the URL slug.
+- Episodes are the `vods[]` of the tab whose `id` is `allEpisodes`. Entries with
+  `componentLayout == "ad"` (mako interleaves ad slots) or without the three playback
+  ids are skipped. Episode number is the integer after "פרק" in `extraInfo`
+  ("פרק 3@08.01.98" → 3); when absent, the 1-based position among real episodes. The
+  air date is the `dd.MM.yy` after `@` (two-digit years 70–99 → 19xx, otherwise 20xx).
+  The thumbnail is `pics[0].picUrl`.
+- An episode's id packs what playback needs — `itemVcmId`, `channelId`,
+  `galleryChannelId` — so play needs no lookup and survives a restart.
+
+Play:
+- Playlist URL from the core config's template (`%VCM_ID%`, `%CHANNEL_ID%`,
+  `%GALLERY_ID%`, `%CONSUMER%` = `mobileApp`). The body is Base64 of AES-192-CBC,
+  IV `theExact16Chars=`, key `note1_n`, falling back to `note1_o`.
+- Media entry with the highest `cdnLB` (a string in mako's JSON). The normal `media`
+  list is used, as the app does — not `mediaClean`.
+- `videoDetails.extraParams.protectedContent` false → the URL is final. True → POST
+  the encrypted token body (`da` app id, `du` device id, `et` "ngt", `na` app version,
+  `rv` cdn, `lp` url, `dv` vcm id) to the token URL with key `note3`; the decoded
+  `tickets[0].ticket` is appended with `?` or `&`. An empty `tickets` means mako
+  refused: playback fails, the log carries the `caseId`, nothing is worked around.
+- **Stream description.** The master playlist is fetched from the CDN (not
+  `www.mako.co.il`, so it is outside the bot protection) and parsed: the highest
+  bandwidth variant's resolution and bitrate, and the H.264 profile and level from
+  its `CODECS` attribute when present. With a full description Jellyfin can copy
+  the video instead of re-encoding it. When `CODECS` is absent (it is on Shemesh),
+  the description falls back to H.264 Main — what mako's streams were measured to
+  be — and the step B check records whether Jellyfin copies.
+- mako's segment URLs carry their own 24-hour token minted from the 15-minute one,
+  so playback and long pauses outlive the master token.
+
+Identity: the device id is `A1` + 23 hex digits, synthesized once and kept in the
+plugin's data folder. The app version (`43.0`) is a setting.
 
 ### 5.3 Caching
 
 Layer 1 is Jellyfin's own: it remembers an opened folder for 3 hours and does
 not call the plugin (`ChannelManager.CacheLength`, v12.1). Layer 2 is the
-plugin's:
+plugin's, and it caches mako's **page text** by page path (parsing is cheap and pure):
 
 | What | Kept for |
 |---|---|
 | Config files (keys, app id) | 24 h; refetched once if a decrypt fails |
-| A show's season list | 12 h |
+| A show's page (season list, overview) | 12 h |
 | Episodes of a past season | 7 days |
 | Episodes of the current season | 6 h |
-| A resolved stream URL | 5 min |
+| A resolved stream link | 5 min, in memory only |
 
-Durations live in one settings class. The cache is persisted to a file in the
-plugin's data folder so a Jellyfin restart does not cause a wave of refetches.
-Resolved stream URLs are held in memory only.
+Durations live in one settings class. The browse cache is persisted to a file in
+the plugin's data folder so a Jellyfin restart does not cause a wave of refetches.
+Resolved stream links never reach disk. (Jellyfin itself also caches the resolved
+source per episode for 5 minutes.)
 
 ### 5.4 Failure handling
 
 - **Bot challenge** (redirect to `validate.perfdrive.com`): serve the stale
   cached copy if there is one, otherwise an empty folder; log it; do not call
-  mako again for a few minutes.
-- **Entitlement denied:** playback fails; the log names the item and the
-  `caseId`.
+  `www.mako.co.il` again for a few minutes.
+- **Entitlement denied:** playback fails; the log names the item and the `caseId`.
 - **Decrypt failure:** try the fallback key, then refetch the config once, then
   fail with a typed error.
 - Errors are typed (`BotChallengeException`, `EntitlementDeniedException`,
-  `PayloadDecryptException`) and never swallowed.
+  `PayloadDecryptException`, `MakoRequestException`) and never swallowed silently.
+- At most one request to `www.mako.co.il` is in flight, and consecutive requests
+  are spaced (N4).
 
 ### 5.5 Checks
 
-1. Opening the pinned show lists real seasons and episodes with correct numbers
-   and Hebrew titles, on all three apps.
-2. The log shows exactly the requests in N1's table, and none overnight.
-3. Reopening the show causes no request to mako.
-4. A protected episode plays on all three apps; seek and resume work.
-5. Pause 20 minutes, then resume. If this fails, the full plugin needs a
-   re-sign-on-reopen path.
+1. Opening the pinned show lists real seasons and episodes with correct numbers,
+   Hebrew titles, thumbnails and air dates, on all three apps.
+2. The log shows exactly the requests in N1's table, and none while idle.
+3. Reopening the show or a season causes no request to mako.
+4. A protected episode plays on all three apps; seek and stop/resume work
+   (carried over from step A, where they were never reported).
+5. Pause 20 minutes, then resume.
+6. Whether Jellyfin copies the video stream or re-encodes it (ffmpeg log), and
+   ffmpeg's memory while playing.
+7. First open of a never-opened season: how long until episodes appear (step A saw
+   an empty list for a few seconds while Jellyfin linked new items).
+8. Carried over: a genre filter on the show list; the Android TV "two pages" quirk.
 
 ## 6. Testing
 
@@ -256,7 +310,7 @@ Only the manual checks above call mako. Everything else runs offline:
 | `PayloadCipher` | decrypt a saved real playlist body; round-trip encrypt/decrypt |
 | `MakoPages` | saved show and season pages: season numbers, placeholders, shorts tab, air date |
 | `StreamResolver` | fake HTTP: protected, unprotected, denied, key fallback |
-| `TimedCache`, `CachedCatalog` | fake clock; expiry; stale-on-challenge |
+| `TimedCache`, `MakoPageSource` | fake clock; expiry; stale-on-challenge |
 | On-demand rule (N1) | fake HTTP that counts requests per user action |
 | `MakoChannel` | folder id in → items out, over `StaticCatalog` |
 

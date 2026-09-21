@@ -1,0 +1,12 @@
+{
+  "sources": {
+    "baseUrl": "https://www.mako.co.il%PAGE_URL%&platform=mobileApp",
+    "ksCoreConfig": "https://apps.mako.co.il/mobile/config/12Plus/android/mobile/player/coreConfig.json",
+    "pages": {
+      "search": "/AjaxPage?jspName=vodSolrSearch.jsp&q=%TEXT%&ac=true"
+    }
+  },
+  "params": {
+    "appId": "078E8ABF-12plus-C6550-androidF1A35D4"
+  }
+}

@@ -39,7 +39,21 @@ browses and plays on web, Android TV and Fladder** (`docs/step-a-results.md`). S
 
 ## Step B — live mako under one pinned show
 
-Not planned yet. Gated on A8.
+Plan: `docs/plan-step-b.md` (written 2026-09-21, awaiting the user's approval). Spec §5 was revised for what step A settled. Test fixtures are committed under `tests/Jellyfin.Plugin.Mako.Tests/Fixtures/` — two real mako pages trimmed and stripped of analytics, a master playlist with its token blanked, the two endpoint configs, and a notes config holding SYNTHETIC keys (mako's real keys are fetched at run time and never stored).
+
+| Task | Title | Driver | Status | Notes |
+|---|---|---|---|---|
+| B1 | Clock and timed cache | agent | `todo` | |
+| B2 | Payload cipher | agent | `todo` | |
+| B3 | URL rules and the config model | agent | `todo` | |
+| B4 | The HTTP boundary, pacing, and the config loader | agent | `todo` | |
+| B5 | Page parsing and the episode key | agent | `todo` | |
+| B6 | Stream description from the master playlist | agent | `todo` | |
+| B7 | Stream resolver | agent | `todo` | |
+| B8 | Cached page source | agent | `todo` | |
+| B9 | The live catalogue — and the on-demand proof | agent | `todo` | |
+| B10 | Settings, wiring, and removing the step A fixture | agent | `todo` | |
+| B11 | Deploy and run the step B checks | agent + user | `todo` | Restarts Jellyfin and makes real requests to mako; needs the user's go-ahead. |
 
 ## Whole-branch review fixes (2026-09-20)
 
