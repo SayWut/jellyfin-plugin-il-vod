@@ -45,7 +45,7 @@ Plan: `docs/plan-step-b.md` (written 2026-09-21, awaiting the user's approval). 
 |---|---|---|---|---|
 | B1 | Clock and timed cache | agent | `done` | `Cache/IClock`, `SystemClock`, `CacheRead`, `TimedCache` (stale-after-lifetime reads, atomic JSON persistence via `.tmp` + `File.Move`, thread-safe). 8 new tests (75/75 total). |
 | B2 | Payload cipher | agent | `done` | `Mako/PayloadCipher` (AES-192-CBC/PKCS7, fixed IV, whitespace-tolerant Base64, multi-key fallback) and `Mako/PayloadDecryptException`. `MatchesAKnownVector` pinned against Python `Cryptodome` output on this machine. 7 new tests (82/82 total). |
-| B3 | URL rules and the config model | agent | `todo` | |
+| B3 | URL rules and the config model | agent | `done` | `Mako/MakoUrls` (`Page`'s `?`/`&` rule, `Playlist`, `MainConfigUrl`, the two host constants) and `Mako/MakoConfig` (three-stage config parse, playlist keys new→old, missing-field `FormatException`). 9 new tests (91/91 total). |
 | B4 | The HTTP boundary, pacing, and the config loader | agent | `todo` | |
 | B5 | Page parsing and the episode key | agent | `todo` | |
 | B6 | Stream description from the master playlist | agent | `todo` | |
