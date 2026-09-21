@@ -44,7 +44,7 @@ Plan: `docs/plan-step-b.md` (written 2026-09-21, awaiting the user's approval). 
 | Task | Title | Driver | Status | Notes |
 |---|---|---|---|---|
 | B1 | Clock and timed cache | agent | `done` | `Cache/IClock`, `SystemClock`, `CacheRead`, `TimedCache` (stale-after-lifetime reads, atomic JSON persistence via `.tmp` + `File.Move`, thread-safe). 8 new tests (75/75 total). |
-| B2 | Payload cipher | agent | `todo` | |
+| B2 | Payload cipher | agent | `done` | `Mako/PayloadCipher` (AES-192-CBC/PKCS7, fixed IV, whitespace-tolerant Base64, multi-key fallback) and `Mako/PayloadDecryptException`. `MatchesAKnownVector` pinned against Python `Cryptodome` output on this machine. 7 new tests (82/82 total). |
 | B3 | URL rules and the config model | agent | `todo` | |
 | B4 | The HTTP boundary, pacing, and the config loader | agent | `todo` | |
 | B5 | Page parsing and the episode key | agent | `todo` | |
@@ -99,6 +99,7 @@ Anything that differed from the spec or the plan, with the reason.
 
 | Date | Task | What differed | Why |
 |---|---|---|---|
+| 2026-09-21 | B2 | Everything under `src/Jellyfin.Plugin.Mako/Mako/` uses namespace `Jellyfin.Plugin.Mako.MakoApi`, not `Jellyfin.Plugin.Mako.Mako`. | Controller ruling: `Jellyfin.Plugin.Mako.Mako` repeats the last segment and reads badly; `MakoApi` names what the folder actually holds (the mako API boundary). Recorded here so B4–B9 (which also land in `Mako/`) use the same namespace. |
 | 2026-09-21 | A8 | Show/season folders are `ChannelFolderType.Series`/`Season`, not `Container`; folder id prefixes changed; `DataVersion` 2. | Fladder cannot open a plain channel folder. The plan's Container constraint is withdrawn — see Step A live findings. |
 | 2026-09-20 | A1 | `dotnet new sln` created `Jellyfin.Plugin.Mako.slnx`, not `.sln`. | This is .NET 10's new default; the brief said either is fine. |
 | 2026-09-20 | A1 | Omitted the `<None Remove>`/`<EmbeddedResource Include>` item group for `Configuration\configPage.html` from the plugin `.csproj` (Step 4). | That file doesn't exist yet — Task 1's file list doesn't create it, and it's only added in Task 6 (`docs/plan.md`, `task-6-brief.md`). Embedding a resource that isn't on disk fails the build with CS1566. Will restore this item group in Task 6 alongside the real file. |
