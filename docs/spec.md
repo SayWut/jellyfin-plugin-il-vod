@@ -35,12 +35,19 @@ otherwise.
 | Nothing: server idle, Jellyfin scheduled tasks, library scans | 0 |
 | Open a show | 1 (the show page: season list + current season's episodes) |
 | Open a season | 1, or 0 if it arrived with the show page |
-| Press play | 1 playlist request, plus 1 token request if the item is protected |
+| Press play | 1 playlist request, plus 1 token request if the item is protected (and 2 to the CDN: the master playlist and its best variant, which is the only place an episode's length can be measured — without a length Jellyfin treats the stream as live) |
 
 Opening a show never fetches all of its seasons. The plugin has no scheduled
 task and no background work, and does not implement `ISupportsLatestMedia`
 (that feature makes Jellyfin walk the root folder and every folder in it by
 itself — verified in `ChannelManager.RefreshLatestChannelItems`, v12.1).
+
+Jellyfin also opens folders by itself once shows are `Series`/`Season`: every
+new season is queued for a metadata refresh, which asks the channel for that
+season's episodes (`SeasonMetadataService` → `Season.GetEpisodes`, v12.1). Those
+queries carry no user id; a person's click always does. The channel refuses any
+query without a user before it touches the catalogue — by throwing, never with
+an empty list, because Jellyfin deletes the items an answer lacks.
 
 **N2 — Cached.** Opening the same show, season or channel again does not call
 mako while the cached copy is fresh. Shows change rarely, so the copies live
@@ -276,8 +283,12 @@ source per episode for 5 minutes.)
 ### 5.4 Failure handling
 
 - **Bot challenge** (redirect to `validate.perfdrive.com`): serve the stale
-  cached copy if there is one, otherwise an empty folder; log it; do not call
+  cached copy if there is one, otherwise fail the folder; log it; do not call
   `www.mako.co.il` again for a few minutes.
+- **A failed browse is never answered with an empty list.** Jellyfin 12.1 takes
+  any answer as the folder's full contents: it caches it for 3 hours and deletes
+  the items it holds that the answer lacks. The failure is rethrown instead, so
+  nothing is cached or deleted and the next open asks again.
 - **Entitlement denied:** playback fails; the log names the item and the `caseId`.
 - **Decrypt failure:** try the fallback key, then refetch the config once, then
   fail with a typed error.
@@ -286,8 +297,8 @@ source per episode for 5 minutes.)
 - At most one request to `www.mako.co.il` is in flight, and consecutive requests
   are spaced (N4).
 - **A page or config that is not valid JSON is a browse failure and is never
-  cached.** mako answers an HTML error page with status 200; opening a folder
-  shows an empty view (never an HTTP 500), and nothing that failed to parse is
+  cached.** mako answers an HTML error page with status 200; opening the folder
+  fails (see above), and nothing that failed to parse is
   written to the browse cache — so the next open asks mako again instead of
   replaying the same rubbish for the rest of the lifetime.
 - **Constructing the channel touches nothing.** Jellyfin builds every `IChannel`
@@ -365,6 +376,15 @@ The scripts touch nothing on the phone except that one plugin folder.
    the probe-size limiter (§4.3) decorates — it fails open and simply stops
    limiting the probe size; playback correctness for mako then depends on the
    global setting again until the decorator is updated.
+
+### 9.1 Known limitation, accepted
+
+A season opened for the very first time lists only some of its episodes; a
+page reload a few seconds later shows all of them. Jellyfin answers from its own
+database, filtered by a series key that a new episode only gets when its queued
+metadata refresh has run. The only plugin-side fix is decorating Jellyfin's
+`IChannelManager`; that cost does not match a once-per-season, 3-second cosmetic
+gap, so it is not fixed (decided 2026-09-22; details in `PROGRESS.md`).
 
 ## 10. Out of scope for the prototype
 

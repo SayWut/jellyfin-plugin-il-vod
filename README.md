@@ -58,3 +58,10 @@ transcode manager and rewrites `-probesize` to `20M` only for the command lines 
 its own streams (`Transcoding/ProbeSizeLimitingTranscodeManager.cs`). Every other stream is
 untouched, and if the wrapped seam ever disappears in a future Jellyfin release the plugin
 simply stops limiting it rather than failing to load — see `docs/spec.md` §4.3.
+
+## Known limitation
+
+The first time a season is ever opened, it may list only some of its episodes.
+Reload the page after a few seconds and the full list is there; it does not
+happen again for that season. This is Jellyfin linking the new episodes in the
+background, and it is deliberately not worked around (see `docs/spec.md` §9.1).
