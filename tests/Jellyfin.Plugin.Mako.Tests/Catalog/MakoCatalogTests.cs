@@ -352,35 +352,35 @@ public class MakoCatalogTests
     /// <summary>
     /// mako's page endpoint answering an HTML error page with status 200 must not poison the
     /// persisted cache for the next 12 hours: the page is rejected before it is written, so the
-    /// user sees an empty folder now and the next open asks mako again rather than replaying the
-    /// same rubbish from disk. The channel is in the picture because the empty view is its half
-    /// of that promise.
+    /// folder fails now and the next open asks mako again rather than replaying the same rubbish
+    /// from disk. The channel is in the picture because failing — never answering empty, which
+    /// Jellyfin would cache and act on — is its half of that promise.
     /// </summary>
     [Fact]
-    public async Task AnHtmlShowPageIsNeverCachedAndShowsAnEmptyFolder()
+    public async Task AnHtmlShowPageIsNeverCachedAndFailsTheFolder()
     {
         FakeMakoHttp http = new();
         http.Respond(ShowPageUrl, HtmlErrorPage);
         MakoChannel channel = ChannelOver(await CreateCatalogAsync(http));
 
-        Assert.Empty((await OpenFolder(channel, FolderId.ForShow(PinnedPagePath))).Items);
+        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForShow(PinnedPagePath)));
         Assert.Single(http.Requests);
 
-        Assert.Empty((await OpenFolder(channel, FolderId.ForShow(PinnedPagePath))).Items);
+        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForShow(PinnedPagePath)));
         Assert.Equal(2, http.Requests.Count);
     }
 
     [Fact]
-    public async Task AnHtmlSeasonPageIsNeverCachedAndShowsAnEmptyFolder()
+    public async Task AnHtmlSeasonPageIsNeverCachedAndFailsTheFolder()
     {
         FakeMakoHttp http = new();
         http.Respond(SeasonOneUrl, HtmlErrorPage);
         MakoChannel channel = ChannelOver(await CreateCatalogAsync(http));
 
-        Assert.Empty((await OpenFolder(channel, FolderId.ForSeason(SeasonOnePagePath))).Items);
+        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForSeason(SeasonOnePagePath)));
         Assert.Single(http.Requests);
 
-        Assert.Empty((await OpenFolder(channel, FolderId.ForSeason(SeasonOnePagePath))).Items);
+        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForSeason(SeasonOnePagePath)));
         Assert.Equal(2, http.Requests.Count);
     }
 
@@ -489,7 +489,7 @@ public class MakoCatalogTests
         new(new Lazy<ICatalog>(() => catalog), new RecordingLogger<MakoChannel>());
 
     private static Task<ChannelItemResult> OpenFolder(MakoChannel channel, FolderId folder) =>
-        channel.GetChannelItems(new InternalChannelItemQuery { FolderId = folder.ToString() }, CancellationToken.None);
+        channel.GetChannelItems(new InternalChannelItemQuery { FolderId = folder.ToString(), UserId = Guid.NewGuid() }, CancellationToken.None);
 
     private static async Task<MakoCatalog> CreateCatalogAsync(
         FakeMakoHttp http, IClock? clock = null, string? pageCachePersistencePath = null, PinnedShow? pinnedShow = null)

@@ -122,7 +122,7 @@ public sealed class PluginServiceRegistratorTests
         IChannel channel = provider.GetServices<IChannel>().OfType<MakoChannel>().Single();
         Assert.Equal(0, dataFolderReads);
 
-        ChannelItemResult result = await channel.GetChannelItems(new InternalChannelItemQuery { FolderId = null }, CancellationToken.None);
+        ChannelItemResult result = await channel.GetChannelItems(new InternalChannelItemQuery { FolderId = null, UserId = Guid.NewGuid() }, CancellationToken.None);
 
         Assert.Equal(new PluginConfiguration().PinnedShowName, Assert.Single(result.Items).Name);
         Assert.True(dataFolderReads > 0);

@@ -40,11 +40,18 @@ public sealed class FakeCatalog : ICatalog
     /// <summary>What <see cref="GetStreamLinkAsync"/> answers when <see cref="StreamLinkFailure"/> is not set.</summary>
     public StreamLink? StreamLink { get; set; }
 
-    public Task<IReadOnlyList<Show>> GetShowsAsync(CancellationToken cancellationToken) =>
-        BrowseFailure is { } failure ? Task.FromException<IReadOnlyList<Show>>(failure) : Task.FromResult(DefaultShows);
+    /// <summary>How many times any browse method was called, failed or not.</summary>
+    public int BrowseCalls { get; private set; }
+
+    public Task<IReadOnlyList<Show>> GetShowsAsync(CancellationToken cancellationToken)
+    {
+        BrowseCalls++;
+        return BrowseFailure is { } failure ? Task.FromException<IReadOnlyList<Show>>(failure) : Task.FromResult(DefaultShows);
+    }
 
     public Task<IReadOnlyList<Season>> GetSeasonsAsync(string showId, CancellationToken cancellationToken)
     {
+        BrowseCalls++;
         if (BrowseFailure is { } failure)
         {
             return Task.FromException<IReadOnlyList<Season>>(failure);
@@ -56,6 +63,7 @@ public sealed class FakeCatalog : ICatalog
 
     public Task<IReadOnlyList<Episode>> GetEpisodesAsync(string seasonId, CancellationToken cancellationToken)
     {
+        BrowseCalls++;
         if (BrowseFailure is { } failure)
         {
             return Task.FromException<IReadOnlyList<Episode>>(failure);

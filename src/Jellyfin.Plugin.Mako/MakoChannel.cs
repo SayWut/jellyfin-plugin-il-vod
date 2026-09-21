@@ -71,6 +71,8 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
 
     public async Task<ChannelItemResult> GetChannelItems(InternalChannelItemQuery query, CancellationToken cancellationToken)
     {
+        RefuseUnlessOpenedByAUser(query);
+
         FolderId? folder = TryParseFolderId(query.FolderId);
         if (folder is null)
         {
@@ -84,17 +86,24 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
             List<ChannelItemInfo> items = await ItemsInside(folder, cancellationToken).ConfigureAwait(false);
             return new ChannelItemResult { Items = items, TotalRecordCount = items.Count };
         }
-        catch (Exception exception) when (exception is BotChallengeException or MakoRequestException or FormatException or ArgumentException)
+        catch (Exception exception) when (exception is BotChallengeException or MakoRequestException or FormatException)
         {
-            // Jellyfin 12.1 does not catch this itself: an uncaught exception here would turn
-            // opening a folder into an HTTP 500 in the Channels view instead of an empty one.
-            // FormatException is mako answering something that is not a mako page (an HTML error
-            // page with status 200); ArgumentException is a folder id whose page path MakoUrls
-            // refuses. exception.Message is itself the reason (already scrubbed of any query
-            // string, per N3, by BotChallengeException/MakoRequestException/MakoUrls.RedactedUrl,
-            // and of any payload text by MakoPages/MakoConfig).
+            // mako failed (FormatException is mako answering something that is not a mako page —
+            // an HTML error page with status 200). Rethrown, never answered with an empty list:
+            // Jellyfin 12.1 takes any answer as the folder's full contents, caches it for 3 hours
+            // and deletes every item it holds that the answer lacks. A failure is neither cached
+            // nor acted on, so the next open asks again. exception.Message is already scrubbed of
+            // any query string (N3) and of any payload text.
             _logger.LogWarning(
-                exception, "mako: could not open {FolderKind} '{FolderValue}': {Reason}; showing an empty view", folder.Kind, folder.Value, exception.Message);
+                "mako: could not open {FolderKind} '{FolderValue}': {Reason}", folder.Kind, folder.Value, exception.Message);
+            throw;
+        }
+        catch (ArgumentException exception)
+        {
+            // A folder id whose page path MakoUrls refuses. That is wrong for good, not for now,
+            // so an empty view is the honest answer and caching it costs nothing.
+            _logger.LogWarning(
+                "mako: could not open {FolderKind} '{FolderValue}': {Reason}; showing an empty view", folder.Kind, folder.Value, exception.Message);
             return EmptyResult();
         }
     }
@@ -106,6 +115,20 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
 
         StreamLink link = await _catalog.Value.GetStreamLinkAsync(id, cancellationToken).ConfigureAwait(false);
         return [MediaSourceFactory.Create(link)];
+    }
+
+    // Jellyfin 12.1 walks folders by itself: every new Season item is queued for a metadata
+    // refresh, and SeasonMetadataService asks for the season's episodes (Season.GetEpisodes →
+    // Series.GetSeasonEpisodes → ChannelManager.GetChannelItemsInternal) — so one user opening
+    // a show made Jellyfin open all of its seasons within seconds, which mako answered with a
+    // bot challenge. Those queries carry no user; a person's click always does.
+    private void RefuseUnlessOpenedByAUser(InternalChannelItemQuery query)
+    {
+        if (query.UserId == Guid.Empty)
+        {
+            _logger.LogDebug("mako: folder '{RawFolderId}' asked for by Jellyfin itself; refused", query.FolderId);
+            throw new NotOpenedByAUserException(query.FolderId ?? string.Empty);
+        }
     }
 
     // Jellyfin's global -probesize buffers mako's unidentifiable data track in RAM until the
