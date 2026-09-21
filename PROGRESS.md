@@ -55,6 +55,57 @@ Plan: `docs/plan-step-b.md` (written 2026-09-21, awaiting the user's approval). 
 | B10 | Settings, wiring, and removing the step A fixture | agent | `done` | `Configuration/PluginConfiguration` drops `TestStreamUrl`/`TestStreamContainer`, gains `PinnedShowPath` (default `/mako-vod-keshet/shemesh`), `PinnedShowName` (default `שמש`), `AppVersion` (default `43.0`) and the four lifetimes as whole numbers (`ShowPageCacheHours` 12, `PastSeasonCacheDays` 7, `CurrentSeasonCacheHours` 6, `StreamLinkCacheMinutes` 5); `configPage.html` now has the three text inputs, the step A ones removed, GUID test still passing. `ChannelItemMapper.EpisodeShapeRevision` bumped to 2026-09-23, `ToPlayable` now sets `ImageUrl = episode.ThumbnailUrl`; `MakoChannel`'s `ContentVersion` bumped to `"4"`. `PluginServiceRegistrator.RegisterServices` now only calls a new `internal static AddMakoServices(this IServiceCollection, Func<string> dataFolder, Func<PluginConfiguration> configuration)` (in the same file, plus two internal wrapper types `BrowseCache`/`StreamLinkCache`, each exposing a `TimedCache Value`) with delegates reading `Plugin.Instance` lazily — never at registration time, since it does not exist yet then. `AddMakoServices` registers, all as singletons: `IClock`→`SystemClock`; `RequestPacer` (delay = `Task.Delay`); `BrowseCache` over a `TimedCache` persisted to `<DataFolderPath>/mako-cache.json` (used by both `MakoConfigLoader` and `MakoPageSource` — config files and page text share the same persisted layer per spec §5.3); `StreamLinkCache` over a `TimedCache` with no persistence path (N3); `IMakoHttp`→`MakoHttpClient` over an `HttpClient` built from the new `Mako/MakoHttpHandlerFactory.CreateHandler()` (`SocketsHttpHandler { AllowAutoRedirect = false, AutomaticDecompression = DecompressionMethods.All }`) with `MakoHttpClient.Timeout` (15 s); `MakoConfigLoader`; `DeviceIdentity` (`<DataFolderPath>/device.id`); `StreamResolver`; `MakoPageSource`; `MakoCatalog` as `ICatalog`. The data folder is created (`Directory.CreateDirectory`, tolerant of `IOException`/`UnauthorizedAccessException`) lazily inside the factory that first needs it. No `IHostedService`, no scheduled task; `IChannel`→`MakoChannel` and `TranscodeManagerDecoration.Apply` unchanged. `MakoChannel.GetChannelItems` now catches `BotChallengeException`/`MakoRequestException` around the whole `ItemsInside` call, logs a `Warning` naming `exception.Message` (already query-string-free per N3) and returns an empty `ChannelItemResult`; `GetChannelItemMediaInfo` still catches nothing. `MakoChannelTests` now runs over a new hand-written `Tests/Support/FakeCatalog : ICatalog` (settable `BrowseFailure`/`StreamLinkFailure`/`StreamLink`) instead of the deleted `StaticCatalog`, keeping every existing behavioural assertion and adding `ABotChallengeWhileBrowsingShowsAnEmptyFolderInsteadOfFailing` and `AMakoRequestFailureWhileBrowsingAShowShowsAnEmptyFolderInsteadOfFailing`. New `PluginServiceRegistratorTests` (DI smoke test): resolves `ICatalog`/`IChannel` from a `ServiceCollection` wired only through `AddMakoServices` over a temp folder and a throwaway `PluginConfiguration` (no `Plugin.Instance` anywhere) and asserts they are `MakoCatalog`/`MakoChannel`; a second test resolves `IMakoHttp` as `MakoHttpClient` and asserts `MakoHttpHandlerFactory.CreateHandler().AllowAutoRedirect` is false; a third writes through the resolved `StreamLinkCache` and asserts no file appears anywhere under the data folder; a fourth writes through `BrowseCache` and asserts `mako-cache.json` appears. New `MakoHttpHandlerFactoryTests` pins the handler's two settings directly. `Catalog/StaticCatalog.cs` and `StaticCatalogTests.cs` deleted. `Jellyfin.Plugin.Mako.csproj` gained `<InternalsVisibleTo Include="Jellyfin.Plugin.Mako.Tests" />` so the test project can call `AddMakoServices` and resolve `BrowseCache`/`StreamLinkCache`/`MakoHttpHandlerFactory` (all `internal`) directly. Verified `BasePlugin<T>.DataFolderPath` is the real 12.1.0 property name by reflecting the compiled `MediaBrowser.Common.Plugins.BasePlugin<>` type — matches the brief, no rename needed. README's "Test a stream (step A)" section replaced with how to set the pinned show, the app version setting, and what `mako-cache.json` holds. 16 new tests added, `StaticCatalogTests`' 15 removed (231/231 total), 0 build warnings. RED captured first: `dotnet build` failed to compile against the not-yet-written `AddMakoServices`/`BrowseCache`/`StreamLinkCache`/`MakoHttpHandlerFactory`/`PluginConfiguration`'s new properties (13 `CS0103`/`CS0246`/`CS1061` errors); implementing the production changes turned it GREEN with no further fix round. Deviation: `MakoConfigLoader` and `MakoPageSource` are wired over the **same** `BrowseCache.Value` (not a third cache) — the brief's registration list names a "persisted TimedCache" once and lists `MakoConfigLoader`/`MakoPageSource` separately but does not say they need separate caches; spec §5.3 already treats mako's page text and its config files as one persisted layer, and their cache keys (`config:*` vs `page:*`) cannot collide. Open item carried over from B9's fix round: `MakoCatalog.GetEpisodesAsync` still does not check that a season id belongs to the pinned show; a prefix rule was deliberately not invented (mako's season paths are arbitrary) — a stale folder id from a previously pinned show costs one request and shows that season, which is harmless. |
 | B11 | Deploy and run the step B checks | agent + user | `todo` | Restarts Jellyfin and makes real requests to mako; needs the user's go-ahead. |
 
+## Step B — whole-branch review fixes (2026-09-22)
+
+One wave of fixes from the whole-branch review of step B, applied before the plugin is
+installed on the live server. `dotnet test`: 233 → 263, all green, 0 warnings, ~0.4 s.
+
+- **C1 (critical) — the plugin would have stopped Jellyfin from starting.** Jellyfin 12.1
+  constructs every `IChannel` before any plugin instance exists:
+  `ApplicationHost.InitializeServices` → `SetStaticProperties()` → `Resolve<IChannelManager>()`,
+  and `ChannelManager`'s constructor materialises `IEnumerable<IChannel>` with `.ToArray()` —
+  all of it before `FindParts()` → `CreatePlugins()` sets `Plugin.Instance`. Constructing
+  `MakoChannel` built the whole graph down to `Plugin.Instance.DataFolderPath`, so
+  `InvalidOperationException("The Mako plugin has not been loaded yet.")` escaped
+  `InitializeServices`: the server would not boot, and the plugin would not even be disabled.
+  `MakoChannel` now takes `Lazy<ICatalog>` and only reads `.Value` inside `GetChannelItems` /
+  `GetChannelItemMediaInfo`; the registration builds the `Lazy` from
+  `provider.GetRequiredService<ICatalog>`. Three tests pin it, one of them reproducing exactly
+  what Jellyfin does (both delegates throw, `GetServices<IChannel>().ToArray()` must not).
+- **I1 — a non-JSON page is no longer cached for 12 hours, nor an HTTP 500.**
+  `MakoCatalog.GetSeasonsAsync`'s lifetime delegate now parses the page before it returns a
+  lifetime, so `MakoPageSource` never writes a page that is not a mako page (the season path's
+  delegate already did this implicitly, by parsing to find the latest season).
+  `MakoChannel.GetChannelItems` treats `FormatException` like any other browse failure: a
+  warning and an empty view. `GetChannelItemMediaInfo` still propagates.
+- **I2 — `MakoConfig`'s parses are guarded.** Each of the three documents throws
+  `FormatException("mako {main|core|notes} config is not valid JSON")` with no inner exception
+  and no payload text, instead of a raw `JsonReaderException` quoting the payload.
+  `MakoConfigLoader` caches the chain only once all three documents have parsed, so one HTML
+  error page can no longer poison the 24-hour cache. On the play path `StreamResolver` turns a
+  `FormatException` from config loading into `MakoRequestException("mako config is not valid JSON")`.
+- **M1 — an in-flight page fetch entry can no longer outlive its fetch.** When the only caller
+  cancels, nothing was left to notice the fetch settling, so the settled task stayed in
+  `_inFlightFetches` and answered the next caller — after the cache expired — with its old json
+  (or replayed its old failure) without a request. The fetch now clears its own entry through a
+  continuation attached when it is created, *in addition to* the existing `IsCompleted` check in
+  the caller's `finally`; both remove only the exact task they published.
+- **M2 — `ShowPage.PagePath` removed** (nothing in production read it), with its tests.
+- **M3 — `MakoUrls.Page` refuses a page path that could leave mako's host.** Show and season ids
+  arrive from a folder id a client sent: `@evil.example/x` used to build
+  `https://www.mako.co.il@evil.example/x?…`, a request to another host that N4's pacing and
+  bot-challenge back-off would never see. A page path must start with a single `/` and carry no
+  `@`, `\`, `://` or whitespace, else `ArgumentException("not a mako page path")`; the filled URL
+  is then re-checked against `MakoUrls.BrowseHost`. `MakoChannel` treats that `ArgumentException`
+  as a browse failure too.
+- **M4 — `cdnLB` is read as a JSON number as well as a string**, matching the prototype's `_as_int`.
+- **M7 — `scripts/build.sh`'s `meta.json` changelog** is now "Step B: live mako for one pinned show".
+- **M9 — an empty or whitespace `PinnedShowPath` means "no show configured"**: `GetShowsAsync`
+  returns an empty list and nothing is requested.
+- **docs** — `docs/spec.md` §5.4 gained the two rules this wave settled: a page or config that is
+  not valid JSON is a browse failure and is never cached, and constructing the channel touches
+  nothing.
+
 ## Whole-branch review fixes (2026-09-20)
 
 - Added a second setting, `TestStreamContainer`, so step A check 5 can be run once with the
@@ -99,6 +150,11 @@ Anything that differed from the spec or the plan, with the reason.
 
 | Date | Task | What differed | Why |
 |---|---|---|---|
+| 2026-09-22 | review fix C1 | **Public signature change:** `MakoChannel`'s constructor takes `Lazy<ICatalog>`, not `ICatalog`. | Jellyfin 12.1 constructs every `IChannel` in `ApplicationHost.InitializeServices` (via `ChannelManager`'s `channels.ToArray()`) before `CreatePlugins` has set `Plugin.Instance`, so building the catalogue in the constructor threw out of server startup. Deferring the whole graph behind one `Lazy` is the smallest change that makes construction touch nothing at all, rather than a guess about which single dependency is safe today. |
+| 2026-09-22 | review fix M2 | **Public signature change:** `ShowPage` no longer has `PagePath`; `MakoPages.ParseShowPage` no longer fills it. | Nothing in production ever read it — the page's own `pageUrl` is used inside `MakoPages` through its private `PageUrlOf`, and the catalogue keys pages by the path it fetched them under. Dead field, dead assertions. |
+| 2026-09-22 | review fix I2 | `MakoConfigLoader` caches all three config documents only after the whole chain has parsed, rather than validating and caching each one as it is fetched. | The brief asked for "validate before writing". Writing only a chain that fully parsed is the same promise with less machinery (no per-document validator API on `MakoConfig`) and is strictly stronger — a notes config missing its keys is not cached either. The cost is that a failure on the third document makes the next attempt refetch all three; `TryReadFreshConfig` already required all three fresh, so a partial chain was never usable anyway. |
+| 2026-09-22 | review fix M3 | The "filled URL is still on the browse host" re-check is defence in depth with no test of its own. | Given the shape rules the same method enforces first (absolute path, no `@`, no `//`, no `://`, no `\\`, no whitespace), no page path can reach it and change the host — it is unreachable by construction, and a test would have to break the first rule to get there. Kept because the two rules can drift apart later. |
+| 2026-09-22 | review fix M1 | `MakoPageSourceTests`'s two abandoned-fetch tests wait on a new `FakeMakoHttp.Settled(url)` signal plus a 25 ms settle delay. | With every caller gone there is nothing left to await the fetch, and the entry it clears is private. `Settled` is signalled at the outermost point the fake controls, after which every remaining step runs synchronously on the same thread (`ConfigureAwait(false)` throughout), so the delay covers microseconds of synchronous work with a thousandfold margin. An earlier version signalled one frame deeper and flaked once in the full suite. |
 | 2026-09-21 | B10 | The two step A settings, `TestStreamUrl`/`TestStreamContainer`, and their `configPage.html` inputs are removed; `PluginConfiguration` now only carries the three pinned-show/app-version settings plus the four cache lifetimes. `StaticCatalog`/`StaticCatalogTests` deleted; `MakoChannelTests` runs over a new `Tests/Support/FakeCatalog`. | Per the brief and spec §5 ("The two step A test settings ... are removed"): step B replaces the static catalogue with the live one, and there is no longer a per-episode pasted URL to test against. |
 | 2026-09-21 | B10 | `MakoConfigLoader` and `MakoPageSource` are both registered over the same `BrowseCache.Value` (one persisted `TimedCache`), not two separate persisted caches. | The brief's registration list names one "persisted TimedCache" and lists `MakoConfigLoader`/`MakoPageSource` as separate registrations, but does not say each needs its own cache; spec §5.3 treats mako's page text and its config files as one persisted layer ("Layer 2 is the plugin's, and it caches mako's page text..."), and their cache keys (`config:main`/`config:core`/`config:notes` vs `page:{pagePath}`) cannot collide. |
 | 2026-09-21 | B10 | The two DI wrapper types `BrowseCache`/`StreamLinkCache` live inside `PluginServiceRegistrator.cs` itself (namespace `Jellyfin.Plugin.Mako`), not a new file under `Cache/`. | They exist solely to let this one file's DI registrations tell two `TimedCache` instances apart without a magic string key — they are registrator-specific wiring concepts, not general cache-library types, so they are colocated with the one file that constructs and consumes them (a similar, previously-recorded exception to "one type per file" is `Support/FakeMakoHttp`'s `RecordedCall`, B8/B9). |
@@ -153,3 +209,15 @@ Anything that differed from the spec or the plan, with the reason.
   `vods` array, which could in principle be the `shorts` tab (this is the prototype's own
   rule, kept per the plan) — revisit if a real show ever hits this fallback and gets shorts
   instead of episodes.
+- Recorded and deliberately deferred by the 2026-09-22 review wave, none of them a correctness
+  risk for B11:
+  - the shared `HttpClient`'s handler has no `PooledConnectionLifetime`, so a DNS change is not
+    picked up until Jellyfin restarts;
+  - `RecordingLogger` (tests) records the formatted message only, never the exception's own text,
+    so a test cannot assert on what an exception said;
+  - `PayloadCipher` emits single-line Base64 while mako's own payloads are wrapped — watch it on
+    the live run in B11;
+  - `TimedCache` rewrites the whole JSON file on every write;
+  - a season page is parsed two to three times per open (episodes, season number, latest-season
+    check);
+  - the parked B4 sanitiser polish.

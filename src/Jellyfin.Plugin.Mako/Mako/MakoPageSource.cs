@@ -24,9 +24,12 @@ public sealed class MakoPageSource
     /// One fetch in flight per page path (N4: at most one request to the bot-protected host at a
     /// time). A second caller for the same uncached path joins the same <see cref="Task{TResult}"/>
     /// instead of starting its own request. The entry is removed once the shared fetch itself has
-    /// settled (checked via <see cref="Task.IsCompleted"/> in <see cref="GetAsync"/>'s
-    /// <c>finally</c>) — never merely because one caller's own wait on it was cancelled, since the
-    /// fetch — and every other caller still relying on it — keeps running regardless.
+    /// settled — never merely because one caller's own wait on it was cancelled, since the fetch,
+    /// and every other caller still relying on it, keeps running regardless. Two mechanisms
+    /// together make that exhaustive, and both remove only the exact task they published, so
+    /// neither can evict a newer fetch: <see cref="StartFetch"/>'s continuation covers a fetch
+    /// that settles after the entry was published, and <see cref="GetAsync"/>'s <c>finally</c>
+    /// covers a fetch that had already settled by the time it was.
     /// </summary>
     private readonly ConcurrentDictionary<string, Task<string>> _inFlightFetches = new();
 
@@ -67,9 +70,7 @@ public sealed class MakoPageSource
         // lifetimeOf is likewise taken from whichever caller happens to start the fetch: every
         // caller asking for the same page path always passes an equivalent function in this
         // codebase (MakoCatalog decides it from the page path alone), so that is acceptable.
-        Task<string> fetch = _inFlightFetches.GetOrAdd(
-            pagePath,
-            _ => FetchAndCacheAsync(pagePath, cacheKey, lifetimeOf, CancellationToken.None));
+        Task<string> fetch = _inFlightFetches.GetOrAdd(pagePath, _ => StartFetch(pagePath, cacheKey, lifetimeOf));
 
         try
         {
@@ -89,10 +90,12 @@ public sealed class MakoPageSource
         {
             // Only once the shared fetch has actually settled — a caller whose own WaitAsync
             // ended because of ITS OWN token (fetch.IsCompleted still false) must not touch the
-            // entry every other caller sharing that same fetch still needs.
+            // entry every other caller sharing that same fetch still needs. This is what catches
+            // a fetch that settled before GetOrAdd had published it, which StartFetch's own
+            // continuation ran too early to see.
             if (fetch.IsCompleted)
             {
-                _inFlightFetches.TryRemove(new KeyValuePair<string, Task<string>>(pagePath, fetch));
+                Forget(_inFlightFetches, pagePath, fetch);
             }
         }
     }
@@ -110,6 +113,36 @@ public sealed class MakoPageSource
         json = _cache.Read(CacheKeyFor(pagePath)).Value;
         return json is not null;
     }
+
+    /// <summary>
+    /// Starts the shared fetch and makes it clear its own coalescing entry the moment it settles.
+    /// Without that, a fetch whose only caller gave up has nobody left to notice it finished: the
+    /// settled task would stay behind and, once the cached page expired, answer the next caller
+    /// with its old json — or replay its old failure — without asking mako at all.
+    /// </summary>
+    private Task<string> StartFetch(string pagePath, string cacheKey, Func<string, TimeSpan> lifetimeOf)
+    {
+        Task<string> fetch = FetchAndCacheAsync(pagePath, cacheKey, lifetimeOf, CancellationToken.None);
+
+        _ = fetch.ContinueWith(
+            static (settled, state) =>
+            {
+                (ConcurrentDictionary<string, Task<string>> inFlightFetches, string pagePath) =
+                    ((ConcurrentDictionary<string, Task<string>>, string))state!;
+                Forget(inFlightFetches, pagePath, settled);
+            },
+            (_inFlightFetches, pagePath),
+            CancellationToken.None,
+            TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
+
+        return fetch;
+    }
+
+    /// <summary>Removes <paramref name="pagePath"/>'s entry only while it still holds exactly
+    /// <paramref name="fetch"/>, so a fetch settling late can never evict a newer one.</summary>
+    private static void Forget(ConcurrentDictionary<string, Task<string>> inFlightFetches, string pagePath, Task<string> fetch) =>
+        inFlightFetches.TryRemove(new KeyValuePair<string, Task<string>>(pagePath, fetch));
 
     private async Task<string> FetchAndCacheAsync(string pagePath, string cacheKey, Func<string, TimeSpan> lifetimeOf, CancellationToken cancellationToken)
     {

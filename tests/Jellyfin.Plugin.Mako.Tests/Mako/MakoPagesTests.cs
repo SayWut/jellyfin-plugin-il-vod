@@ -40,14 +40,6 @@ public class MakoPagesTests
     }
 
     [Fact]
-    public void ThePagePathIsThePagesOwnTopLevelUrl()
-    {
-        ShowPage page = MakoPages.ParseShowPage(ShowPageJson);
-
-        Assert.Equal("/mako-vod-keshet/shemesh-s6", page.PagePath);
-    }
-
-    [Fact]
     public void TheOverviewIsTheHerosDescription()
     {
         ShowPage page = MakoPages.ParseShowPage(ShowPageJson);
@@ -94,7 +86,6 @@ public class MakoPagesTests
         Assert.Equal(1, season.Number);
         Assert.Equal("עונה 1", season.Name);
         Assert.Equal("/show/only", page.DisplayedSeasonId);
-        Assert.Equal("/show/only", page.PagePath);
     }
 
     [Fact]

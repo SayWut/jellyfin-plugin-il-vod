@@ -22,7 +22,7 @@ cp "$PUBLISH_DIR/Jellyfin.Plugin.Mako.dll" "$PLUGIN_DIR/"
 cat > "$PLUGIN_DIR/meta.json" <<EOF
 {
   "category": "Channels",
-  "changelog": "Step A prototype",
+  "changelog": "Step B: live mako for one pinned show",
   "description": "Prototype. Shows mako VOD in Jellyfin, fetching only what a user opens or plays.",
   "guid": "$PLUGIN_GUID",
   "name": "$PLUGIN_NAME",

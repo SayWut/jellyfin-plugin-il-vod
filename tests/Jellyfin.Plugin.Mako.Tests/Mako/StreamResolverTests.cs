@@ -337,6 +337,57 @@ public class StreamResolverTests
         Assert.Equal(realWeightUrl, link.Url);
     }
 
+    /// <summary>mako sends <c>cdnLB</c> as a JSON number as readily as a string — the app's own
+    /// reader coerces either — so the higher weight must win in both spellings.</summary>
+    [Fact]
+    public async Task ACdnWeightSentAsAJsonNumberIsRead()
+    {
+        const string lowWeightUrl = "https://cdn.example.test/low-numeric-weight.m3u8";
+        const string highWeightUrl = "https://cdn.example.test/high-numeric-weight.m3u8";
+        string playlistJson =
+            $$"""
+            {
+              "media": [
+                { "url": "{{lowWeightUrl}}", "cdn": "low", "cdnLB": 20 },
+                { "url": "{{highWeightUrl}}", "cdn": "high", "cdnLB": 80 }
+              ],
+              "videoDetails": { "extraParams": { "protectedContent": false } }
+            }
+            """;
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
+        http.Respond(highWeightUrl, MasterPlaylistText);
+
+        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+
+        Assert.Equal(highWeightUrl, link.Url);
+    }
+
+    /// <summary>A numeric weight and a string weight are compared on the same scale.</summary>
+    [Fact]
+    public async Task ANumericCdnWeightAndAStringCdnWeightAreComparedTogether()
+    {
+        const string numericWeightUrl = "https://cdn.example.test/numeric-weight.m3u8";
+        const string stringWeightUrl = "https://cdn.example.test/string-weight.m3u8";
+        string playlistJson =
+            $$"""
+            {
+              "media": [
+                { "url": "{{numericWeightUrl}}", "cdn": "numeric", "cdnLB": 90 },
+                { "url": "{{stringWeightUrl}}", "cdn": "string", "cdnLB": "10" }
+              ],
+              "videoDetails": { "extraParams": { "protectedContent": false } }
+            }
+            """;
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
+        http.Respond(numericWeightUrl, MasterPlaylistText);
+
+        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+
+        Assert.Equal(numericWeightUrl, link.Url);
+    }
+
     [Fact]
     public async Task NoVideoDetailsAtAllIsTreatedAsUnprotected()
     {

@@ -285,6 +285,16 @@ source per episode for 5 minutes.)
   `PayloadDecryptException`, `MakoRequestException`) and never swallowed silently.
 - At most one request to `www.mako.co.il` is in flight, and consecutive requests
   are spaced (N4).
+- **A page or config that is not valid JSON is a browse failure and is never
+  cached.** mako answers an HTML error page with status 200; opening a folder
+  shows an empty view (never an HTTP 500), and nothing that failed to parse is
+  written to the browse cache — so the next open asks mako again instead of
+  replaying the same rubbish for the rest of the lifetime.
+- **Constructing the channel touches nothing.** Jellyfin builds every `IChannel`
+  during `ApplicationHost.InitializeServices`, before `CreatePlugins` has set
+  `Plugin.Instance` — so the constructor may not read the data folder, the
+  configuration, or anything built from them. An exception there does not disable
+  the plugin; it stops the server from starting.
 
 ### 5.5 Checks
 

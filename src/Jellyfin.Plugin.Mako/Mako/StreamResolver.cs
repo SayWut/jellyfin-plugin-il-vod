@@ -179,12 +179,27 @@ public sealed class StreamResolver
             ? new UsableMedia(url, TryGetString(media, MediaCdnProperty) ?? string.Empty, CdnWeightOf(media))
             : null;
 
-    /// <summary><c>cdnLB</c> is a JSON string holding a weight; an unparseable one counts as 0.</summary>
-    private static int CdnWeightOf(JsonElement media) =>
-        TryGetString(media, CdnWeightProperty) is string weightText
-        && int.TryParse(weightText, NumberStyles.Integer, CultureInfo.InvariantCulture, out int weight)
-            ? weight
-            : 0;
+    /// <summary>
+    /// <c>cdnLB</c> is the entry's weight, which mako sends as a JSON string or as a JSON number —
+    /// mako's own app coerces either. Anything else, and an unparseable string, counts as 0.
+    /// </summary>
+    private static int CdnWeightOf(JsonElement media)
+    {
+        if (media.ValueKind != JsonValueKind.Object || !media.TryGetProperty(CdnWeightProperty, out JsonElement cdnWeight))
+        {
+            return 0;
+        }
+
+        return cdnWeight.ValueKind switch
+        {
+            JsonValueKind.String => WeightFromText(cdnWeight.GetString()),
+            JsonValueKind.Number => cdnWeight.TryGetInt32(out int weight) ? weight : 0,
+            _ => 0,
+        };
+    }
+
+    private static int WeightFromText(string? weightText) =>
+        int.TryParse(weightText, NumberStyles.Integer, CultureInfo.InvariantCulture, out int weight) ? weight : 0;
 
     private static bool IsProtectedContent(JsonElement root) =>
         TryGetObject(root, VideoDetailsProperty, out JsonElement videoDetails)

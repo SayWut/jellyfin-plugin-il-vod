@@ -11,6 +11,10 @@ public class MakoPageSourceTests
 
     private static readonly TimeSpan ShowPageLifetime = TimeSpan.FromHours(12);
 
+    /// <summary>See <see cref="LetTheAbandonedFetchSettleAsync"/>: orders of magnitude more than
+    /// the few statements it covers, and still invisible in the suite's runtime.</summary>
+    private static readonly TimeSpan AbandonedFetchSettleTime = TimeSpan.FromMilliseconds(25);
+
     private static readonly string MainConfigJson = FixtureFile.ReadText("main-config.json");
     private static readonly string CoreConfigJson = FixtureFile.ReadText("core-config.json");
     private static readonly string NotesConfigJson = FixtureFile.ReadText("notes-config.json");
@@ -256,6 +260,72 @@ public class MakoPageSourceTests
         string later = await pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, CancellationToken.None);
         Assert.Equal(ShowPageJson, later);
         Assert.Single(http.Requests);
+    }
+
+    /// <summary>
+    /// When the caller that started a fetch is also the only one, no caller is left to notice the
+    /// fetch settling — so the coalescing entry has to clear itself. Left behind, the settled task
+    /// keeps answering: once the cached copy expires, the next open is served that same old json
+    /// without a single request to mako.
+    /// </summary>
+    [Fact]
+    public async Task TheEntryOfAFetchEveryCallerAbandonedDoesNotOutliveIt()
+    {
+        const string laterShowPageJson = """{ "pageUrl": "/mako-vod-keshet/shemesh-s6" }""";
+        FakeClock clock = new();
+        FakeMakoHttp http = new();
+        TaskCompletionSource gate = http.GateResponseTo(ShowPageUrl);
+        http.Respond(ShowPageUrl, ShowPageJson);
+        MakoPageSource pages = await CreatePageSourceAsync(http, clock);
+        using CancellationTokenSource cancellation = new();
+
+        Task<string> abandonedCall = pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, cancellation.Token);
+        cancellation.Cancel();
+        gate.SetResult();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => abandonedCall);
+        await LetTheAbandonedFetchSettleAsync(http, ShowPageUrl);
+
+        clock.Advance(ShowPageLifetime + TimeSpan.FromSeconds(1));
+        http.Respond(ShowPageUrl, laterShowPageJson);
+        string later = await pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, CancellationToken.None);
+
+        Assert.Equal(laterShowPageJson, later);
+        Assert.Equal(2, http.Requests.Count);
+    }
+
+    /// <summary>The same for a fetch that failed: an abandoned failure must not be replayed to
+    /// the next caller, who would then see mako refusing without mako having been asked.</summary>
+    [Fact]
+    public async Task AFailedFetchEveryCallerAbandonedIsNotReplayedToTheNextOne()
+    {
+        FakeMakoHttp http = new();
+        TaskCompletionSource gate = http.GateResponseTo(ShowPageUrl);
+        http.Fail(ShowPageUrl);
+        MakoPageSource pages = await CreatePageSourceAsync(http);
+        using CancellationTokenSource cancellation = new();
+
+        Task<string> abandonedCall = pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, cancellation.Token);
+        cancellation.Cancel();
+        gate.SetResult();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => abandonedCall);
+        await LetTheAbandonedFetchSettleAsync(http, ShowPageUrl);
+
+        await Assert.ThrowsAsync<MakoRequestException>(
+            () => pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, CancellationToken.None));
+
+        Assert.Equal(2, http.Requests.Count);
+    }
+
+    /// <summary>
+    /// Waits for a fetch every caller abandoned. Nothing is left to await it, so the test waits on
+    /// the fake's own last word about the request and then gives the handful of synchronous steps
+    /// behind it — the cache write, and the coalescing entry the fetch clears as it completes — a
+    /// moment of their own.
+    /// </summary>
+    private static async Task LetTheAbandonedFetchSettleAsync(FakeMakoHttp http, string url)
+    {
+        await http.Settled(url);
+        await Task.Delay(AbandonedFetchSettleTime);
     }
 
     private static async Task<MakoPageSource> CreatePageSourceAsync(

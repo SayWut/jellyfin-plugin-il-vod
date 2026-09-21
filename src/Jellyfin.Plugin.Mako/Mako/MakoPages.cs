@@ -31,7 +31,6 @@ public static class MakoPages
         JsonElement root = RequireObjectRoot(document.RootElement);
 
         return new ShowPage(
-            PagePath: PageUrlOf(root),
             Overview: TryGetNestedString(root, "hero", "description"),
             PosterUrl: PosterUrlOf(root),
             Seasons: ParseSeasons(root),

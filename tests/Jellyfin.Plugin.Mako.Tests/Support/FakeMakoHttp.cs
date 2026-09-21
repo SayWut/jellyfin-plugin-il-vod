@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Jellyfin.Plugin.Mako.MakoApi;
 
 namespace Jellyfin.Plugin.Mako.Tests.Support;
@@ -21,6 +22,7 @@ public sealed class FakeMakoHttp : IMakoHttp
     private readonly HashSet<string> _challengedUrls = [];
     private readonly HashSet<string> _failingUrls = [];
     private readonly Dictionary<string, TaskCompletionSource> _gates = [];
+    private readonly ConcurrentDictionary<string, TaskCompletionSource> _settled = new();
     private readonly List<string> _requests = [];
     private readonly List<RecordedCall> _calls = [];
     private readonly object _requestsLock = new();
@@ -68,17 +70,40 @@ public sealed class FakeMakoHttp : IMakoHttp
         return gate;
     }
 
+    /// <summary>
+    /// Completes once this fake has finished with <paramref name="url"/> — response delivered,
+    /// challenge or failure thrown — so a test can wait for a fetch that every caller has already
+    /// given up on and that it can no longer await through a caller of its own. It is signalled
+    /// at the very last moment this fake controls, so that everything still to happen inside the
+    /// code under test runs on the completing thread without suspending again.
+    /// </summary>
+    public Task Settled(string url) => SettledSource(url).Task;
+
     public async Task<string> GetTextAsync(string url, CancellationToken cancellationToken)
     {
         RecordRequest(GetMethod, url);
-        return await ResolveAsync(url, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            return await ResolveAsync(url, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            SettledSource(url).TrySetResult();
+        }
     }
 
     public async Task<string> PostTextAsync(string url, string body, string contentType, CancellationToken cancellationToken)
     {
         RecordRequest(PostMethod, url);
         LastPostBody = body;
-        return await ResolveAsync(url, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            return await ResolveAsync(url, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            SettledSource(url).TrySetResult();
+        }
     }
 
     private void RecordRequest(string method, string url)
@@ -111,4 +136,7 @@ public sealed class FakeMakoHttp : IMakoHttp
             ? body
             : throw new KeyNotFoundException($"FakeMakoHttp has no response configured for '{url}'");
     }
+
+    private TaskCompletionSource SettledSource(string url) =>
+        _settled.GetOrAdd(url, _ => new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously));
 }
