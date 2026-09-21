@@ -39,6 +39,14 @@ public static class MasterPlaylist
             : Describe(variants.MaxBy(variant => variant.BitsPerSecond)!);
     }
 
+    /// <summary>The URI of the highest-bandwidth variant exactly as the playlist spells it —
+    /// usually relative to the master playlist's own URL; <c>null</c> when there is none.</summary>
+    public static string? BestVariantUri(string masterPlaylistText) =>
+        ParseVariants(masterPlaylistText)
+            .Where(variant => variant.Uri is not null)
+            .MaxBy(variant => variant.BitsPerSecond)
+            ?.Uri;
+
     private static StreamDescription Describe(StreamVariant variant)
     {
         (string profile, double? level) = ProfileAndLevelFrom(variant.Codecs);
@@ -47,9 +55,10 @@ public static class MasterPlaylist
 
     private static IEnumerable<StreamVariant> ParseVariants(string masterPlaylistText)
     {
-        foreach (string line in masterPlaylistText.Split('\n'))
+        string[] lines = masterPlaylistText.Split('\n');
+        for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
         {
-            string trimmedLine = line.Trim();
+            string trimmedLine = lines[lineIndex].Trim();
             if (!trimmedLine.StartsWith(StreamInfTag, StringComparison.Ordinal))
             {
                 continue;
@@ -62,7 +71,8 @@ public static class MasterPlaylist
             }
 
             (int? width, int? height) = ParseResolution(attributes.GetValueOrDefault(ResolutionAttribute));
-            yield return new StreamVariant(bitsPerSecond, width, height, attributes.GetValueOrDefault(CodecsAttribute));
+            yield return new StreamVariant(
+                bitsPerSecond, width, height, attributes.GetValueOrDefault(CodecsAttribute), UriFollowing(lines, lineIndex));
         }
     }
 
@@ -109,7 +119,19 @@ public static class MasterPlaylist
         return (profile, level);
     }
 
-    private sealed record StreamVariant(int BitsPerSecond, int? Width, int? Height, string? Codecs);
+    /// <summary>A variant's URI is the first line after its tag that is neither blank nor
+    /// another tag; a tag arriving first means this variant has none.</summary>
+    private static string? UriFollowing(string[] lines, int streamInfLineIndex)
+    {
+        string? next = lines
+            .Skip(streamInfLineIndex + 1)
+            .Select(line => line.Trim())
+            .FirstOrDefault(line => line.Length > 0);
+
+        return next is null || next.StartsWith('#') ? null : next;
+    }
+
+    private sealed record StreamVariant(int BitsPerSecond, int? Width, int? Height, string? Codecs, string? Uri);
 
     private static IReadOnlyDictionary<string, string> ParseAttributes(string attributeList)
     {

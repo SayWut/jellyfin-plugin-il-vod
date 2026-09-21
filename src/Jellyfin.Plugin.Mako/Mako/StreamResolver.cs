@@ -288,7 +288,8 @@ public sealed class StreamResolver
         try
         {
             string masterPlaylistText = await _http.GetTextAsync(finalUrl, cancellationToken).ConfigureAwait(false);
-            return MasterPlaylist.Describe(masterPlaylistText);
+            TimeSpan? duration = await MeasureDurationAsync(finalUrl, masterPlaylistText, cancellationToken).ConfigureAwait(false);
+            return MasterPlaylist.Describe(masterPlaylistText) with { Duration = duration };
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
@@ -297,6 +298,36 @@ public sealed class StreamResolver
                 "mako: could not describe the master playlist at {HostAndPath}; using the default stream description",
                 MakoUrls.RedactedUrl(finalUrl));
             return StreamDescription.MakoDefault;
+        }
+    }
+
+    /// <summary>
+    /// mako states an episode's length nowhere, and Jellyfin 12.1 treats a source with no run
+    /// time as a live stream — players then join 30-60 s in and cannot rewind. The CDN's variant
+    /// playlist lists every segment, so its sum is the length: one more CDN request per play,
+    /// none to mako's bot-protected host. Best-effort like the description itself: a failure
+    /// leaves the duration unmeasured rather than failing playback.
+    /// </summary>
+    private async Task<TimeSpan?> MeasureDurationAsync(string masterPlaylistUrl, string masterPlaylistText, CancellationToken cancellationToken)
+    {
+        if (MasterPlaylist.BestVariantUri(masterPlaylistText) is not string variantUri
+            || !Uri.TryCreate(new Uri(masterPlaylistUrl), variantUri, out Uri? variantUrl))
+        {
+            return null;
+        }
+
+        try
+        {
+            string variantPlaylistText = await _http.GetTextAsync(variantUrl.AbsoluteUri, cancellationToken).ConfigureAwait(false);
+            return MediaPlaylist.TotalDuration(variantPlaylistText);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            _logger.LogWarning(
+                "mako: could not measure the duration from {HostAndPath} ({Reason}); Jellyfin will treat the stream as live",
+                MakoUrls.RedactedUrl(variantUrl.AbsoluteUri),
+                exception.GetType().Name);
+            return null;
         }
     }
 

@@ -289,9 +289,10 @@ public class MakoCatalogTests
         clock.Advance(TimeSpan.FromMinutes(2));
         StreamLink resolvedAgain = await catalog.GetStreamLinkAsync(Episode.ToString(), CancellationToken.None);
 
-        // A fresh resolve costs exactly the playlist GET and the master-playlist GET (config is
-        // already cached) — never a loose "some new requests happened".
-        Assert.Equal(requestsAfterFirstResolve + 2, http.Requests.Count);
+        // A fresh resolve costs exactly the playlist GET, the master-playlist GET and the
+        // variant-playlist GET that measures the duration (config is already cached) — never a
+        // loose "some new requests happened".
+        Assert.Equal(requestsAfterFirstResolve + 3, http.Requests.Count);
         Assert.Equal(first.Url, resolvedAgain.Url);
     }
 

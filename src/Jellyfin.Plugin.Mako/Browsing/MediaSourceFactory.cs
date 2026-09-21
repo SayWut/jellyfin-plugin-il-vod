@@ -53,6 +53,7 @@ public static class MediaSourceFactory
         Container = string.IsNullOrEmpty(link.Container) ? null : link.Container,
         IsRemote = true,
         IsInfiniteStream = false,
+        RunTimeTicks = link.Description.Duration?.Ticks,
         SupportsDirectPlay = true,
         SupportsDirectStream = true,
         SupportsTranscoding = true,

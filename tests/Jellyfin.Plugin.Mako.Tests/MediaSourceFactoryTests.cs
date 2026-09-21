@@ -25,6 +25,28 @@ public class MediaSourceFactoryTests
         Assert.False(source.RequiresOpening);
     }
 
+    /// <summary>
+    /// Jellyfin 12.1 treats a source with no run time as a segmented LIVE stream
+    /// (<c>EncodingJobInfo.IsSegmentedLiveStream</c>): it serves a growing EVENT playlist, which
+    /// players join near its end — so an episode started 30-60 s in and could not be rewound.
+    /// </summary>
+    [Fact]
+    public void TheMeasuredDurationBecomesTheRunTimeSoJellyfinDoesNotTreatTheStreamAsLive()
+    {
+        StreamDescription measured = StreamDescription.MakoDefault with { Duration = TimeSpan.FromSeconds(1320.08) };
+        var link = new StreamLink("https://cdn.test/master.m3u8", "hls", measured);
+
+        Assert.Equal(TimeSpan.FromSeconds(1320.08).Ticks, MediaSourceFactory.Create(link).RunTimeTicks);
+    }
+
+    [Fact]
+    public void AnUnmeasuredDurationLeavesTheRunTimeUnset()
+    {
+        var link = new StreamLink("https://cdn.test/master.m3u8", "hls", StreamDescription.MakoDefault);
+
+        Assert.Null(MediaSourceFactory.Create(link).RunTimeTicks);
+    }
+
     [Fact]
     public void AnEmptyContainerBecomesNullSoJellyfinDecides()
     {

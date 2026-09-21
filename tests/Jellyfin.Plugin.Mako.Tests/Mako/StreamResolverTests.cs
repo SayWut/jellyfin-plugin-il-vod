@@ -18,6 +18,9 @@ public class StreamResolverTests
     private static readonly string MainConfigJson = FixtureFile.ReadText("main-config.json");
     private static readonly string CoreConfigJson = FixtureFile.ReadText("core-config.json");
     private static readonly string NotesConfigJson = FixtureFile.ReadText("notes-config.json");
+    // master.m3u8's highest-bandwidth variant, "../850/…/index_850.m3u8", resolved against MediaUrl.
+    private const string BestVariantUrl = "https://cdn.example.test/850/hdntl=exp=1790000000~acl=%2f*~data=hdntl~hmac=0000/index_850.m3u8";
+
     private static readonly string MasterPlaylistText = FixtureFile.ReadText("master.m3u8");
 
     private static readonly string MainConfigUrl = MakoUrls.MainConfigUrl(AppVersion);
@@ -212,6 +215,35 @@ public class StreamResolverTests
         FakeMakoHttp http = SeededHttp();
         http.Respond(PlaylistUrl, EncryptedPlaylist(MediaUrl, isProtected: false));
         http.Respond(MediaUrl, MasterPlaylistText);
+
+        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+
+        Assert.Equal(MasterPlaylist.Describe(MasterPlaylistText), link.Description);
+    }
+
+    /// <summary>mako states an episode's length nowhere; the CDN's own variant playlist is the
+    /// only place it can be measured. Its URI is relative to the master playlist's.</summary>
+    [Fact]
+    public async Task TheDurationIsMeasuredFromTheBestVariantPlaylist()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, EncryptedPlaylist(MediaUrl, isProtected: false));
+        http.Respond(MediaUrl, MasterPlaylistText);
+        http.Respond(BestVariantUrl, "#EXTM3U\n#EXTINF:6.0,\n00.ts\n#EXTINF:4.5,\n01.ts\n#EXT-X-ENDLIST\n");
+
+        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+
+        Assert.Equal(TimeSpan.FromSeconds(10.5), link.Description.Duration);
+        Assert.Equal(MasterPlaylist.Describe(MasterPlaylistText), link.Description with { Duration = null });
+    }
+
+    [Fact]
+    public async Task AnUnreadableVariantPlaylistLeavesTheDurationUnmeasuredWithoutFailingPlayback()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(PlaylistUrl, EncryptedPlaylist(MediaUrl, isProtected: false));
+        http.Respond(MediaUrl, MasterPlaylistText);
+        http.Fail(BestVariantUrl);
 
         StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 

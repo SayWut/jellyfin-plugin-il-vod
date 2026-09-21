@@ -6,6 +6,10 @@ namespace Jellyfin.Plugin.Mako.Model;
 /// </summary>
 public sealed record StreamDescription(int? Width, int? Height, int? BitsPerSecond, string VideoProfile, double? VideoLevel)
 {
+    /// <summary>The episode's length, measured from the variant playlist at play time;
+    /// <c>null</c> when it could not be measured. Without it Jellyfin treats the stream as live.</summary>
+    public TimeSpan? Duration { get; init; }
+
     private const string UnmeasuredProfile = "Main";
 
     /// <summary>

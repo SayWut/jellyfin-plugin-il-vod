@@ -62,6 +62,10 @@ public class OnDemandRequestBudgetTests
     private static readonly string TokenUrl = ParsedConfig.TokenUrl;
     private static readonly string FinalMediaUrl = $"{MediaUrl}?{DecodedTicket}";
 
+    // master.m3u8's best variant ("../850/…/index_850.m3u8") resolved against the master's URL:
+    // the one extra CDN request per play, which measures the episode's length.
+    private const string BestVariantUrl = "https://cdn.example.test/850/hdntl=exp=1790000000~acl=%2f*~data=hdntl~hmac=0000/index_850.m3u8";
+
     [Fact]
     public async Task TheRequestBudgetMatchesEveryStepOfTheOnDemandTable()
     {
@@ -93,11 +97,12 @@ public class OnDemandRequestBudgetTests
         await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
         Assert.Equal(2, BrowseHostRequestCount(http));
 
-        // | GetStreamLinkAsync(protected episode) | 3 on www (playlist) + 1 POST to mass.mako.co.il + 1 GET to the CDN |
+        // | GetStreamLinkAsync(protected episode) | 3 on www (playlist) + 1 POST to mass.mako.co.il + 2 GETs to the CDN (master, best variant) |
         StreamLink link = await catalog.GetStreamLinkAsync(ProtectedEpisode.ToString(), CancellationToken.None);
         Assert.Equal(3, BrowseHostRequestCount(http));
         Assert.Equal(1, RequestCountTo(http, TokenUrl));
         Assert.Equal(1, RequestCountTo(http, FinalMediaUrl));
+        Assert.Equal(1, RequestCountTo(http, BestVariantUrl));
         Assert.Equal(FinalMediaUrl, link.Url);
 
         // The token endpoint is POSTed to; every other request (pages, playlist, the CDN) is a GET.
@@ -109,6 +114,7 @@ public class OnDemandRequestBudgetTests
         Assert.Equal(3, BrowseHostRequestCount(http));
         Assert.Equal(1, RequestCountTo(http, TokenUrl));
         Assert.Equal(1, RequestCountTo(http, FinalMediaUrl));
+        Assert.Equal(1, RequestCountTo(http, BestVariantUrl));
         Assert.Equal(link, again);
     }
 
@@ -140,6 +146,7 @@ public class OnDemandRequestBudgetTests
         http.Respond(PlaylistUrl, EncryptedProtectedPlaylist());
         http.Respond(TokenUrl, EncryptedTokenResponse());
         http.Respond(FinalMediaUrl, MasterPlaylistText);
+        http.Respond(BestVariantUrl, "#EXTM3U\n#EXTINF:6.0,\n00.ts\n#EXT-X-ENDLIST\n");
         return http;
     }
 

@@ -56,4 +56,21 @@ public class MasterPlaylistTests
 
         Assert.Equal(StreamDescription.MakoDefault, description);
     }
+
+    [Fact]
+    public void TheBestVariantIsTheHighestBandwidthOnesUri()
+    {
+        const string master = "#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=598880\nlow/index.m3u8\n#EXT-X-STREAM-INF:BANDWIDTH=1008884\n\nhigh/index.m3u8\n";
+
+        Assert.Equal("high/index.m3u8", MasterPlaylist.BestVariantUri(master));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("#EXTM3U\n#EXTINF:6,\n00.ts\n")]
+    [InlineData("#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=1008884\n")]
+    public void AMasterPlaylistWithNoVariantUriHasNoBestVariant(string master)
+    {
+        Assert.Null(MasterPlaylist.BestVariantUri(master));
+    }
 }
