@@ -71,14 +71,14 @@ public sealed class FakeMakoHttp : IMakoHttp
     public async Task<string> GetTextAsync(string url, CancellationToken cancellationToken)
     {
         RecordRequest(GetMethod, url);
-        return await ResolveAsync(url).ConfigureAwait(false);
+        return await ResolveAsync(url, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<string> PostTextAsync(string url, string body, string contentType, CancellationToken cancellationToken)
     {
         RecordRequest(PostMethod, url);
         LastPostBody = body;
-        return await ResolveAsync(url).ConfigureAwait(false);
+        return await ResolveAsync(url, cancellationToken).ConfigureAwait(false);
     }
 
     private void RecordRequest(string method, string url)
@@ -90,11 +90,11 @@ public sealed class FakeMakoHttp : IMakoHttp
         }
     }
 
-    private async Task<string> ResolveAsync(string url)
+    private async Task<string> ResolveAsync(string url, CancellationToken cancellationToken)
     {
         if (_gates.TryGetValue(url, out TaskCompletionSource? gate))
         {
-            await gate.Task.ConfigureAwait(false);
+            await gate.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
         }
 
         if (_challengedUrls.Contains(url))

@@ -23,8 +23,10 @@ public sealed class MakoPageSource
     /// <summary>
     /// One fetch in flight per page path (N4: at most one request to the bot-protected host at a
     /// time). A second caller for the same uncached path joins the same <see cref="Task{TResult}"/>
-    /// instead of starting its own request; the entry is removed once that fetch settles, success
-    /// or failure, so a failure never poisons a later call into forever reusing it.
+    /// instead of starting its own request. The entry is removed once the shared fetch itself has
+    /// settled (checked via <see cref="Task.IsCompleted"/> in <see cref="GetAsync"/>'s
+    /// <c>finally</c>) — never merely because one caller's own wait on it was cancelled, since the
+    /// fetch — and every other caller still relying on it — keeps running regardless.
     /// </summary>
     private readonly ConcurrentDictionary<string, Task<string>> _inFlightFetches = new();
 
@@ -43,6 +45,14 @@ public sealed class MakoPageSource
     /// <see cref="MakoRequestException"/> falls back to a stale cached copy when one exists, and
     /// rethrows when it does not.
     /// </summary>
+    /// <exception cref="OperationCanceledException">
+    /// <paramref name="cancellationToken"/> was already cancelled and nothing fresh was cached —
+    /// checked before joining or starting a fetch, so a caller that has already given up never
+    /// waits on, or starts, one. A caller that cancels while a fetch it joined is still running
+    /// only ever fails its own wait: the shared fetch itself is never bound to any one caller's
+    /// token (it runs with <see cref="CancellationToken.None"/>, bounded only by the HTTP client's
+    /// own timeout), so it — and every other caller still sharing it — keeps running regardless.
+    /// </exception>
     public async Task<string> GetAsync(string pagePath, Func<string, TimeSpan> lifetimeOf, CancellationToken cancellationToken)
     {
         string cacheKey = CacheKeyFor(pagePath);
@@ -52,12 +62,18 @@ public sealed class MakoPageSource
             return cached.Value!;
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
+
+        // lifetimeOf is likewise taken from whichever caller happens to start the fetch: every
+        // caller asking for the same page path always passes an equivalent function in this
+        // codebase (MakoCatalog decides it from the page path alone), so that is acceptable.
         Task<string> fetch = _inFlightFetches.GetOrAdd(
             pagePath,
-            _ => FetchAndCacheAsync(pagePath, cacheKey, lifetimeOf, cancellationToken));
+            _ => FetchAndCacheAsync(pagePath, cacheKey, lifetimeOf, CancellationToken.None));
+
         try
         {
-            return await fetch.ConfigureAwait(false);
+            return await fetch.WaitAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception) when (exception is BotChallengeException or MakoRequestException)
         {
@@ -71,7 +87,13 @@ public sealed class MakoPageSource
         }
         finally
         {
-            _inFlightFetches.TryRemove(new KeyValuePair<string, Task<string>>(pagePath, fetch));
+            // Only once the shared fetch has actually settled — a caller whose own WaitAsync
+            // ended because of ITS OWN token (fetch.IsCompleted still false) must not touch the
+            // entry every other caller sharing that same fetch still needs.
+            if (fetch.IsCompleted)
+            {
+                _inFlightFetches.TryRemove(new KeyValuePair<string, Task<string>>(pagePath, fetch));
+            }
         }
     }
 

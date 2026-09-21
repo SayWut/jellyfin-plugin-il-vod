@@ -208,6 +208,56 @@ public class MakoPageSourceTests
         Assert.Equal(2, http.Requests.Count);
     }
 
+    /// <summary>
+    /// A caller's own cancellation must end only that caller's wait, not the shared fetch every
+    /// other caller for the same page path is also relying on.
+    /// </summary>
+    [Fact]
+    public async Task ACancelledCallerDoesNotFailAnotherCallerSharingTheSameFetch()
+    {
+        FakeMakoHttp http = new();
+        TaskCompletionSource gate = http.GateResponseTo(ShowPageUrl);
+        http.Respond(ShowPageUrl, ShowPageJson);
+        MakoPageSource pages = await CreatePageSourceAsync(http);
+        using CancellationTokenSource callerACancellation = new();
+
+        Task<string> callerA = pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, callerACancellation.Token);
+        Task<string> callerB = pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, CancellationToken.None);
+        callerACancellation.Cancel();
+        gate.SetResult();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => callerA);
+        Assert.Equal(ShowPageJson, await callerB);
+        Assert.Single(http.Requests);
+
+        string third = await pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, CancellationToken.None);
+        Assert.Equal(ShowPageJson, third);
+        Assert.Single(http.Requests);
+    }
+
+    /// <summary>Even when the cancelled caller is the ONLY caller, the fetch it started keeps
+    /// running (bounded by the HTTP client's own timeout, not that caller's token) and still
+    /// populates the cache for whoever asks next.</summary>
+    [Fact]
+    public async Task CancellingTheOnlyCallerStillLetsTheFetchPopulateTheCache()
+    {
+        FakeMakoHttp http = new();
+        TaskCompletionSource gate = http.GateResponseTo(ShowPageUrl);
+        http.Respond(ShowPageUrl, ShowPageJson);
+        MakoPageSource pages = await CreatePageSourceAsync(http);
+        using CancellationTokenSource cancellation = new();
+
+        Task<string> cancelledCall = pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, cancellation.Token);
+        cancellation.Cancel();
+        gate.SetResult();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => cancelledCall);
+
+        string later = await pages.GetAsync(ShowPagePath, _ => ShowPageLifetime, CancellationToken.None);
+        Assert.Equal(ShowPageJson, later);
+        Assert.Single(http.Requests);
+    }
+
     private static async Task<MakoPageSource> CreatePageSourceAsync(
         FakeMakoHttp http,
         IClock? clock = null,
