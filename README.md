@@ -76,6 +76,14 @@ its own streams (`Transcoding/ProbeSizeLimitingTranscodeManager.cs`). Every othe
 untouched, and if the wrapped seam ever disappears in a future Jellyfin release the plugin
 simply stops limiting it rather than failing to load — see `docs/spec.md` §4.3.
 
+## After the first open: run a library scan once
+
+Jellyfin lists a genre in its Genres views only once a `Genre` entity exists for the
+name, and those are created by a post-scan task. So after the channel's first open the
+"mako test" tile shows the shows but an empty Genres view until the next library scan
+(Dashboard → Scan All Libraries, or wait for the scheduled one). The scan sends nothing to
+mako.
+
 ## Known limitation
 
 The first time a season is ever opened, it may list only some of its episodes.
