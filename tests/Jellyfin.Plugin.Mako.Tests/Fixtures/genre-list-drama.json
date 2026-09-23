@@ -1,0 +1,34 @@
+{
+  "lastUpdate": "Tue, 22 Sep 2026 11:12:13 +0300",
+  "timestamp": 1790064733255,
+  "pageType": "SubVertical",
+  "vcmid": "05fcbac980653210VgnVCM2000002a0c10acRCRD",
+  "channelVcmId": "05c2e4caebbe3210VgnVCM100000290c10acRCRD",
+  "sch": "05c2e4caebbe3210",
+  "items": [
+    {
+      "itemVcmId": "deb23f0b5959f310VgnVCM2000002a0c10acRCRD",
+      "title": "עבודה ערבית",
+      "pageUrl": "/mako-vod-keshet/Arabic-work",
+      "pic": "https://img.mako.co.il/2021/08/17/Avoda_Aravit_1a_logo_e.jpg"
+    },
+    {
+      "itemVcmId": "b6d8aa0c10111510VgnVCM2000002a0c10acRCRD",
+      "title": "דני הוליווד",
+      "pageUrl": "/mako-vod-keshet/dani_hollywood",
+      "pic": "https://img.mako.co.il/2026/06/16/DaniHolywood_1_e_re.jpg"
+    },
+    {
+      "itemVcmId": "3286e9c4a4b9a910VgnVCM100000700a10acRCRD",
+      "title": "רצח בים המלח",
+      "pageUrl": "/mako-vod-keshet/lowest_place_world",
+      "pic": "https://img.mako.co.il/2025/12/22/DeadSea_01_e_re.jpg"
+    },
+    {
+      "itemVcmId": "07d45071a8857910VgnVCM100000700a10acRCRD",
+      "title": "נוטוק",
+      "pageUrl": "/mako-vod-keshet/nutuk_drama",
+      "pic": "https://img.mako.co.il/2025/06/11/NOTOK_1_e_re.jpg"
+    }
+  ]
+}

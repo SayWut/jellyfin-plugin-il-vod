@@ -64,4 +64,4 @@ simply stops limiting it rather than failing to load — see `docs/spec.md` §4.
 The first time a season is ever opened, it may list only some of its episodes.
 Reload the page after a few seconds and the full list is there; it does not
 happen again for that season. This is Jellyfin linking the new episodes in the
-background, and it is deliberately not worked around (see `docs/spec.md` §9.1).
+background, and it is deliberately not worked around (see `docs/spec.md` §10.1).

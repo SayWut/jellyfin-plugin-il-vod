@@ -1,0 +1,50 @@
+{
+  "lastUpdate": "Tue, 22 Sep 2026 15:19:11 +0300",
+  "timestamp": 1790079551551,
+  "menuItems": [
+    {
+      "title": "כל התכניות",
+      "url": "/mako-vod-index"
+    },
+    {
+      "title": "ריאליטי",
+      "url": "/mako-vod-index?filter=genre&vcmId=4f9dbac980653210VgnVCM2000002a0c10acRCRD"
+    },
+    {
+      "title": "דוקומנטרי",
+      "url": "/mako-vod-index?filter=genre&vcmId=8e8abac980653210VgnVCM2000002a0c10acRCRD"
+    },
+    {
+      "title": "דרמה",
+      "url": "/mako-vod-index?filter=genre&vcmId=05fcbac980653210VgnVCM2000002a0c10acRCRD"
+    },
+    {
+      "title": "קומדיה",
+      "url": "/mako-vod-index?filter=genre&vcmId=fe2dbac980653210VgnVCM2000002a0c10acRCRD"
+    },
+    {
+      "title": "בישול",
+      "url": "/mako-vod-index?filter=genre&vcmId=5d738481c9674210VgnVCM2000002a0c10acRCRD"
+    },
+    {
+      "title": "החדשות",
+      "url": "/mako-vod-index?filter=provider&vcmId=ee06c13070733210VgnVCM2000002a0c10acRCRD"
+    },
+    {
+      "title": "פודקאסטים",
+      "url": "/mako-vod-index?filter=provider&vcmId=d5aae64655ea0810VgnVCM100000700a10acRCRD"
+    },
+    {
+      "title": "ערוץ 24",
+      "url": "/mako-vod-index?filter=provider&vcmId=3377c13070733210VgnVCM2000002a0c10acRCRD"
+    },
+    {
+      "title": "תכניות לפי א'-ב'",
+      "url": "/mako-vod-index?filter=ABC_Programs_Slider"
+    },
+    {
+      "title": "פלייליסטים",
+      "url": "/mako-vod-index?filter=playlists"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Jellyfin mako plugin — prototype design
 
-Date: 2026-09-20; step B section revised 2026-09-21 after step A. Status: step A done; step B awaiting review.
+Date: 2026-09-20; step B section revised 2026-09-21 after step A; step C added 2026-09-23. Status: steps A and B done; step C designed, awaiting the plan.
 
 ## 1. What this is
 
@@ -33,6 +33,7 @@ otherwise.
 | User action | Requests to mako |
 |---|---|
 | Nothing: server idle, Jellyfin scheduled tasks, library scans | 0 |
+| Open the channel | 0 while the catalogue cache is fresh; else 6 (genre menu + 5 genre lists), paced — step C, §6.2 |
 | Open a show | 1 (the show page: season list + current season's episodes) |
 | Open a season | 1, or 0 if it arrived with the show page |
 | Press play | 1 playlist request, plus 1 token request if the item is protected (and 2 to the CDN: the master playlist and its best variant, which is the only place an episode's length can be measured — without a length Jellyfin treats the stream as live) |
@@ -64,9 +65,9 @@ causes a back-off, not a retry loop.
 playback fails with a clear log line. The plugin uses the normal `media`
 stream the app uses and does not work around refusals.
 
-**N6 — Clean code.** All code follows the `clean-code` skill (§7).
+**N6 — Clean code.** All code follows the `clean-code` skill (§8).
 
-## 3. Approach: two steps, with a stop rule
+## 3. Approach: three steps, with a stop rule
 
 **Step A — static plugin.** No mako calls. Proves that a home-built plugin
 loads, that the Channels view is acceptable on the three apps, and that Jellyfin
@@ -75,6 +76,10 @@ calls the plugin on click.
 **Step B — live mako under one pinned show.** Starts only if step A passes.
 Proves on-demand fetching, caching, the C# port of the AES and token flow, and
 play-time URL resolution.
+
+**Step C — the catalogue by genre.** Starts only if step B passes. Replaces the
+one pinned show with every show mako files under a real genre, and gives the
+channel a genre view in the apps (§6).
 
 **Stop rule.** If the channel cannot be found or browsed (step A checks 2–3) on
 an app that matters, work stops before any mako code is written, and the
@@ -322,7 +327,129 @@ source per episode for 5 minutes.)
    an empty list for a few seconds while Jellyfin linked new items).
 8. Carried over: a genre filter on the show list; the Android TV "two pages" quirk.
 
-## 6. Testing
+## 6. Step C — the catalogue by genre
+
+Step B passed its checks on 2026-09-22 (`PROGRESS.md`, "Step B live findings").
+Step C replaces the one pinned show with **every show mako files under a real
+genre**, each carrying its genres, so the apps can show mako as a Shows library
+with one row per genre. The pinned-show settings are removed.
+
+### 6.0 What the research settled (2026-09-22/23)
+
+- A channel plugin controls nothing about layout. Inside one channel the only
+  folders Fladder can open are Series and Season; plain channel folders arrive as
+  `ChannelFolderItem`, which Fladder has no screen for. Genre folders inside the
+  channel are therefore out. One channel per genre works everywhere but puts a
+  tile per genre on the home screen, which the user rejected. Collections
+  (BoxSets) can hold channel shows but no app renders them as rows.
+- **A real `tvshows` library whose single media path is the channel's own
+  metadata folder** makes every app render the channel as a Shows library, with
+  the web's Genres tab, Android TV's Genres button and Fladder's genre rows.
+  Jellyfin resolves that path to the Channel entity, so every library query lands
+  on the channel's items; the scanner ignores folders named `metadata`, so it
+  never touches them. Verified on the server on 2026-09-22 (`/UserViews`,
+  `/Items?parentId=<lib>`, `/Genres?parentId=<lib>`, `/Users/{id}/Items/Latest`,
+  `/Shows/{id}/Seasons` all answer from the channel) and by the user in the apps.
+  The library was created by hand through the API with every metadata and image
+  fetcher disabled and no scan; the plugin does not create it yet (§6.5).
+- Jellyfin copies a show's genres, description and poster URL **only when it
+  first creates the item**; a poster is added later only if the item has none.
+  `DataVersion` only invalidates Jellyfin's 3-hour answer cache — items live on by
+  their ids. To give an existing show genres, its id must change.
+- mako's sources: the show index (654 shows: name, page path, poster; no genre, no
+  description); the genre menu (five real genres — ריאליטי, דוקומנטרי, דרמה,
+  קומדיה, בישול — plus three provider groups, an A–B list and playlists, which are
+  dropped); one list per genre, same item shape as the index. The show and season
+  pages carry no show name. The paced burst — index, menu and every menu entry,
+  12 requests at 750 ms — passed twice in a row from the phone with the plugin's
+  HTTP stack, no challenge.
+- Jellyfin downloads each poster once, in the item's queued metadata refresh, and
+  serves it from disk afterwards; there is no proxied mode.
+
+### 6.1 Structure
+
+```
+src/Jellyfin.Plugin.Mako/
+├── Mako/MakoIndex.cs             genre menu JSON → the real genres; a genre list JSON → (path, name, poster) entries (parsing only)
+├── Mako/MakoIndexPaths.cs        the menu's page path, and the rule that tells a real genre's list from the rest
+├── Catalog/MakoCatalog.cs        GetShowsAsync answers from the genre lists; GetEpisodesAsync names the show from them
+├── Catalog/CatalogueLifetimes.cs replaces CacheLifetimes; adds the catalogue's lifetime (PinnedShow.cs deleted)
+├── Browsing/FolderId.cs          new prefixes; a season id carries its show's path
+├── Configuration/                PinnedShowPath/PinnedShowName removed; CatalogueCacheHours added
+└── Model/Show.cs                 unchanged shape: Id, Name, PosterUrl, Overview, Genres
+```
+
+The menu and the lists are ordinary mako pages (`/mako-vod-index?filter=…`
+passes `MakoUrls.Page`'s rules), so `MakoPageSource` fetches, caches, coalesces
+and stale-serves them unchanged — there is no new source class. `MakoChannel`
+(apart from the season folder's two-part id), `MakoPageSource`, `MakoPages`,
+`StreamResolver` and everything under `Transcoding/` do not change.
+
+### 6.2 Behaviour
+
+- **Opening the channel** (root folder, by a user): the catalogue loads the genre
+  menu, keeps the entries whose URL says `filter=genre`, loads each genre's list,
+  and answers one `Show` per distinct page path with the name and poster from
+  the first list that named it and the genres of every list that named it. Order:
+  as mako lists them, first genre first. No description (§6.4).
+- **A season id** is `<showPath>|<seasonPath>`, so `GetEpisodesAsync` can name the
+  show for its episodes by looking the path up in the cached lists; an unknown
+  path gives episodes with no series name rather than a failure.
+- **Folder id prefixes** change (`series|` → `mako-series|`, `series-season|` →
+  `mako-season|`) so Jellyfin creates every show afresh, with its genres, and
+  deletes the old pinned-show items itself as "no longer in the answer";
+  `DataVersion` bumps so Jellyfin's answer cache is not consulted.
+- **N1 becomes:** opening the channel costs 1 (menu) + 5 (genres) requests when
+  the catalogue cache is cold, paced, ≈ 5 s; 0 while it is fresh. The rest of the
+  table is unchanged. Nothing is fetched ahead of a user opening the channel.
+- **Failure:** a bot challenge or request failure with a stale copy of every
+  needed list serves the stale copies; with any list missing it fails the folder
+  (never an empty answer, §5.4). A list that is not valid JSON is a failure and is
+  never cached. A genre list that fails while others succeed fails the whole
+  answer — a partial catalogue would make Jellyfin delete the missing shows.
+
+### 6.3 Caching
+
+| What | Kept for |
+|---|---|
+| Genre menu and each genre's list | `CatalogueCacheHours`, default 24 h, persisted with the browse cache |
+
+Everything in §5.3 stays. After the first open, a day costs mako one burst.
+
+### 6.4 Descriptions — deliberately not fetched
+
+The lists carry none, the show page does (`hero.description`), but Jellyfin
+copies a description only at creation, and fetching 654 show pages to have it
+ready at creation would be 654 requests. Shows have no description in step C.
+
+### 6.5 The library tile — manual in step C
+
+The `tvshows` library over the channel's metadata folder is created by hand
+(Dashboard or `POST /Library/VirtualFolders`, fetchers off, `refreshLibrary=false`).
+Having the plugin create it idempotently at startup, and hide the channel's own
+tile per user, is a later step. The channel keeps working without the library.
+
+### 6.6 Jellyfin-side cost, accepted
+
+The first open creates ~430 Series items (five genres, overlapping), queues a
+metadata refresh per item (the plugin refuses the folder walk each queues, §2),
+and downloads each poster once from `img.mako.co.il` in the background (≈ 50–100
+MB, once). Opening the channel the first time is slow once; afterwards Jellyfin
+answers from its database.
+
+### 6.7 Checks
+
+1. The "mako test" library tile lists the shows with posters on all three apps;
+   the Genres view shows five rows.
+2. The log shows the burst of six requests on the first open and none on the
+   second; none while idle.
+3. A show from each genre opens to its seasons, a season to its episodes, and an
+   episode plays.
+4. Reopening the channel the next day makes exactly one burst.
+5. Jellyfin's log shows no metadata fetcher and no image fetcher running for
+   mako items (the library was created with them off).
+
+## 7. Testing
 
 Only the manual checks above call mako. Everything else runs offline:
 
@@ -338,7 +465,7 @@ Only the manual checks above call mako. Everything else runs offline:
 Fixtures are copied from `_analysis` into `tests/fixtures/` after checking they
 contain no device or account identifier. `.device_id` is never copied.
 
-## 7. Code standard
+## 8. Code standard
 
 The `clean-code` skill applies to every task: one job per class; names that say
 what a thing does; small functions; no magic values (URLs, IV, headers and
@@ -346,7 +473,7 @@ durations each live in one named place); typed errors with a reason; tests
 written first and readable as a description of the behaviour. A task is not done
 until it meets this.
 
-## 8. Build and install
+## 9. Build and install
 
 - `scripts/build.sh` — `dotnet publish`, then assembles the plugin folder with
   its `meta.json`.
@@ -358,7 +485,7 @@ until it meets this.
 
 The scripts touch nothing on the phone except that one plugin folder.
 
-## 9. Risks
+## 10. Risks
 
 1. Channels look poor or are hidden on one of the three apps — step A finds out.
 2. A .NET 10 plugin built on the laptop fails to load under Termux — step A
@@ -377,7 +504,7 @@ The scripts touch nothing on the phone except that one plugin folder.
    limiting the probe size; playback correctness for mako then depends on the
    global setting again until the decorator is updated.
 
-### 9.1 Known limitation, accepted
+### 10.1 Known limitation, accepted
 
 A season opened for the very first time lists only some of its episodes; a
 page reload a few seconds later shows all of them. Jellyfin answers from its own
@@ -386,8 +513,9 @@ metadata refresh has run. The only plugin-side fix is decorating Jellyfin's
 `IChannelManager`; that cost does not match a once-per-season, 3-second cosmetic
 gap, so it is not fixed (decided 2026-09-22; details in `PROGRESS.md`).
 
-## 10. Out of scope for the prototype
+## 11. Out of scope for the prototype
 
-The full show list, genres, search, movies, other providers, a plugin
-repository for catalogue install, and any setting beyond the cache durations
-and the pinned show. Each is designed after step B passes.
+Search (Jellyfin's own search covers show names once the shows exist), movies,
+other providers, a plugin repository for catalogue install, show descriptions
+(§6.4), the plugin creating its own library tile (§6.5), and any setting beyond
+the cache durations and the app version.

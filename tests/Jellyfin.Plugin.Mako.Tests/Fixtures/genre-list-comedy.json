@@ -1,0 +1,40 @@
+{
+  "lastUpdate": "Tue, 22 Sep 2026 16:45:59 +0300",
+  "timestamp": 1790084759748,
+  "pageType": "SubVertical",
+  "vcmid": "fe2dbac980653210VgnVCM2000002a0c10acRCRD",
+  "channelVcmId": "05c2e4caebbe3210VgnVCM100000290c10acRCRD",
+  "sch": "05c2e4caebbe3210",
+  "items": [
+    {
+      "itemVcmId": "adee625164835910VgnVCM100000700a10acRCRD",
+      "title": "שמש",
+      "pageUrl": "/mako-vod-keshet/shemesh",
+      "pic": "https://img.mako.co.il/2025/06/09/Shemesh_e.jpg"
+    },
+    {
+      "itemVcmId": "deb23f0b5959f310VgnVCM2000002a0c10acRCRD",
+      "title": "עבודה ערבית",
+      "pageUrl": "/mako-vod-keshet/Arabic-work",
+      "pic": "https://img.mako.co.il/2021/08/17/Avoda_Aravit_1a_logo_e.jpg"
+    },
+    {
+      "itemVcmId": "612604fd2f9a0a10VgnVCM100000700a10acRCRD",
+      "title": "הסטנדאפ של קובי מימון",
+      "pageUrl": "/mako-vod-keshet/kobi_maimon_standup",
+      "pic": "https://img.mako.co.il/2026/09/17/KobiMyamonSU_e_re.jpg"
+    },
+    {
+      "itemVcmId": "b5e16445b1af1910VgnVCM200000650a10acRCRD",
+      "title": "החיים הם תקופה קשה",
+      "pageUrl": "/mako-vod-keshet/life_is_difficult",
+      "pic": "https://img.mako.co.il/2026/08/24/HaHaimTkufaKasha2_e_re.jpg"
+    },
+    {
+      "itemVcmId": "a576def39dd10a10VgnVCM200000650a10acRCRD",
+      "title": "מתן פרץ שישי חסר מעצורים",
+      "pageUrl": "/mako-vod-keshet/matan_peretz_standup",
+      "pic": "https://img.mako.co.il/2026/08/20/MatanPerez_e_re.jpg"
+    }
+  ]
+}
