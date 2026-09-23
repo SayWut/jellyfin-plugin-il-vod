@@ -257,6 +257,12 @@ installed on the live server. `dotnet test`: 233 → 263, all green, 0 warnings,
 - `README.md` and `docs/spec.md` updated for the second setting, the two-pass check 5, the
   5-minute per-episode stream cache, and the 3-hour folder cache.
 
+## Step C — the catalogue by genre
+
+| Task | Title | Driver | Status | Notes |
+|---|---|---|---|---|
+| C1 | Index parsing | agent | `done` | TDD: RED (CS0246) → GREEN (293/293, 0 warnings); Genre/IndexEntry records + MakoIndex/MakoIndexPaths parsing. |
+
 ## Deviations log
 
 Anything that differed from the spec or the plan, with the reason.
