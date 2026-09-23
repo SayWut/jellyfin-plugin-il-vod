@@ -103,13 +103,8 @@ internal static class MakoServiceCollectionExtensions
         Timeout = MakoHttpClient.Timeout,
     };
 
-    /// <summary>
-    /// The catalogue's own (menu + genre lists) lifetime has no setting yet — task C5 adds one —
-    /// so it is read from <see cref="CatalogueLifetimes.Default"/> for now, while every other
-    /// lifetime already comes from the settings page.
-    /// </summary>
     private static CatalogueLifetimes CatalogueLifetimesFrom(PluginConfiguration configuration) => new(
-        Catalogue: CatalogueLifetimes.Default.Catalogue,
+        Catalogue: TimeSpan.FromHours(configuration.CatalogueCacheHours),
         ShowPage: TimeSpan.FromHours(configuration.ShowPageCacheHours),
         PastSeason: TimeSpan.FromDays(configuration.PastSeasonCacheDays),
         CurrentSeason: TimeSpan.FromHours(configuration.CurrentSeasonCacheHours),

@@ -4,26 +4,19 @@ namespace Jellyfin.Plugin.Mako.Configuration;
 
 public sealed class PluginConfiguration : BasePluginConfiguration
 {
-    private const string DefaultPinnedShowPath = "/mako-vod-keshet/shemesh";
-    private const string DefaultPinnedShowName = "שמש";
     private const string DefaultAppVersion = "43.0";
 
+    private const int DefaultCatalogueCacheHours = 24;
     private const int DefaultShowPageCacheHours = 12;
     private const int DefaultPastSeasonCacheDays = 7;
     private const int DefaultCurrentSeasonCacheHours = 6;
     private const int DefaultStreamLinkCacheMinutes = 5;
 
-    /// <summary>mako's own page path for the one show this channel plays (spec §5).</summary>
-    public string PinnedShowPath { get; set; } = DefaultPinnedShowPath;
-
-    /// <summary>
-    /// The name shown for the pinned show. A setting rather than something scraped: mako's show
-    /// page carries no reliable title of its own (<c>channelName</c> is the current season's name).
-    /// </summary>
-    public string PinnedShowName { get; set; } = DefaultPinnedShowName;
-
     /// <summary>The app version reported to mako in its config and token request URLs, as mako's own Android app would.</summary>
     public string AppVersion { get; set; } = DefaultAppVersion;
+
+    /// <summary>How long the genre menu and each genre's list may be served from cache (spec §6.3).</summary>
+    public int CatalogueCacheHours { get; set; } = DefaultCatalogueCacheHours;
 
     /// <summary>How long a show's page (season list, overview) may be served from cache (spec §5.3).</summary>
     public int ShowPageCacheHours { get; set; } = DefaultShowPageCacheHours;

@@ -19,12 +19,26 @@ public class PluginPagesTests
     [Fact]
     public void SettingsPageReferencesTheLivePluginGuid()
     {
+        string html = EmbeddedSettingsPageHtml();
+
+        Assert.Contains(Plugin.PluginGuid.ToString(), html, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SettingsPageHasTheCatalogueCacheSettingAndNoPinnedShowSettings()
+    {
+        string html = EmbeddedSettingsPageHtml();
+
+        Assert.DoesNotContain("PinnedShow", html, StringComparison.Ordinal);
+        Assert.Contains("CatalogueCacheHours", html, StringComparison.Ordinal);
+    }
+
+    private static string EmbeddedSettingsPageHtml()
+    {
         using Stream? resource = typeof(Plugin).Assembly.GetManifestResourceStream(Plugin.SettingsPageResource);
         Assert.NotNull(resource);
 
         using var reader = new StreamReader(resource!);
-        string html = reader.ReadToEnd();
-
-        Assert.Contains(Plugin.PluginGuid.ToString(), html, StringComparison.Ordinal);
+        return reader.ReadToEnd();
     }
 }

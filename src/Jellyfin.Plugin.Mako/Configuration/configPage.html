@@ -13,18 +13,11 @@
                 <div class="verticalSection">
                     <h2 class="sectionTitle">Mako</h2>
                     <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="PinnedShowPath">Pinned show path</label>
-                        <input id="PinnedShowPath" name="PinnedShowPath" type="text" is="emby-input" />
+                        <label class="inputLabel inputLabelUnfocused" for="CatalogueCacheHours">Catalogue cache (hours)</label>
+                        <input id="CatalogueCacheHours" name="CatalogueCacheHours" type="number" min="1" is="emby-input" />
                         <div class="fieldDescription">
-                            mako's own page path for the show this channel shows, e.g.
-                            <code>/mako-vod-keshet/shemesh</code>.
-                        </div>
-                    </div>
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="PinnedShowName">Pinned show name</label>
-                        <input id="PinnedShowName" name="PinnedShowName" type="text" is="emby-input" />
-                        <div class="fieldDescription">
-                            The name shown for the show. mako's own show page carries no reliable title.
+                            How long the genre lists are kept before mako is asked again. Opening the channel with a
+                            cold cache costs six requests, paced.
                         </div>
                     </div>
                     <div class="inputContainer">
@@ -49,8 +42,7 @@
         document.querySelector('#MakoConfigPage').addEventListener('pageshow', function () {
             Dashboard.showLoadingMsg();
             ApiClient.getPluginConfiguration(MakoConfig.pluginUniqueId).then(function (config) {
-                document.querySelector('#PinnedShowPath').value = config.PinnedShowPath || '';
-                document.querySelector('#PinnedShowName').value = config.PinnedShowName || '';
+                document.querySelector('#CatalogueCacheHours').value = config.CatalogueCacheHours;
                 document.querySelector('#AppVersion').value = config.AppVersion || '';
                 Dashboard.hideLoadingMsg();
             });
@@ -60,8 +52,7 @@
             event.preventDefault();
             Dashboard.showLoadingMsg();
             ApiClient.getPluginConfiguration(MakoConfig.pluginUniqueId).then(function (config) {
-                config.PinnedShowPath = document.querySelector('#PinnedShowPath').value.trim();
-                config.PinnedShowName = document.querySelector('#PinnedShowName').value.trim();
+                config.CatalogueCacheHours = parseInt(document.querySelector('#CatalogueCacheHours').value, 10);
                 config.AppVersion = document.querySelector('#AppVersion').value.trim();
                 ApiClient.updatePluginConfiguration(MakoConfig.pluginUniqueId, config).then(function (result) {
                     Dashboard.processPluginConfigurationUpdateResult(result);

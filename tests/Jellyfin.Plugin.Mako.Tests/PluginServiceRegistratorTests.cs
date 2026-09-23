@@ -102,15 +102,16 @@ public sealed class PluginServiceRegistratorTests
 
     /// <summary>
     /// The other half of the same rule: deferring construction must not mean never constructing.
-    /// The first user action builds the whole graph — and only then is the data folder read.
-    /// Resolution-only (no <c>GetChannelItems</c> call): the live <c>MakoCatalog</c> now reaches
-    /// mako on every browse, so exercising it here would send a real HTTP request. Resolving
-    /// <see cref="ICatalog"/> itself is "the first user action" for this test's purpose — it is
-    /// exactly what <see cref="MakoChannel"/>'s own <c>Lazy&lt;ICatalog&gt;</c> forces open on a
-    /// real first action, and it alone is enough to prove the data folder is read lazily.
+    /// Resolving the catalogue is the first user action that builds the whole graph — and only
+    /// then is the data folder read. Resolution-only (no <c>GetChannelItems</c> call): the live
+    /// <c>MakoCatalog</c> now reaches mako on every browse, so exercising it here would send a
+    /// real HTTP request. Resolving <see cref="ICatalog"/> itself is "the first user action" for
+    /// this test's purpose — it is exactly what <see cref="MakoChannel"/>'s own
+    /// <c>Lazy&lt;ICatalog&gt;</c> forces open on a real first action, and it alone is enough to
+    /// prove the data folder is read lazily.
     /// </summary>
     [Fact]
-    public void TheFirstUserActionBuildsTheGraphAndReadsTheDataFolder()
+    public void ResolvingTheCatalogueBuildsTheGraphAndReadsTheDataFolder()
     {
         using TemporaryDirectory dataFolder = new();
         int dataFolderReads = 0;
