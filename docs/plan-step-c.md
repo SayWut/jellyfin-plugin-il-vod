@@ -51,7 +51,7 @@ tests/Jellyfin.Plugin.Mako.Tests/
 
 ---
 
-### Task C1: Index parsing — the real genres and a genre's entries
+### Task 1 (C1): Index parsing — the real genres and a genre's entries
 
 **Files:**
 - Create: `src/Jellyfin.Plugin.Mako/Mako/MakoIndex.cs`, `src/Jellyfin.Plugin.Mako/Mako/MakoIndexPaths.cs`
@@ -305,7 +305,7 @@ git commit --author="Claude Code <claude@anthropic.com>" -m "mako plugin: parse 
 
 ---
 
-### Task C2: Folder ids — new prefixes, and a season id that knows its show
+### Task 2 (C2): Folder ids — new prefixes, and a season id that knows its show
 
 **Files:**
 - Modify: `src/Jellyfin.Plugin.Mako/Browsing/FolderId.cs`, `src/Jellyfin.Plugin.Mako/Browsing/ChannelItemMapper.cs` (`ToFolder(Season)`), `src/Jellyfin.Plugin.Mako/MakoChannel.cs` (`ContentVersion`, the Season case of `ItemsInside`), `src/Jellyfin.Plugin.Mako/Catalog/ICatalog.cs`, `src/Jellyfin.Plugin.Mako/Catalog/MakoCatalog.cs` (signature only, behaviour in C3), `tests/.../Support/FakeCatalog.cs`
@@ -450,7 +450,7 @@ git commit --author="Claude Code <claude@anthropic.com>" -m "mako plugin: new fo
 
 ---
 
-### Task C3: The catalogue answers from the genre lists
+### Task 3 (C3): The catalogue answers from the genre lists
 
 **Files:**
 - Create: `src/Jellyfin.Plugin.Mako/Catalog/CatalogueLifetimes.cs`
@@ -727,7 +727,7 @@ git commit --author="Claude Code <claude@anthropic.com>" -m "mako plugin: the ca
 
 ---
 
-### Task C4: The request budget — N1 for step C
+### Task 4 (C4): The request budget — N1 for step C
 
 **Files:**
 - Test: `tests/Jellyfin.Plugin.Mako.Tests/Catalog/OnDemandRequestBudgetTests.cs`
@@ -798,7 +798,7 @@ git commit --author="Claude Code <claude@anthropic.com>" -m "mako plugin: pin st
 
 ---
 
-### Task C5: Settings and wiring
+### Task 5 (C5): Settings and wiring
 
 **Files:**
 - Modify: `src/Jellyfin.Plugin.Mako/Configuration/PluginConfiguration.cs`, `src/Jellyfin.Plugin.Mako/Configuration/configPage.html`, `src/Jellyfin.Plugin.Mako/PluginServiceRegistrator.cs`, `README.md`
@@ -877,7 +877,7 @@ git commit --author="Claude Code <claude@anthropic.com>" -m "mako plugin: settin
 
 ---
 
-### Task C6: Install and run the step C checks (agent + user)
+### Task 6 (C6): Install and run the step C checks (agent + user)
 
 **Files:** none in the repo except `PROGRESS.md`.
 
