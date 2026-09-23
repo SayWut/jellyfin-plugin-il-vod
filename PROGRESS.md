@@ -331,7 +331,22 @@ before C6. `dotnet test`: 304 → 309, all green, 0 warnings.
 - Log noise, unchanged: one `Probe Provider` error per queued episode refresh; the
   `SplashscreenPostScanTask` failure ("not enough valid pictures") is Jellyfin's login collage
   and unrelated. `mako-cache.json` is now 764 KB.
-- **Awaits the user's app check (§6.7 checks 1, 3):** the "mako test" tile on web, Android TV
+- **User's app check, Fladder on Android TV (2026-09-23): browse and play work; 12 shows across
+  the genres and 9 seasons opened, 0 `could not open` warnings** — the untested show shapes
+  (one-off documentaries, cooking) parse fine. Three observations, none a plugin defect:
+  1. *Genre rows change order after visiting a show.* Fladder's home library screen fetches each
+     genre shelf with `sortBy=Random` (`library_screen_provider.dart:237`) and refetches on every
+     mount (`pull_to_refresh.dart:39-45`); the full-library grid sorts by name and is stable.
+     Client choice; nothing the plugin can set changes it.
+  2. *A season opened for the first time shows nothing; back and in shows the episodes.* The
+     accepted first-open limitation (spec §10.1) as Fladder renders it: it fetches
+     `/Shows/{id}/Episodes` exactly once and draws the list only `if (episodes.isNotEmpty)`
+     (`season_detail_screen.dart:154`) — no spinner, no retry. The show page's lag is the same
+     first open (one mako request + item creation) plus Fladder loading every episode of every
+     season up front (`series_details_provider.dart:59-68`). Once per show, ever.
+  3. *No show description* — spec §6.4, deliberate. Revisit needs a way to fill an item's
+     overview after Jellyfin created it (same constraint as genres/posters).
+- **Original app-check request (§6.7 checks 1, 3):** the "mako test" tile on web, Android TV
   and Fladder — five genre rows; open several shows per genre, including a one-off documentary
   and a cooking show; a season; play. The log is then read for `could not open Show` warnings.
 
