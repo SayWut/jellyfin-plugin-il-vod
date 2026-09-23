@@ -103,9 +103,14 @@ public sealed class PluginServiceRegistratorTests
     /// <summary>
     /// The other half of the same rule: deferring construction must not mean never constructing.
     /// The first user action builds the whole graph — and only then is the data folder read.
+    /// Resolution-only (no <c>GetChannelItems</c> call): the live <c>MakoCatalog</c> now reaches
+    /// mako on every browse, so exercising it here would send a real HTTP request. Resolving
+    /// <see cref="ICatalog"/> itself is "the first user action" for this test's purpose — it is
+    /// exactly what <see cref="MakoChannel"/>'s own <c>Lazy&lt;ICatalog&gt;</c> forces open on a
+    /// real first action, and it alone is enough to prove the data folder is read lazily.
     /// </summary>
     [Fact]
-    public async Task TheFirstUserActionBuildsTheGraphAndReadsTheDataFolder()
+    public void TheFirstUserActionBuildsTheGraphAndReadsTheDataFolder()
     {
         using TemporaryDirectory dataFolder = new();
         int dataFolderReads = 0;
@@ -122,9 +127,8 @@ public sealed class PluginServiceRegistratorTests
         IChannel channel = provider.GetServices<IChannel>().OfType<MakoChannel>().Single();
         Assert.Equal(0, dataFolderReads);
 
-        ChannelItemResult result = await channel.GetChannelItems(new InternalChannelItemQuery { FolderId = null, UserId = Guid.NewGuid() }, CancellationToken.None);
+        Assert.IsType<MakoCatalog>(provider.GetRequiredService<ICatalog>());
 
-        Assert.Equal(new PluginConfiguration().PinnedShowName, Assert.Single(result.Items).Name);
         Assert.True(dataFolderReads > 0);
     }
 
