@@ -346,6 +346,14 @@ before C6. `dotnet test`: 304 → 309, all green, 0 warnings.
      season up front (`series_details_provider.dart:59-68`). Once per show, ever.
   3. *No show description* — spec §6.4, deliberate. Revisit needs a way to fill an item's
      overview after Jellyfin created it (same constraint as genres/posters).
+- **Burst test, "fetch every season on a show click" (2026-09-23 16:41), from the phone with the
+  plugin's HTTP stack, headers and 750 ms pacing:** four heavy reality shows (המירוץ למיליון,
+  מאסטר שף, הכוכב הבא — 12 seasons — , חתונה ממבט ראשון), show page + every season page = 24
+  requests, then immediately six shows = 28 more: **52 requests in ~1 min, all HTTP 200, 0
+  challenges.** mako's "seasons" include spin-offs (masterchef-vip_2022, dream_team); the
+  amazing-race page lists one season. So the extra cost is 1–12 requests per first show open.
+  Design not decided yet: warm the cache after answering (keeps the show page fast; seasons
+  still create their episodes on first open) vs creating episodes with the show.
 - **Original app-check request (§6.7 checks 1, 3):** the "mako test" tile on web, Android TV
   and Fladder — five genre rows; open several shows per genre, including a one-off documentary
   and a cooking show; a season; play. The log is then read for `could not open Show` warnings.
