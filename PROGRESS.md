@@ -354,6 +354,31 @@ before C6. `dotnet test`: 304 → 309, all green, 0 warnings.
   amazing-race page lists one season. So the extra cost is 1–12 requests per first show open.
   Design not decided yet: warm the cache after answering (keeps the show page fast; seasons
   still create their episodes on first open) vs creating episodes with the show.
+- **Incident, 2026-09-23 18:55–19:10 — renaming the library wiped the shows; recovered by a
+  restart.** Sequence: `POST /Library/VirtualFolders/Name?name=mako test&newName=mako` (HTTP
+  204) renamed the folder on disk but left the existing `CollectionFolder` item's `Path` at
+  `root/default/mako test`; the channel tile was also hidden for both users
+  (`MyMediaExcludes`). The library scan I then ran to pick the new name up created a *second*
+  "mako" library item over the same media path, and validated the old item's children against
+  a folder that no longer existed — `Folder.ValidateChildrenInternal2` (v12.1, `Folder.cs:539-
+  560`) removed every child that `CanDelete()`: all 413 mako Series (seasons cascaded; 712
+  episodes stayed orphaned). No `Removing item` line is logged on that path. Recovery attempts
+  through repeated root opens then created nothing, although the plugin answered 413 each time
+  (0 requests to mako): `LibraryManager.GetItemById` serves from an in-memory LRU
+  (`LibraryManager.cs:90,1697`) that the scan's mass removal never evicted, so
+  `ChannelManager.GetItemById<Series>` saw the deleted rows as existing (`isNew=false`).
+  That LRU theory was wrong — a restart changed nothing. The real blocker was Jellyfin's
+  3-hour channel answer cache (`ChannelManager.GetChannelItems` returns `null` on a hit and
+  the create loop is skipped): every "recovery" root open was a cache hit answering from the
+  database, and deleting the one cache file raced with Jellyfin rewriting it. Removing the
+  channel's whole cache directory and opening the root once recreated all 413 shows in 7 s
+  with 0 requests to mako (the plugin's own cache was fresh). **Lessons:** never rename a library over the channel's folder with the Name
+  endpoint — create a new library and delete the old one instead; never run a library scan
+  while a library item's path is stale; and the plugin's "never answer empty" rule was not
+  involved (its answers were complete throughout). Watch state for the mako shows from the
+  morning is lost (rows deleted). End state: one "mako" library tile (413 shows, five genre
+  rows, posters), the channel tile hidden for both users via `MyMediaExcludes`, the stale
+  "mako test" item gone.
 - **Original app-check request (§6.7 checks 1, 3):** the "mako test" tile on web, Android TV
   and Fladder — five genre rows; open several shows per genre, including a one-off documentary
   and a cooking show; a season; play. The log is then read for `could not open Show` warnings.
