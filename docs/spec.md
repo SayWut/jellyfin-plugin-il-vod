@@ -1,6 +1,6 @@
 # Jellyfin mako plugin — prototype design
 
-Date: 2026-09-20; step B section revised 2026-09-21 after step A; step C added 2026-09-23. Status: steps A and B done; step C designed, awaiting the plan.
+Date: 2026-09-20; step B section revised 2026-09-21 after step A; step C added 2026-09-23. Status: steps A and B done; step C built, awaiting install (C6).
 
 ## 1. What this is
 
@@ -406,7 +406,9 @@ and stale-serves them unchanged — there is no new source class. `MakoChannel`
   needed list serves the stale copies; with any list missing it fails the folder
   (never an empty answer, §5.4). A list that is not valid JSON is a failure and is
   never cached. A genre list that fails while others succeed fails the whole
-  answer — a partial catalogue would make Jellyfin delete the missing shows.
+  answer — a partial catalogue would make Jellyfin delete the missing shows. A
+  menu that names no genre, or a genre list that names no show, is a failure too
+  and is never cached — mako's real genres are never empty.
 
 ### 6.3 Caching
 

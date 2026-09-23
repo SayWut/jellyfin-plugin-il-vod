@@ -3,29 +3,29 @@ using Jellyfin.Plugin.Mako.Catalog;
 using Jellyfin.Plugin.Mako.MakoApi;
 using Jellyfin.Plugin.Mako.Model;
 using Jellyfin.Plugin.Mako.Tests.Support;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Jellyfin.Plugin.Mako.Tests.Catalog;
 
 /// <summary>
 /// N1's definition of done (spec §2): one <see cref="FakeMakoHttp"/> wired through the real
 /// <see cref="MakoConfigLoader"/>, <see cref="MakoPageSource"/>, <see cref="StreamResolver"/> and
-/// <see cref="MakoCatalog"/>, counting requests after every step of a user session — browsing the
-/// pinned show, its current season, a past season, and pressing play — to prove that only what
-/// each action actually needs is ever asked of mako, nothing ahead of it and nothing repeated
-/// inside a cache's lifetime.
+/// <see cref="MakoCatalog"/>, counting requests after every step of a user session — browsing a
+/// show, its current season, a past season, and pressing play — to prove that only what each
+/// action actually needs is ever asked of mako, nothing ahead of it and nothing repeated inside a
+/// cache's lifetime.
 /// </summary>
 public class OnDemandRequestBudgetTests
 {
     private const string AppVersion = "43.0";
 
-    // The real default: the pinned page is the show's own landing path, which is NOT the same as
-    // whichever season page it happens to display (that is DisplayedSeasonPath below). Serving
-    // the show-page fixture's JSON at this distinct url is what makes the "current season" row of
-    // the table below a genuine test of MakoCatalog.Remember-ing under a different cache key,
-    // rather than a same-key overwrite that would pass even if nothing were remembered at all.
-    private const string PinnedPagePath = "/mako-vod-keshet/shemesh";
+    // The show's own landing path, which is NOT the same as whichever season page it happens to
+    // display (that is DisplayedSeasonPath below). Serving the show-page fixture's JSON at this
+    // distinct url is what makes the "current season" row of the table below a genuine test of
+    // MakoCatalog.Remember-ing under a different cache key, rather than a same-key overwrite that
+    // would pass even if nothing were remembered at all.
+    private const string ShemeshPagePath = "/mako-vod-keshet/shemesh";
     private const string DisplayedSeasonPath = "/mako-vod-keshet/shemesh-s6";
-    private const string PinnedShowName = "שמש";
     private const string SeasonOnePagePath = "/mako-vod-keshet/shemesh-s1";
     private const string NewPlaylistKey = "TESTKEY-PLAYLIST-NEW-24b";
     private const string TokenKey = "TESTKEY-TOKEN-TICKET-24b";
@@ -54,7 +54,7 @@ public class OnDemandRequestBudgetTests
     private static readonly string NotesConfigUrl = MakoConfig.NotesUrlOf(CoreConfigJson);
     private static readonly MakoConfig ParsedConfig = MakoConfig.Parse(MainConfigJson, CoreConfigJson, NotesConfigJson);
 
-    private static readonly string PinnedPageUrl = MakoUrls.Page(ParsedConfig.BaseUrlTemplate, PinnedPagePath);
+    private static readonly string ShowPageUrl = MakoUrls.Page(ParsedConfig.BaseUrlTemplate, ShemeshPagePath);
     private static readonly string SeasonOneUrl = MakoUrls.Page(ParsedConfig.BaseUrlTemplate, SeasonOnePagePath);
 
     private static readonly EpisodeKey ProtectedEpisode =
@@ -83,23 +83,23 @@ public class OnDemandRequestBudgetTests
         Assert.Equal(6, BrowseHostRequestCount(http));
 
         // | Open a show | 7 (the show page) |
-        await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
+        await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None);
         Assert.Equal(7, BrowseHostRequestCount(http));
 
         // | Open the season the show page displayed | 7, unchanged |
-        await catalog.GetEpisodesAsync(PinnedPagePath, DisplayedSeasonPath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(ShemeshPagePath, DisplayedSeasonPath, CancellationToken.None);
         Assert.Equal(7, BrowseHostRequestCount(http));
 
         // | Open another season | 8 |
-        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
         Assert.Equal(8, BrowseHostRequestCount(http));
 
         // | GetEpisodesAsync(season 1) again | 8 |
-        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
         Assert.Equal(8, BrowseHostRequestCount(http));
 
         // | GetSeasonsAsync(show) again | 8 |
-        await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
+        await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None);
         Assert.Equal(8, BrowseHostRequestCount(http));
 
         // | Press play (protected) | 9 on www + 1 POST token + 2 CDN GETs |
@@ -129,8 +129,8 @@ public class OnDemandRequestBudgetTests
         FakeMakoHttp http = SeededHttp();
         MakoCatalog catalog = await CreateCatalogAsync(http);
 
-        await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
-        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
+        await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
 
         foreach (string untouchedSeasonSlug in new[] { "shemesh-s2", "shemesh-s3", "shemesh-s4", "shemesh-s5" })
         {
@@ -152,6 +152,11 @@ public class OnDemandRequestBudgetTests
         await catalog.GetShowsAsync(CancellationToken.None);
 
         Assert.DoesNotContain(http.Requests, url => url.Contains("/mako-vod-keshet/", StringComparison.Ordinal));
+
+        // Positive control: the same matcher style DOES find the index request GetShowsAsync
+        // itself makes, so the assertion above is proven to be checking something real rather
+        // than passing vacuously because the matcher itself never matches anything.
+        Assert.Contains(http.Requests, url => url.Contains("mako-vod-index", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -160,14 +165,21 @@ public class OnDemandRequestBudgetTests
         FakeMakoHttp http = SeededHttp();
         MakoCatalog catalog = await CreateCatalogAsync(http);
 
-        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
 
         Assert.DoesNotContain(http.Requests, url => url.Contains("mako-vod-index", StringComparison.Ordinal));
+
+        // Positive control: the same matcher style DOES find the one request this test's own
+        // GetEpisodesAsync call makes, so the assertion above is proven to be checking something
+        // real rather than passing vacuously because the matcher itself never matches anything.
+        Assert.Contains(http.Requests, url => url.Contains("shemesh-s1", StringComparison.Ordinal));
     }
 
     /// <summary>The genre menu plus its five real genre lists (comedy and drama carry the real
-    /// fixtures, the rest answer an empty list) — same seeding as <c>MakoCatalogTests</c> — plus
-    /// the pinned show/season/playlist/token/CDN fixtures the rest of this test's steps need.</summary>
+    /// fixtures; the other three real genres answer one throwaway placeholder show each, never an
+    /// empty list — mako's real genres are never empty, spec §6.2) — same seeding as
+    /// <c>MakoCatalogTests</c> — plus the show/season/playlist/token/CDN fixtures the rest of this
+    /// test's steps need.</summary>
     private static FakeMakoHttp SeededHttp()
     {
         FakeMakoHttp http = new();
@@ -178,12 +190,15 @@ public class OnDemandRequestBudgetTests
             {
                 "קומדיה" => ComedyJson,
                 "דרמה" => DramaJson,
+                "ריאליטי" => PlaceholderListJson(genre.Name, "/mako-vod-keshet/placeholder-1"),
+                "דוקומנטרי" => PlaceholderListJson(genre.Name, "/mako-vod-keshet/placeholder-2"),
+                "בישול" => PlaceholderListJson(genre.Name, "/mako-vod-keshet/placeholder-3"),
                 _ => EmptyListJson,
             };
             http.Respond(MakoUrls.Page(ParsedConfig.BaseUrlTemplate, genre.PagePath), listJson);
         }
 
-        http.Respond(PinnedPageUrl, ShowPageJson);
+        http.Respond(ShowPageUrl, ShowPageJson);
         http.Respond(SeasonOneUrl, SeasonOnePageJson);
         http.Respond(PlaylistUrl, EncryptedProtectedPlaylist());
         http.Respond(TokenUrl, EncryptedTokenResponse());
@@ -191,6 +206,11 @@ public class OnDemandRequestBudgetTests
         http.Respond(BestVariantUrl, "#EXTM3U\n#EXTINF:6.0,\n00.ts\n#EXT-X-ENDLIST\n");
         return http;
     }
+
+    /// <summary>One throwaway show for a genre this suite carries no real fixture for — never
+    /// <see cref="EmptyListJson"/>, since §6.2 treats a real genre naming no show as a failure.</summary>
+    private static string PlaceholderListJson(string genreName, string pagePath) =>
+        $$"""{"items":[{"itemVcmId":"x","title":"{{genreName}} placeholder","pageUrl":"{{pagePath}}","pic":null}]}""";
 
     private static int BrowseHostRequestCount(FakeMakoHttp http) => RequestCountToHost(http, MakoUrls.BrowseHost);
 
@@ -221,7 +241,7 @@ public class OnDemandRequestBudgetTests
         MakoPageSource pages = new(http, config, pageCache, new RecordingLogger<MakoPageSource>());
         StreamResolver resolver = new(http, config, CreateDevice(), () => AppVersion, new RecordingLogger<StreamResolver>());
 
-        return new MakoCatalog(pages, resolver, streamLinkCache, () => CatalogueLifetimes.Default);
+        return new MakoCatalog(pages, resolver, streamLinkCache, () => CatalogueLifetimes.Default, NullLogger<MakoCatalog>.Instance);
     }
 
     /// <summary>

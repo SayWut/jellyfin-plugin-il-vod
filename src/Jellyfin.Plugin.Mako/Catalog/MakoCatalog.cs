@@ -2,6 +2,7 @@ using System.Text.Json;
 using Jellyfin.Plugin.Mako.Cache;
 using Jellyfin.Plugin.Mako.MakoApi;
 using Jellyfin.Plugin.Mako.Model;
+using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.Mako.Catalog;
 
@@ -18,17 +19,36 @@ public sealed class MakoCatalog : ICatalog
     private const int FallbackSeasonNumber = 1;
     private const string UnknownShowName = "";
 
+    /// <summary>Mako's real genres are never empty (§6.2's controller ruling): a menu naming none
+    /// is treated the same as one that is not JSON at all — a failure, never cached.</summary>
+    private const string EmptyGenreMenuMessage = "mako's genre menu names no genre";
+
+    /// <summary>Same ruling as <see cref="EmptyGenreMenuMessage"/>, for a genre's own list.</summary>
+    private const string EmptyGenreListMessage = "mako's genre list names no show";
+
+    /// <summary>Logged by <see cref="ParseOrEmpty{T}"/>, which only ever runs against an already
+    /// cached page — this is a stale/corrupted cache entry, not a live browse failure.</summary>
+    private const string CachedIndexPageUnparseableWarning =
+        "mako: a cached index page could not be parsed; episodes will carry no series name";
+
     private readonly MakoPageSource _pages;
     private readonly StreamResolver _resolver;
     private readonly TimedCache _streamLinks;
     private readonly Func<CatalogueLifetimes> _readLifetimes;
+    private readonly ILogger<MakoCatalog> _logger;
 
-    public MakoCatalog(MakoPageSource pages, StreamResolver resolver, TimedCache streamLinks, Func<CatalogueLifetimes> readLifetimes)
+    public MakoCatalog(
+        MakoPageSource pages,
+        StreamResolver resolver,
+        TimedCache streamLinks,
+        Func<CatalogueLifetimes> readLifetimes,
+        ILogger<MakoCatalog> logger)
     {
         _pages = pages;
         _resolver = resolver;
         _streamLinks = streamLinks;
         _readLifetimes = readLifetimes;
+        _logger = logger;
     }
 
     /// <summary>
@@ -52,7 +72,11 @@ public sealed class MakoCatalog : ICatalog
             {
                 if (showsByPath.TryGetValue(entry.PagePath, out Show? known))
                 {
-                    showsByPath[entry.PagePath] = known with { Genres = [.. known.Genres, genre.Name] };
+                    if (!known.Genres.Contains(genre.Name, StringComparer.Ordinal))
+                    {
+                        showsByPath[entry.PagePath] = known with { Genres = [.. known.Genres, genre.Name] };
+                    }
+
                     continue;
                 }
 
@@ -139,22 +163,35 @@ public sealed class MakoCatalog : ICatalog
             return lifetimes.ShowPage;
         };
 
-    /// <summary>The menu is parsed with <see cref="MakoIndex.ParseGenres"/> before a lifetime is
-    /// returned, so an HTML error page mako answered with status 200 is never written to the
-    /// cache (same rule as the show page).</summary>
+    /// <summary>
+    /// The menu is parsed with <see cref="MakoIndex.ParseGenres"/> before a lifetime is returned,
+    /// so an HTML error page mako answered with status 200 is never written to the cache (same
+    /// rule as the show page). A menu that parses but names no genre is rejected the same way —
+    /// mako's real genres are never empty, and an empty root answer would make Jellyfin delete
+    /// every show it holds.
+    /// </summary>
     private static Func<string, TimeSpan> MenuLifetimeOf(TimeSpan lifetime) =>
         menuJson =>
         {
-            MakoIndex.ParseGenres(menuJson);
+            if (MakoIndex.ParseGenres(menuJson).Count == 0)
+            {
+                throw new FormatException(EmptyGenreMenuMessage);
+            }
+
             return lifetime;
         };
 
     /// <summary>Same rule as <see cref="MenuLifetimeOf"/>, validating a genre's own list with
-    /// <see cref="MakoIndex.ParseEntries"/> instead.</summary>
+    /// <see cref="MakoIndex.ParseEntries"/> instead: a list that parses but names no show is a
+    /// failure too, since a shorter root answer would make Jellyfin delete the shows it lacks.</summary>
     private static Func<string, TimeSpan> ListLifetimeOf(TimeSpan lifetime) =>
         listJson =>
         {
-            MakoIndex.ParseEntries(listJson);
+            if (MakoIndex.ParseEntries(listJson).Count == 0)
+            {
+                throw new FormatException(EmptyGenreListMessage);
+            }
+
             return lifetime;
         };
 
@@ -191,7 +228,7 @@ public sealed class MakoCatalog : ICatalog
         return UnknownShowName;
     }
 
-    private static IReadOnlyList<T> ParseOrEmpty<T>(Func<IReadOnlyList<T>> parse)
+    private IReadOnlyList<T> ParseOrEmpty<T>(Func<IReadOnlyList<T>> parse)
     {
         try
         {
@@ -199,6 +236,7 @@ public sealed class MakoCatalog : ICatalog
         }
         catch (FormatException)
         {
+            _logger.LogWarning(CachedIndexPageUnparseableWarning);
             return [];
         }
     }

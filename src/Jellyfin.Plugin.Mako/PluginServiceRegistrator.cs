@@ -41,6 +41,11 @@ internal static class MakoServiceCollectionExtensions
     private const string BrowseCacheFileName = "mako-cache.json";
     private const string DeviceIdentityFileName = "device.id";
 
+    /// <summary>A setting of 0 (or less) would cache the catalogue for no time at all, turning
+    /// every channel open into a cold one — floored to the smallest lifetime that still means
+    /// "cached" rather than trusting the settings page's number field unchecked.</summary>
+    private const int MinimumCatalogueCacheHours = 1;
+
     /// <summary>The 15 s timeout applies from here down: <see cref="MakoConfigLoader"/>, <see cref="MakoPageSource"/>
     /// and <see cref="StreamResolver"/> all share the one <see cref="IMakoHttp"/> registered below.</summary>
     internal static void AddMakoServices(this IServiceCollection services, Func<string> dataFolder, Func<PluginConfiguration> configuration)
@@ -83,7 +88,8 @@ internal static class MakoServiceCollectionExtensions
             provider.GetRequiredService<MakoPageSource>(),
             provider.GetRequiredService<StreamResolver>(),
             provider.GetRequiredService<StreamLinkCache>().Value,
-            () => CatalogueLifetimesFrom(configuration())));
+            () => CatalogueLifetimesFrom(configuration()),
+            provider.GetRequiredService<ILogger<MakoCatalog>>()));
 
         // Lazy, not ICatalog: Jellyfin constructs every IChannel before any plugin instance
         // exists (see MakoChannel's own remarks), and building the catalogue reads the data
@@ -103,8 +109,10 @@ internal static class MakoServiceCollectionExtensions
         Timeout = MakoHttpClient.Timeout,
     };
 
-    private static CatalogueLifetimes CatalogueLifetimesFrom(PluginConfiguration configuration) => new(
-        Catalogue: TimeSpan.FromHours(configuration.CatalogueCacheHours),
+    /// <summary>internal (not private): a test reaches this directly, through the test project's
+    /// <c>InternalsVisibleTo</c> grant, to pin the floor without building a whole service graph.</summary>
+    internal static CatalogueLifetimes CatalogueLifetimesFrom(PluginConfiguration configuration) => new(
+        Catalogue: TimeSpan.FromHours(Math.Max(MinimumCatalogueCacheHours, configuration.CatalogueCacheHours)),
         ShowPage: TimeSpan.FromHours(configuration.ShowPageCacheHours),
         PastSeason: TimeSpan.FromDays(configuration.PastSeasonCacheDays),
         CurrentSeason: TimeSpan.FromHours(configuration.CurrentSeasonCacheHours),

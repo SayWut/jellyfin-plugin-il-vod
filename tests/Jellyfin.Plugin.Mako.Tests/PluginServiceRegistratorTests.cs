@@ -25,6 +25,21 @@ public sealed class PluginServiceRegistratorTests
         Assert.IsType<MakoChannel>(provider.GetRequiredService<IChannel>());
     }
 
+    /// <summary>A setting of 0 (or a stray negative value) must not cache the catalogue for no
+    /// time at all — that would turn every channel open into a cold, six-request one.
+    /// <c>CatalogueLifetimesFrom</c> is <c>internal</c> precisely so this can call it directly,
+    /// through this test project's <c>InternalsVisibleTo</c> grant, without building the whole
+    /// service graph just to read one number back off it.</summary>
+    [Fact]
+    public void ACatalogueCacheHoursOfZeroFloorsToOneHour()
+    {
+        PluginConfiguration configuration = new() { CatalogueCacheHours = 0 };
+
+        CatalogueLifetimes lifetimes = MakoServiceCollectionExtensions.CatalogueLifetimesFrom(configuration);
+
+        Assert.Equal(TimeSpan.FromHours(1), lifetimes.Catalogue);
+    }
+
     [Fact]
     public void TheHttpGraphResolvesOverAHandlerThatNeverFollowsRedirectsAutomatically()
     {

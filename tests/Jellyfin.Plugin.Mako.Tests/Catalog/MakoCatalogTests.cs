@@ -5,6 +5,7 @@ using Jellyfin.Plugin.Mako.MakoApi;
 using Jellyfin.Plugin.Mako.Model;
 using Jellyfin.Plugin.Mako.Tests.Support;
 using MediaBrowser.Controller.Channels;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Jellyfin.Plugin.Mako.Tests.Catalog;
 
@@ -21,6 +22,14 @@ public class MakoCatalogTests
     // with the real fixture, since ShemeshPagePath and DisplayedSeasonPath no longer coincide now
     // that GetShowsAsync no longer keys shows by their season.
     private const string DisplayedSeasonPath = "/mako-vod-keshet/shemesh-s6";
+
+    // The three real genres genre-menu.json names besides דרמה/קומדיה: SeededHttp() gives each one
+    // throwaway show at its own path, rather than an empty list, per §6.2's "mako's real genres
+    // are never empty" ruling.
+    private const string RealityPlaceholderPath = "/mako-vod-keshet/placeholder-1"; // ריאליטי
+    private const string DocumentaryPlaceholderPath = "/mako-vod-keshet/placeholder-2"; // דוקומנטרי
+    private const string CookingPlaceholderPath = "/mako-vod-keshet/placeholder-3"; // בישול
+
     private const string NewPlaylistKey = "TESTKEY-PLAYLIST-NEW-24b";
     private const string TokenKey = "TESTKEY-TOKEN-TICKET-24b";
     private const string MediaUrl = "https://cdn.example.test/master.m3u8";
@@ -64,7 +73,7 @@ public class MakoCatalogTests
 
         IReadOnlyList<Show> shows = await catalog.GetShowsAsync(CancellationToken.None);
 
-        Assert.Equal(8, shows.Count); // 5 comedy + 4 drama − 1 shared
+        Assert.Equal(11, shows.Count); // 1 reality + 1 documentary + 5 comedy + 4 drama − 1 shared + 1 cooking
         Show shemesh = Assert.Single(shows, show => show.Id == ShemeshPagePath);
         // Assert.Equivalent, not Assert.Equal: Show's Genres is an IReadOnlyList<string>, whose
         // default equality (used by the compiler-generated record Equals) is reference equality —
@@ -77,13 +86,16 @@ public class MakoCatalogTests
         Assert.Equal(new[] { "דרמה", "קומדיה" }, shared.Genres); // menu order: drama comes before comedy
 
         // Order-sensitive: shows are returned in first-appearance order, not grouped by genre or
-        // sorted by name. דרמה is processed before קומדיה (menu order), so its four shows appear
-        // first, in genre-list-drama.json's own order; קומדיה then contributes only the four shows
-        // not already seen (עבודה ערבית/Arabic-work is skipped a second time), in genre-list-comedy
-        // .json's own order.
+        // sorted by name. Menu order is ריאליטי, דוקומנטרי, דרמה, קומדיה, בישול, so the reality and
+        // documentary placeholders lead; דרמה then contributes its four shows, in genre-list-drama
+        // .json's own order; קומדיה contributes only the four shows not already seen (עבודה ערבית/
+        // Arabic-work is skipped a second time), in genre-list-comedy.json's own order; the cooking
+        // placeholder trails.
         Assert.Equal(
             new[]
             {
+                RealityPlaceholderPath,
+                DocumentaryPlaceholderPath,
                 ArabicWorkPagePath,
                 "/mako-vod-keshet/dani_hollywood",
                 "/mako-vod-keshet/lowest_place_world",
@@ -92,8 +104,36 @@ public class MakoCatalogTests
                 "/mako-vod-keshet/kobi_maimon_standup",
                 "/mako-vod-keshet/life_is_difficult",
                 "/mako-vod-keshet/matan_peretz_standup",
+                CookingPlaceholderPath,
             },
             shows.Select(show => show.Id));
+    }
+
+    /// <summary>A show can legitimately carry more than one real genre (<c>ArabicWorkPagePath</c>
+    /// above), but a single list naming the very same show twice must not double that list's own
+    /// genre onto it.</summary>
+    [Fact]
+    public async Task AShowListedTwiceInOneGenreCarriesThatGenreOnce()
+    {
+        const string genreName = "ריאליטי";
+        const string duplicateShowPath = "/mako-vod-keshet/duplicate-in-one-genre";
+        string listWithADuplicateEntry = $$"""
+            {
+              "items": [
+                { "itemVcmId": "dup1", "title": "כפול", "pageUrl": "{{duplicateShowPath}}", "pic": null },
+                { "itemVcmId": "dup2", "title": "כפול", "pageUrl": "{{duplicateShowPath}}", "pic": null }
+              ]
+            }
+            """;
+        FakeMakoHttp http = SeededHttp();
+        Genre realityGenre = MakoIndex.ParseGenres(MenuJson).Single(genre => genre.Name == genreName);
+        http.Respond(MakoUrls.Page(BaseUrlTemplate, realityGenre.PagePath), listWithADuplicateEntry);
+        MakoCatalog catalog = await CreateCatalogAsync(http);
+
+        IReadOnlyList<Show> shows = await catalog.GetShowsAsync(CancellationToken.None);
+
+        Show duplicate = Assert.Single(shows, show => show.Id == duplicateShowPath);
+        Assert.Equal(new[] { genreName }, duplicate.Genres);
     }
 
     [Fact]
@@ -120,6 +160,38 @@ public class MakoCatalogTests
         await Assert.ThrowsAsync<BotChallengeException>(() => catalog.GetShowsAsync(CancellationToken.None));
     }
 
+    /// <summary>§6.2's controller ruling: mako's real genres are never empty, so a genre list that
+    /// parses but names no show is a failure too, not a shorter answer — the same destructive hole
+    /// as <see cref="AMenuThatNamesNoGenreFailsTheChannelAndIsNeverCached"/> below, one level
+    /// deeper. Only ריאליטי's list is broken; the other four genres still answer normally.</summary>
+    [Fact]
+    public async Task AGenreListThatNamesNoShowFailsTheWholeAnswerAndIsNeverCached()
+    {
+        FakeMakoHttp http = SeededHttp();
+        string realityListUrl = MakoUrls.Page(BaseUrlTemplate, MakoIndex.ParseGenres(MenuJson)[0].PagePath); // ריאליטי
+        http.Respond(realityListUrl, EmptyListJson);
+        MakoCatalog catalog = await CreateCatalogAsync(http);
+
+        await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
+        await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
+        Assert.Equal(2, http.Requests.Count(url => url == realityListUrl));
+    }
+
+    /// <summary>Clone of <see cref="AMenuThatIsNotJsonIsNeverCachedAndFailsTheChannel"/> one level
+    /// deeper: a genre's own list answering HTML must not be cached either.</summary>
+    [Fact]
+    public async Task AGenreListThatIsNotJsonIsNeverCachedAndFailsTheChannel()
+    {
+        FakeMakoHttp http = SeededHttp();
+        string dramaListUrl = MakoUrls.Page(BaseUrlTemplate, MakoIndex.ParseGenres(MenuJson)[2].PagePath); // דרמה
+        http.Respond(dramaListUrl, HtmlErrorPage);
+        MakoCatalog catalog = await CreateCatalogAsync(http);
+
+        await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
+        await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
+        Assert.Equal(2, http.Requests.Count(url => url == dramaListUrl));
+    }
+
     [Fact]
     public async Task AStaleCatalogueIsServedWhenMakoRefusesTheRefetch()
     {
@@ -142,6 +214,22 @@ public class MakoCatalogTests
     {
         FakeMakoHttp http = SeededHttp();
         http.Respond(MakoUrls.Page(BaseUrlTemplate, MakoIndexPaths.GenreMenu), HtmlErrorPage);
+        MakoCatalog catalog = await CreateCatalogAsync(http);
+
+        await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
+        await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
+        Assert.Equal(2, http.Requests.Count(url => url.Contains("filter=menu", StringComparison.Ordinal)));
+    }
+
+    /// <summary>Critical, §6.2's controller ruling: mako's real genres are never empty, so a menu
+    /// that parses but names none is treated as a failure too — the same rule as an unparseable
+    /// menu just above, closing the hole where an empty/shorter root answer would make Jellyfin
+    /// delete every show it already held for 3 hours, then cache the useless empty answer for 24.</summary>
+    [Fact]
+    public async Task AMenuThatNamesNoGenreFailsTheChannelAndIsNeverCached()
+    {
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(MakoUrls.Page(BaseUrlTemplate, MakoIndexPaths.GenreMenu), """{"menuItems":[]}""");
         MakoCatalog catalog = await CreateCatalogAsync(http);
 
         await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
@@ -445,9 +533,11 @@ public class MakoCatalogTests
 
     /// <summary>The genre menu plus the five real genre lists it names, matching the fixtures'
     /// own genre order (ריאליטי, דוקומנטרי, דרמה, קומדיה, בישול): comedy and drama carry the real
-    /// show lists (including the show shared between them), the rest answer an empty list. The
-    /// show page and season-one page fixtures stay registered under <see cref="ShemeshPagePath"/>'s
-    /// and <see cref="SeasonOnePagePath"/>'s own URLs, for the tests that open them.</summary>
+    /// show lists (including the show shared between them); the other three real genres answer
+    /// one throwaway placeholder show each rather than an empty list — mako's real genres are
+    /// never empty (spec §6.2), so a genre list this suite seeds must not be either. The show page
+    /// and season-one page fixtures stay registered under <see cref="ShemeshPagePath"/>'s and
+    /// <see cref="SeasonOnePagePath"/>'s own URLs, for the tests that open them.</summary>
     private static FakeMakoHttp SeededHttp()
     {
         FakeMakoHttp http = new();
@@ -458,6 +548,9 @@ public class MakoCatalogTests
             {
                 "קומדיה" => ComedyJson,
                 "דרמה" => DramaJson,
+                "ריאליטי" => PlaceholderListJson(genre.Name, RealityPlaceholderPath),
+                "דוקומנטרי" => PlaceholderListJson(genre.Name, DocumentaryPlaceholderPath),
+                "בישול" => PlaceholderListJson(genre.Name, CookingPlaceholderPath),
                 _ => EmptyListJson,
             };
             http.Respond(MakoUrls.Page(BaseUrlTemplate, genre.PagePath), listJson);
@@ -524,6 +617,12 @@ public class MakoCatalogTests
         }
         """;
 
+    /// <summary>One throwaway show for a genre this suite does not otherwise carry real fixtures
+    /// for — never <see cref="EmptyListJson"/>, since §6.2 treats a real genre naming no show as a
+    /// failure, not an empty answer.</summary>
+    private static string PlaceholderListJson(string genreName, string pagePath) =>
+        $$"""{"items":[{"itemVcmId":"x","title":"{{genreName}} placeholder","pageUrl":"{{pagePath}}","pic":null}]}""";
+
     private static string EncryptedPlaylist(bool isProtected) =>
         PayloadCipher.Encrypt(
             NewPlaylistKey,
@@ -559,7 +658,7 @@ public class MakoCatalogTests
         MakoPageSource pages = new(http, config, pageCache, new RecordingLogger<MakoPageSource>());
         StreamResolver resolver = new(http, config, CreateDevice(), () => AppVersion, new RecordingLogger<StreamResolver>());
 
-        return new MakoCatalog(pages, resolver, streamLinkCache, () => CatalogueLifetimes.Default);
+        return new MakoCatalog(pages, resolver, streamLinkCache, () => CatalogueLifetimes.Default, NullLogger<MakoCatalog>.Instance);
     }
 
     /// <summary>
