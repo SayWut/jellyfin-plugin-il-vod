@@ -74,24 +74,23 @@ public class OnDemandRequestBudgetTests
         FakeMakoHttp http = SeededHttp();
         MakoCatalog catalog = await CreateCatalogAsync(http);
 
-        // | construct everything; open the channel (cold): GetShowsAsync | 6 (menu + 5 genre lists) |
+        // | Open the channel (cold catalogue) | 6 (menu + 5 genre lists) |
         await catalog.GetShowsAsync(CancellationToken.None);
         Assert.Equal(6, BrowseHostRequestCount(http));
 
-        // | open the channel again: GetShowsAsync | 6 |
+        // | Open the channel again (fresh catalogue) | 6, unchanged |
         await catalog.GetShowsAsync(CancellationToken.None);
         Assert.Equal(6, BrowseHostRequestCount(http));
 
-        // | open a show: GetSeasonsAsync(show) | 7 (the show page, fetched under the PINNED path) |
+        // | Open a show | 7 (the show page) |
         await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
         Assert.Equal(7, BrowseHostRequestCount(http));
 
-        // | open the displayed season: GetEpisodesAsync(current season) | 7 (served from the show
-        // page, remembered under the DISPLAYED season's own — different — path) |
+        // | Open the season the show page displayed | 7, unchanged |
         await catalog.GetEpisodesAsync(PinnedPagePath, DisplayedSeasonPath, CancellationToken.None);
         Assert.Equal(7, BrowseHostRequestCount(http));
 
-        // | open another season: GetEpisodesAsync(season 1) | 8 |
+        // | Open another season | 8 |
         await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
         Assert.Equal(8, BrowseHostRequestCount(http));
 
@@ -103,7 +102,7 @@ public class OnDemandRequestBudgetTests
         await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
         Assert.Equal(8, BrowseHostRequestCount(http));
 
-        // | GetStreamLinkAsync(protected episode) | 9 on www (playlist) + 1 POST to mass.mako.co.il + 2 GETs to the CDN (master, best variant) |
+        // | Press play (protected) | 9 on www + 1 POST token + 2 CDN GETs |
         StreamLink link = await catalog.GetStreamLinkAsync(ProtectedEpisode.ToString(), CancellationToken.None);
         Assert.Equal(9, BrowseHostRequestCount(http));
         Assert.Equal(1, RequestCountTo(http, TokenUrl));
@@ -142,6 +141,28 @@ public class OnDemandRequestBudgetTests
         // so the assertions above are proven to be checking something real rather than passing
         // vacuously because the matcher itself never matches anything.
         Assert.Contains(http.Requests, url => url.Contains("shemesh-s1", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task NothingIsEverRequestedForShowsNobodyOpened()
+    {
+        FakeMakoHttp http = SeededHttp();
+        MakoCatalog catalog = await CreateCatalogAsync(http);
+
+        await catalog.GetShowsAsync(CancellationToken.None);
+
+        Assert.DoesNotContain(http.Requests, url => url.Contains("/mako-vod-keshet/", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task ASeasonOpenNeverTurnsIntoAnIndexBurst()
+    {
+        FakeMakoHttp http = SeededHttp();
+        MakoCatalog catalog = await CreateCatalogAsync(http);
+
+        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
+
+        Assert.DoesNotContain(http.Requests, url => url.Contains("mako-vod-index", StringComparison.Ordinal));
     }
 
     /// <summary>The genre menu plus its five real genre lists (comedy and drama carry the real
