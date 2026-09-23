@@ -38,8 +38,6 @@ public class OnDemandRequestBudgetTests
     private const string ProtectedEpisodeChannelId = "4e091bfd191d0810VgnVCM200000650a10acRCRD";
     private const string ProtectedEpisodeGalleryChannelId = "d13f539206c35910VgnVCM200000650a10acRCRD";
 
-    private static readonly PinnedShow Pinned = new(PinnedPagePath, PinnedShowName);
-
     private static readonly string MainConfigJson = FixtureFile.ReadText("main-config.json");
     private static readonly string CoreConfigJson = FixtureFile.ReadText("core-config.json");
     private static readonly string NotesConfigJson = FixtureFile.ReadText("notes-config.json");
@@ -179,7 +177,7 @@ public class OnDemandRequestBudgetTests
         MakoPageSource pages = new(http, config, pageCache, new RecordingLogger<MakoPageSource>());
         StreamResolver resolver = new(http, config, CreateDevice(), () => AppVersion, new RecordingLogger<StreamResolver>());
 
-        return new MakoCatalog(pages, resolver, streamLinkCache, () => Pinned, () => CacheLifetimes.Default);
+        return new MakoCatalog(pages, resolver, streamLinkCache, () => CatalogueLifetimes.Default);
     }
 
     /// <summary>

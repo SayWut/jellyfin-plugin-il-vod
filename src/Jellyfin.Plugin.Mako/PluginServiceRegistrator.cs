@@ -83,8 +83,7 @@ internal static class MakoServiceCollectionExtensions
             provider.GetRequiredService<MakoPageSource>(),
             provider.GetRequiredService<StreamResolver>(),
             provider.GetRequiredService<StreamLinkCache>().Value,
-            () => PinnedShowFrom(configuration()),
-            () => CacheLifetimesFrom(configuration())));
+            () => CatalogueLifetimesFrom(configuration())));
 
         // Lazy, not ICatalog: Jellyfin constructs every IChannel before any plugin instance
         // exists (see MakoChannel's own remarks), and building the catalogue reads the data
@@ -104,10 +103,13 @@ internal static class MakoServiceCollectionExtensions
         Timeout = MakoHttpClient.Timeout,
     };
 
-    private static PinnedShow PinnedShowFrom(PluginConfiguration configuration) =>
-        new(configuration.PinnedShowPath, configuration.PinnedShowName);
-
-    private static CacheLifetimes CacheLifetimesFrom(PluginConfiguration configuration) => new(
+    /// <summary>
+    /// The catalogue's own (menu + genre lists) lifetime has no setting yet — task C5 adds one —
+    /// so it is read from <see cref="CatalogueLifetimes.Default"/> for now, while every other
+    /// lifetime already comes from the settings page.
+    /// </summary>
+    private static CatalogueLifetimes CatalogueLifetimesFrom(PluginConfiguration configuration) => new(
+        Catalogue: CatalogueLifetimes.Default.Catalogue,
         ShowPage: TimeSpan.FromHours(configuration.ShowPageCacheHours),
         PastSeason: TimeSpan.FromDays(configuration.PastSeasonCacheDays),
         CurrentSeason: TimeSpan.FromHours(configuration.CurrentSeasonCacheHours),

@@ -11,10 +11,9 @@ namespace Jellyfin.Plugin.Mako.Tests.Catalog;
 public class MakoCatalogTests
 {
     private const string AppVersion = "43.0";
-    private const string PinnedPagePath = "/mako-vod-keshet/shemesh-s6";
-    private const string PinnedShowName = "שמש";
+    private const string ShemeshPagePath = "/mako-vod-keshet/shemesh";
+    private const string ArabicWorkPagePath = "/mako-vod-keshet/Arabic-work";
     private const string SeasonOnePagePath = "/mako-vod-keshet/shemesh-s1";
-    private const string UnknownShowPagePath = "/mako-vod-keshet/some-other-show";
     private const string NewPlaylistKey = "TESTKEY-PLAYLIST-NEW-24b";
     private const string TokenKey = "TESTKEY-TOKEN-TICKET-24b";
     private const string MediaUrl = "https://cdn.example.test/master.m3u8";
@@ -23,22 +22,25 @@ public class MakoCatalogTests
     /// <summary>What mako serves when it refuses a page without admitting to it: HTML, status 200.</summary>
     private const string HtmlErrorPage = "<html><body>Access Denied</body></html>";
 
-    private static readonly PinnedShow Pinned = new(PinnedPagePath, PinnedShowName);
-
     private static readonly string MainConfigJson = FixtureFile.ReadText("main-config.json");
     private static readonly string CoreConfigJson = FixtureFile.ReadText("core-config.json");
     private static readonly string NotesConfigJson = FixtureFile.ReadText("notes-config.json");
     private static readonly string ShowPageJson = FixtureFile.ReadText("show-page-shemesh.json");
     private static readonly string SeasonOnePageJson = FixtureFile.ReadText("season-page-shemesh-s1.json");
     private static readonly string MasterPlaylistText = FixtureFile.ReadText("master.m3u8");
+    private static readonly string MenuJson = FixtureFile.ReadText("genre-menu.json");
+    private static readonly string ComedyJson = FixtureFile.ReadText("genre-list-comedy.json");
+    private static readonly string DramaJson = FixtureFile.ReadText("genre-list-drama.json");
+    private static readonly string EmptyListJson = """{"items":[]}""";
 
     private static readonly string MainConfigUrl = MakoUrls.MainConfigUrl(AppVersion);
     private static readonly string CoreConfigUrl = MakoConfig.CoreConfigUrlOf(MainConfigJson);
     private static readonly string NotesConfigUrl = MakoConfig.NotesUrlOf(CoreConfigJson);
     private static readonly MakoConfig ParsedConfig = MakoConfig.Parse(MainConfigJson, CoreConfigJson, NotesConfigJson);
+    private static readonly string BaseUrlTemplate = ParsedConfig.BaseUrlTemplate;
 
-    private static readonly string ShowPageUrl = MakoUrls.Page(ParsedConfig.BaseUrlTemplate, PinnedPagePath);
-    private static readonly string SeasonOneUrl = MakoUrls.Page(ParsedConfig.BaseUrlTemplate, SeasonOnePagePath);
+    private static readonly string ShowPageUrl = MakoUrls.Page(BaseUrlTemplate, ShemeshPagePath);
+    private static readonly string SeasonOneUrl = MakoUrls.Page(BaseUrlTemplate, SeasonOnePagePath);
 
     private static readonly EpisodeKey Episode = new("vcm1", "channel1", "gallery1");
     private static readonly string PlaylistUrl =
@@ -47,225 +49,113 @@ public class MakoCatalogTests
     private static readonly string FinalMediaUrl = $"{MediaUrl}?{DecodedTicket}";
 
     [Fact]
-    public async Task TheChannelListsThePinnedShowWithoutAskingMako()
+    public async Task TheChannelListsEveryShowOfEveryRealGenreOnceWithItsGenres()
     {
-        FakeMakoHttp http = new();
+        FakeMakoHttp http = SeededHttp();
         MakoCatalog catalog = await CreateCatalogAsync(http);
 
         IReadOnlyList<Show> shows = await catalog.GetShowsAsync(CancellationToken.None);
 
-        Show show = Assert.Single(shows);
-        Assert.Equal(PinnedPagePath, show.Id);
-        Assert.Equal(PinnedShowName, show.Name);
-        Assert.Null(show.Overview);
-        Assert.Null(show.PosterUrl);
-        Assert.Empty(http.Requests);
+        Assert.Equal(8, shows.Count); // 5 comedy + 4 drama − 1 shared
+        Show shemesh = Assert.Single(shows, show => show.Id == ShemeshPagePath);
+        // Assert.Equivalent, not Assert.Equal: Show's Genres is an IReadOnlyList<string>, whose
+        // default equality (used by the compiler-generated record Equals) is reference equality —
+        // two independently-built lists holding the same single genre would never compare equal.
+        Assert.Equivalent(
+            new Show(ShemeshPagePath, "שמש", "https://img.mako.co.il/2025/06/09/Shemesh_e.jpg", Overview: null, Genres: ["קומדיה"]),
+            shemesh,
+            strict: true);
+        Show shared = Assert.Single(shows, show => show.Id == ArabicWorkPagePath);
+        Assert.Equal(new[] { "דרמה", "קומדיה" }, shared.Genres); // menu order: drama comes before comedy
     }
 
     [Fact]
-    public async Task AfterTheShowWasOpenedItsCardGainsOverviewAndPoster()
+    public async Task OpeningTheChannelCostsTheMenuAndOneRequestPerRealGenreAndThenNothing()
     {
-        FakeMakoHttp http = new();
-        http.Respond(ShowPageUrl, ShowPageJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http);
-        await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
-        int requestsBeforeListing = http.Requests.Count;
-
-        IReadOnlyList<Show> shows = await catalog.GetShowsAsync(CancellationToken.None);
-
-        ShowPage expected = MakoPages.ParseShowPage(ShowPageJson);
-        Show show = Assert.Single(shows);
-        Assert.Equal(expected.Overview, show.Overview);
-        Assert.Equal(expected.PosterUrl, show.PosterUrl);
-        Assert.Equal(requestsBeforeListing, http.Requests.Count);
-    }
-
-    [Fact]
-    public async Task OpeningTheShowListsItsSixSeasons()
-    {
-        FakeMakoHttp http = new();
-        http.Respond(ShowPageUrl, ShowPageJson);
+        FakeMakoHttp http = SeededHttp();
         MakoCatalog catalog = await CreateCatalogAsync(http);
 
-        IReadOnlyList<Season> seasons = await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
+        await catalog.GetShowsAsync(CancellationToken.None);
+        Assert.Equal(6, http.Requests.Count(url => url.Contains(MakoUrls.BrowseHost, StringComparison.Ordinal)));
+        Assert.DoesNotContain(http.Requests, url => url.Contains("filter=provider", StringComparison.Ordinal) || url.Contains("ABC_Programs", StringComparison.Ordinal) || url.Contains("filter=playlists", StringComparison.Ordinal));
 
-        Assert.Equal(6, seasons.Count);
-        Assert.Contains(seasons, season => season.Id == SeasonOnePagePath && season.Number == 1);
-        Assert.Contains(seasons, season => season.Id == PinnedPagePath && season.Number == 6);
+        await catalog.GetShowsAsync(CancellationToken.None);
+        Assert.Equal(6, http.Requests.Count(url => url.Contains(MakoUrls.BrowseHost, StringComparison.Ordinal)));
     }
 
     [Fact]
-    public async Task OpeningAPastSeasonListsItsEpisodesWithIdsThatCarryPlaybackKeys()
+    public async Task AGenreListThatFailsFailsTheWholeAnswerRatherThanShorteningIt()
     {
-        FakeMakoHttp http = new();
-        http.Respond(ShowPageUrl, ShowPageJson);
-        http.Respond(SeasonOneUrl, SeasonOnePageJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http);
-        await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
-
-        IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
-
-        Episode first = Assert.Single(episodes, episode => episode.Number == 1);
-        EpisodeKey key = EpisodeKey.Parse(first.Id);
-        Assert.NotEmpty(key.VcmId);
-        Assert.Equal(1, first.SeasonNumber);
-        Assert.Equal(PinnedShowName, first.ShowName);
-    }
-
-    [Fact]
-    public async Task AnUnknownShowHasNoSeasonsAndCostsNothing()
-    {
-        FakeMakoHttp http = new();
+        FakeMakoHttp http = SeededHttp();
+        http.Challenge(MakoUrls.Page(BaseUrlTemplate, MakoIndex.ParseGenres(MenuJson)[2].PagePath)); // דרמה
         MakoCatalog catalog = await CreateCatalogAsync(http);
 
-        IReadOnlyList<Season> seasons = await catalog.GetSeasonsAsync(UnknownShowPagePath, CancellationToken.None);
-
-        Assert.Empty(seasons);
-        Assert.Empty(http.Requests);
-    }
-
-    /// <summary>
-    /// The pinned page and the season it displays are DIFFERENT cache keys here (unlike the real
-    /// fixtures above, where the pinned path happens to equal the current season's own path) — so
-    /// this is a genuine test of <c>Remember</c> writing under a distinct key, not a same-key
-    /// overwrite that would pass even if nothing were remembered at all.
-    /// </summary>
-    [Fact]
-    public async Task TheDisplayedSeasonIsRememberedUnderItsOwnPathSoOpeningItCostsNothing()
-    {
-        const string showPath = "/x/show-latest";
-        const string latestSeasonPath = "/x/show-latest-s3";
-        string showJson = InlineShowPageJson(showPath, seasonCount: 3, displayedSeasonNumber: 3, episodeTitle: "S3 Episode");
-        FakeMakoHttp http = new();
-        http.Respond(MakoUrls.Page(ParsedConfig.BaseUrlTemplate, showPath), showJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http, pinnedShow: new PinnedShow(showPath, "Show"));
-
-        await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
-        int requestsAfterSeasons = http.Requests.Count;
-
-        IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync(showPath, latestSeasonPath, CancellationToken.None);
-
-        Assert.Equal(requestsAfterSeasons, http.Requests.Count);
-        Assert.Equal("S3 Episode", Assert.Single(episodes).Name);
-    }
-
-    /// <summary>
-    /// The wrong-season guard (finding 3): when the pinned page displays an EARLIER season than
-    /// the latest, opening that displayed season is still free (remembered), but opening the
-    /// actual latest season costs a request and returns THAT season's own episodes — proving the
-    /// two are never confused with one another.
-    /// </summary>
-    [Fact]
-    public async Task ADisplayedSeasonThatIsNotTheLatestIsFreeWhileTheLatestStillCostsARequestWithItsOwnEpisodes()
-    {
-        const string showPath = "/x/show-past";
-        const string displayedSeasonPath = "/x/show-past-s1";
-        const string latestSeasonPath = "/x/show-past-s3";
-        string showJson = InlineShowPageJson(showPath, seasonCount: 3, displayedSeasonNumber: 1, episodeTitle: "S1 Episode");
-        string latestSeasonJson = InlineSeasonPageJson(latestSeasonPath, episodeTitle: "S3 Episode");
-        FakeMakoHttp http = new();
-        http.Respond(MakoUrls.Page(ParsedConfig.BaseUrlTemplate, showPath), showJson);
-        http.Respond(MakoUrls.Page(ParsedConfig.BaseUrlTemplate, latestSeasonPath), latestSeasonJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http, pinnedShow: new PinnedShow(showPath, "Show"));
-
-        await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
-        int requestsAfterSeasons = http.Requests.Count;
-
-        IReadOnlyList<Episode> displayedEpisodes = await catalog.GetEpisodesAsync(showPath, displayedSeasonPath, CancellationToken.None);
-        Assert.Equal(requestsAfterSeasons, http.Requests.Count);
-        Assert.Equal("S1 Episode", Assert.Single(displayedEpisodes).Name);
-
-        IReadOnlyList<Episode> latestEpisodes = await catalog.GetEpisodesAsync(showPath, latestSeasonPath, CancellationToken.None);
-        Assert.Equal(requestsAfterSeasons + 1, http.Requests.Count);
-        Assert.Equal("S3 Episode", Assert.Single(latestEpisodes).Name);
+        await Assert.ThrowsAsync<BotChallengeException>(() => catalog.GetShowsAsync(CancellationToken.None));
     }
 
     [Fact]
-    public async Task APastSeasonPageIsNotRefetchedJustAfterSixHoursButIsAfterSevenDays()
+    public async Task AStaleCatalogueIsServedWhenMakoRefusesTheRefetch()
     {
         FakeClock clock = new();
-        FakeMakoHttp http = new();
-        http.Respond(SeasonOneUrl, SeasonOnePageJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
+        FakeMakoHttp http = SeededHttp();
+        MakoCatalog catalog = await CreateCatalogAsync(http, clock); // builds both TimedCaches over the given FakeClock
+        IReadOnlyList<Show> first = await catalog.GetShowsAsync(CancellationToken.None);
 
-        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
-        int requestsAfterFirst = http.Requests.Count;
+        clock.Advance(CatalogueLifetimes.Default.Catalogue + TimeSpan.FromMinutes(1));
+        foreach (Genre genre in MakoIndex.ParseGenres(MenuJson)) { http.Challenge(MakoUrls.Page(BaseUrlTemplate, genre.PagePath)); }
+        http.Challenge(MakoUrls.Page(BaseUrlTemplate, MakoIndexPaths.GenreMenu));
 
-        clock.Advance(TimeSpan.FromHours(6) + TimeSpan.FromMinutes(1));
-        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
-        Assert.Equal(requestsAfterFirst, http.Requests.Count);
-
-        clock.Advance(TimeSpan.FromDays(7));
-        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
-        Assert.Equal(requestsAfterFirst + 1, http.Requests.Count);
-    }
-
-    /// <summary>
-    /// The real fixture's own pinned path IS its displayed season's id (both
-    /// <c>/mako-vod-keshet/shemesh-s6</c>) — the exact case where a naive, unconditional
-    /// <c>Remember</c> would overwrite the show page's own 12h entry with the season's 6h one,
-    /// silently downgrading it. The guard must skip the remember when the two ids already
-    /// coincide, so the show page keeps its full 12h lifetime.
-    /// </summary>
-    [Fact]
-    public async Task TheShowPageIsNotDowngradedToTheCurrentSeasonLifetimeWhenItsOwnPathIsTheDisplayedSeason()
-    {
-        FakeClock clock = new();
-        FakeMakoHttp http = new();
-        http.Respond(ShowPageUrl, ShowPageJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
-
-        await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
-        int requestsAfterFirst = http.Requests.Count;
-
-        // Past the 6h "current season" lifetime, but still within the show page's own 12h one.
-        clock.Advance(TimeSpan.FromHours(6) + TimeSpan.FromMinutes(1));
-        await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
-
-        Assert.Equal(requestsAfterFirst, http.Requests.Count);
+        // Assert.Equivalent, not Assert.Equal: see the same note on TheChannelListsEveryShowOf... —
+        // Show's Genres list breaks record/list reference equality for any non-empty genre list.
+        Assert.Equivalent(first, await catalog.GetShowsAsync(CancellationToken.None), strict: true);
     }
 
     [Fact]
-    public async Task TheLatestSeasonPageIsRefetchedAfterSixHoursWhenOpenedDirectly()
+    public async Task AMenuThatIsNotJsonIsNeverCachedAndFailsTheChannel()
     {
-        FakeClock clock = new();
-        FakeMakoHttp http = new();
-        http.Respond(ShowPageUrl, ShowPageJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
+        FakeMakoHttp http = SeededHttp();
+        http.Respond(MakoUrls.Page(BaseUrlTemplate, MakoIndexPaths.GenreMenu), HtmlErrorPage);
+        MakoCatalog catalog = await CreateCatalogAsync(http);
 
-        // Opened directly through GetEpisodesAsync, never through GetSeasonsAsync, so this is a
-        // fresh cache entry governed purely by the "is this the latest season" 6h lifetime.
-        await catalog.GetEpisodesAsync(PinnedPagePath, PinnedPagePath, CancellationToken.None);
-        int requestsAfterFirst = http.Requests.Count;
-
-        clock.Advance(TimeSpan.FromHours(6));
-        await catalog.GetEpisodesAsync(PinnedPagePath, PinnedPagePath, CancellationToken.None);
-
-        Assert.Equal(requestsAfterFirst + 1, http.Requests.Count);
+        await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
+        await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
+        Assert.Equal(2, http.Requests.Count(url => url.Contains("filter=menu", StringComparison.Ordinal)));
     }
 
     [Fact]
-    public async Task TheShowPageSurvivesTwelveHoursIndependentlyOfTheRememberedLatestSeason()
+    public async Task EpisodesAreNamedAfterTheirShowFromTheCachedListsWithoutARequest()
     {
-        const string showPath = "/x/show-lifetime";
-        string showJson = InlineShowPageJson(showPath, seasonCount: 3, displayedSeasonNumber: 3, episodeTitle: "S3 Episode");
-        FakeClock clock = new();
-        FakeMakoHttp http = new();
-        http.Respond(MakoUrls.Page(ParsedConfig.BaseUrlTemplate, showPath), showJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http, clock, pinnedShow: new PinnedShow(showPath, "Show"));
+        FakeMakoHttp http = SeededHttp();
+        MakoCatalog catalog = await CreateCatalogAsync(http);
+        await catalog.GetShowsAsync(CancellationToken.None);
+        int requestsBefore = http.Requests.Count;
 
-        await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
-        int requestsAfterFirst = http.Requests.Count;
+        IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
 
-        // Past the remembered latest-season entry's own 6h lifetime, but the show page's key is
-        // a separate cache entry with its own 12h lifetime — unaffected.
-        clock.Advance(TimeSpan.FromHours(6) + TimeSpan.FromMinutes(1));
-        await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
-        Assert.Equal(requestsAfterFirst, http.Requests.Count);
+        Assert.All(episodes, episode => Assert.Equal("שמש", episode.ShowName));
+        Assert.Equal(requestsBefore + 1, http.Requests.Count); // the season page only
+    }
 
-        clock.Advance(TimeSpan.FromHours(12));
-        await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
-        Assert.Equal(requestsAfterFirst + 1, http.Requests.Count);
+    [Fact]
+    public async Task AnUnknownShowStillListsItsEpisodesWithNoSeriesName()
+    {
+        FakeMakoHttp http = SeededHttp();
+        MakoCatalog catalog = await CreateCatalogAsync(http);
+
+        IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync("/mako-vod-keshet/never-listed", SeasonOnePagePath, CancellationToken.None);
+
+        Assert.NotEmpty(episodes);
+        Assert.All(episodes, episode => Assert.Equal(string.Empty, episode.ShowName));
+        Assert.DoesNotContain(http.Requests, url => url.Contains("mako-vod-index", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task AnyShowsSeasonsCanBeOpenedNotJustAPinnedOne()
+    {
+        FakeMakoHttp http = SeededHttp();
+        MakoCatalog catalog = await CreateCatalogAsync(http);
+
+        Assert.NotEmpty(await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None));
     }
 
     [Fact]
@@ -315,7 +205,7 @@ public class MakoCatalogTests
             http.Respond(FinalMediaUrl, MasterPlaylistText);
             MakoCatalog catalog = await CreateCatalogAsync(http, pageCachePersistencePath: persistencePath);
 
-            await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
+            await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None);
             await catalog.GetStreamLinkAsync(Episode.ToString(), CancellationToken.None);
 
             string persistedText = File.Exists(persistencePath) ? File.ReadAllText(persistencePath) : string.Empty;
@@ -327,27 +217,6 @@ public class MakoCatalogTests
         {
             File.Delete(persistencePath);
         }
-    }
-
-    /// <summary>
-    /// A stale copy is served indefinitely (N2/spec §5.4) — so if that copy ever failed to parse,
-    /// a naive <c>GetShowsAsync</c> would throw forever and lock the channel root. It must instead
-    /// fall back to the name-only show, the same as when nothing is cached at all.
-    /// </summary>
-    [Fact]
-    public async Task AMalformedCachedShowPageFallsBackToTheNameOnlyShowInsteadOfThrowing()
-    {
-        FakeMakoHttp http = new();
-        (MakoCatalog catalog, MakoPageSource pages) = await BuildStackAsync(http);
-        pages.Remember(PinnedPagePath, "<html>not json</html>", TimeSpan.FromHours(12));
-
-        IReadOnlyList<Show> shows = await catalog.GetShowsAsync(CancellationToken.None);
-
-        Show show = Assert.Single(shows);
-        Assert.Equal(PinnedPagePath, show.Id);
-        Assert.Equal(PinnedShowName, show.Name);
-        Assert.Null(show.Overview);
-        Assert.Null(show.PosterUrl);
     }
 
     /// <summary>
@@ -364,10 +233,10 @@ public class MakoCatalogTests
         http.Respond(ShowPageUrl, HtmlErrorPage);
         MakoChannel channel = ChannelOver(await CreateCatalogAsync(http));
 
-        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForShow(PinnedPagePath)));
+        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForShow(ShemeshPagePath)));
         Assert.Single(http.Requests);
 
-        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForShow(PinnedPagePath)));
+        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForShow(ShemeshPagePath)));
         Assert.Equal(2, http.Requests.Count);
     }
 
@@ -378,26 +247,11 @@ public class MakoCatalogTests
         http.Respond(SeasonOneUrl, HtmlErrorPage);
         MakoChannel channel = ChannelOver(await CreateCatalogAsync(http));
 
-        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForSeason(PinnedPagePath, SeasonOnePagePath)));
+        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForSeason(ShemeshPagePath, SeasonOnePagePath)));
         Assert.Single(http.Requests);
 
-        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForSeason(PinnedPagePath, SeasonOnePagePath)));
+        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForSeason(ShemeshPagePath, SeasonOnePagePath)));
         Assert.Equal(2, http.Requests.Count);
-    }
-
-    /// <summary>
-    /// A fresh install has no show pinned yet (M9): that is "nothing configured", not a request
-    /// for the empty page path — which mako's URL builder would refuse anyway.
-    /// </summary>
-    [Fact]
-    public async Task AnUnsetPinnedShowPathListsNothingAndCostsNothing()
-    {
-        FakeMakoHttp http = new();
-        MakoCatalog catalog = await CreateCatalogAsync(http, pinnedShow: new PinnedShow("   ", "not configured yet"));
-
-        Assert.Empty(await catalog.GetShowsAsync(CancellationToken.None));
-        Assert.Empty(await catalog.GetSeasonsAsync("   ", CancellationToken.None));
-        Assert.Empty(http.Requests);
     }
 
     /// <summary>A malformed episode id must surface as the catalogue's own playback-failure type,
@@ -415,61 +269,30 @@ public class MakoCatalogTests
         Assert.Contains("not-a-valid-episode-id", exception.Message, StringComparison.Ordinal);
     }
 
-    /// <summary>A minimal show page with <paramref name="seasonCount"/> seasons and a single
-    /// episode under whichever season is marked <c>current</c> — the season the page displays.</summary>
-    private static string InlineShowPageJson(string showPath, int seasonCount, int displayedSeasonNumber, string episodeTitle)
+    /// <summary>The genre menu plus the five real genre lists it names, matching the fixtures'
+    /// own genre order (ריאליטי, דוקומנטרי, דרמה, קומדיה, בישול): comedy and drama carry the real
+    /// show lists (including the show shared between them), the rest answer an empty list. The
+    /// show page and season-one page fixtures stay registered under <see cref="ShemeshPagePath"/>'s
+    /// and <see cref="SeasonOnePagePath"/>'s own URLs, for the tests that open them.</summary>
+    private static FakeMakoHttp SeededHttp()
     {
-        string seasonsJson = string.Join(
-            ",\n",
-            Enumerable.Range(1, seasonCount).Select(number =>
-                $$"""{ "seasonTitle": "עונה {{number}}", "current": {{(number == displayedSeasonNumber ? "true" : "false")}}, "pageUrl": "{{showPath}}-s{{number}}" }"""));
-
-        return $$"""
-            {
-              "pageUrl": "{{showPath}}",
-              "seasons": [ {{seasonsJson}} ],
-              "menu": [
-                {
-                  "id": "allEpisodes",
-                  "vods": [
-                    {
-                      "componentLayout": "vod",
-                      "title": "{{episodeTitle}}",
-                      "itemVcmId": "vcm-{{showPath}}",
-                      "channelId": "chan-{{showPath}}",
-                      "galleryChannelId": "gal-{{showPath}}",
-                      "extraInfo": "פרק 1@01.01.20"
-                    }
-                  ]
-                }
-              ]
-            }
-            """;
-    }
-
-    /// <summary>A season's own page (no <c>seasons</c> array of its own) with a single episode —
-    /// standing in for a season fetched directly rather than remembered from the show page.</summary>
-    private static string InlineSeasonPageJson(string seasonPath, string episodeTitle) =>
-        $$"""
+        FakeMakoHttp http = new();
+        http.Respond(MakoUrls.Page(BaseUrlTemplate, MakoIndexPaths.GenreMenu), MenuJson);
+        foreach (Genre genre in MakoIndex.ParseGenres(MenuJson))
         {
-          "pageUrl": "{{seasonPath}}",
-          "menu": [
+            string listJson = genre.Name switch
             {
-              "id": "allEpisodes",
-              "vods": [
-                {
-                  "componentLayout": "vod",
-                  "title": "{{episodeTitle}}",
-                  "itemVcmId": "vcm-{{seasonPath}}",
-                  "channelId": "chan-{{seasonPath}}",
-                  "galleryChannelId": "gal-{{seasonPath}}",
-                  "extraInfo": "פרק 1@01.01.20"
-                }
-              ]
-            }
-          ]
+                "קומדיה" => ComedyJson,
+                "דרמה" => DramaJson,
+                _ => EmptyListJson,
+            };
+            http.Respond(MakoUrls.Page(BaseUrlTemplate, genre.PagePath), listJson);
         }
-        """;
+
+        http.Respond(ShowPageUrl, ShowPageJson);
+        http.Respond(SeasonOneUrl, SeasonOnePageJson);
+        return http;
+    }
 
     private static string EncryptedPlaylist(bool isProtected) =>
         PayloadCipher.Encrypt(
@@ -492,28 +315,21 @@ public class MakoCatalogTests
     private static Task<ChannelItemResult> OpenFolder(MakoChannel channel, FolderId folder) =>
         channel.GetChannelItems(new InternalChannelItemQuery { FolderId = folder.ToString(), UserId = Guid.NewGuid() }, CancellationToken.None);
 
-    private static async Task<MakoCatalog> CreateCatalogAsync(
-        FakeMakoHttp http, IClock? clock = null, string? pageCachePersistencePath = null, PinnedShow? pinnedShow = null)
-    {
-        (MakoCatalog catalog, _) = await BuildStackAsync(http, clock, pageCachePersistencePath, pinnedShow).ConfigureAwait(false);
-        return catalog;
-    }
+    private static Task<MakoCatalog> CreateCatalogAsync(FakeMakoHttp http, string? pageCachePersistencePath = null) =>
+        CreateCatalogAsync(http, new FakeClock(), pageCachePersistencePath);
 
-    /// <summary>Like <see cref="CreateCatalogAsync"/>, but also hands back the
-    /// <see cref="MakoPageSource"/> the catalog was built on, for tests that need to plant a
-    /// cache entry directly (e.g. a malformed cached page) rather than through a fetch.</summary>
-    private static async Task<(MakoCatalog Catalog, MakoPageSource Pages)> BuildStackAsync(
-        FakeMakoHttp http, IClock? clock = null, string? pageCachePersistencePath = null, PinnedShow? pinnedShow = null)
+    /// <summary>Builds a catalog whose two <see cref="TimedCache"/>s (page cache and stream-link
+    /// cache) both run over <paramref name="clock"/>, so a test can advance one clock and see both
+    /// caches age together — needed by <see cref="AStaleCatalogueIsServedWhenMakoRefusesTheRefetch"/>.</summary>
+    private static async Task<MakoCatalog> CreateCatalogAsync(FakeMakoHttp http, IClock clock, string? pageCachePersistencePath = null)
     {
-        IClock actualClock = clock ?? new FakeClock();
-        TimedCache pageCache = new(actualClock, pageCachePersistencePath);
-        TimedCache streamLinkCache = new(actualClock);
-        MakoConfigLoader config = await WarmedConfigLoaderAsync(http);
+        TimedCache pageCache = new(clock, pageCachePersistencePath);
+        TimedCache streamLinkCache = new(clock);
+        MakoConfigLoader config = await WarmedConfigLoaderAsync(http).ConfigureAwait(false);
         MakoPageSource pages = new(http, config, pageCache, new RecordingLogger<MakoPageSource>());
         StreamResolver resolver = new(http, config, CreateDevice(), () => AppVersion, new RecordingLogger<StreamResolver>());
-        MakoCatalog catalog = new(pages, resolver, streamLinkCache, () => pinnedShow ?? Pinned, () => CacheLifetimes.Default);
 
-        return (catalog, pages);
+        return new MakoCatalog(pages, resolver, streamLinkCache, () => CatalogueLifetimes.Default);
     }
 
     /// <summary>
