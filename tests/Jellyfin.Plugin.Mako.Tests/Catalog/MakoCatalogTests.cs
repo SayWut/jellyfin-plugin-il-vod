@@ -14,6 +14,13 @@ public class MakoCatalogTests
     private const string ShemeshPagePath = "/mako-vod-keshet/shemesh";
     private const string ArabicWorkPagePath = "/mako-vod-keshet/Arabic-work";
     private const string SeasonOnePagePath = "/mako-vod-keshet/shemesh-s1";
+
+    // The real show-page-shemesh.json fixture's own pageUrl — the season it displays — which is a
+    // DIFFERENT path from ShemeshPagePath (the show's own landing path). Fetching it directly
+    // under this path is the one way to reproduce "a show's path IS its displayed season's path"
+    // with the real fixture, since ShemeshPagePath and DisplayedSeasonPath no longer coincide now
+    // that GetShowsAsync no longer keys shows by their season.
+    private const string DisplayedSeasonPath = "/mako-vod-keshet/shemesh-s6";
     private const string NewPlaylistKey = "TESTKEY-PLAYLIST-NEW-24b";
     private const string TokenKey = "TESTKEY-TOKEN-TICKET-24b";
     private const string MediaUrl = "https://cdn.example.test/master.m3u8";
@@ -41,6 +48,7 @@ public class MakoCatalogTests
 
     private static readonly string ShowPageUrl = MakoUrls.Page(BaseUrlTemplate, ShemeshPagePath);
     private static readonly string SeasonOneUrl = MakoUrls.Page(BaseUrlTemplate, SeasonOnePagePath);
+    private static readonly string DisplayedSeasonUrl = MakoUrls.Page(BaseUrlTemplate, DisplayedSeasonPath);
 
     private static readonly EpisodeKey Episode = new("vcm1", "channel1", "gallery1");
     private static readonly string PlaylistUrl =
@@ -67,6 +75,25 @@ public class MakoCatalogTests
             strict: true);
         Show shared = Assert.Single(shows, show => show.Id == ArabicWorkPagePath);
         Assert.Equal(new[] { "דרמה", "קומדיה" }, shared.Genres); // menu order: drama comes before comedy
+
+        // Order-sensitive: shows are returned in first-appearance order, not grouped by genre or
+        // sorted by name. דרמה is processed before קומדיה (menu order), so its four shows appear
+        // first, in genre-list-drama.json's own order; קומדיה then contributes only the four shows
+        // not already seen (עבודה ערבית/Arabic-work is skipped a second time), in genre-list-comedy
+        // .json's own order.
+        Assert.Equal(
+            new[]
+            {
+                ArabicWorkPagePath,
+                "/mako-vod-keshet/dani_hollywood",
+                "/mako-vod-keshet/lowest_place_world",
+                "/mako-vod-keshet/nutuk_drama",
+                ShemeshPagePath,
+                "/mako-vod-keshet/kobi_maimon_standup",
+                "/mako-vod-keshet/life_is_difficult",
+                "/mako-vod-keshet/matan_peretz_standup",
+            },
+            shows.Select(show => show.Id));
     }
 
     [Fact]
@@ -156,6 +183,153 @@ public class MakoCatalogTests
         MakoCatalog catalog = await CreateCatalogAsync(http);
 
         Assert.NotEmpty(await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None));
+    }
+
+    /// <summary>
+    /// The show path and the season it displays are DIFFERENT cache keys here (unlike
+    /// <see cref="TheShowPageIsNotDowngradedToTheCurrentSeasonLifetimeWhenItsOwnPathIsTheDisplayedSeason"/>
+    /// below, where they deliberately coincide) — so this is a genuine test of <c>Remember</c>
+    /// writing under a distinct key, not a same-key overwrite that would pass even if nothing were
+    /// remembered at all.
+    /// </summary>
+    [Fact]
+    public async Task TheDisplayedSeasonIsRememberedUnderItsOwnPathSoOpeningItCostsNothing()
+    {
+        const string showPath = "/x/show-latest";
+        const string latestSeasonPath = "/x/show-latest-s3";
+        string showJson = InlineShowPageJson(showPath, seasonCount: 3, displayedSeasonNumber: 3, episodeTitle: "S3 Episode");
+        FakeMakoHttp http = new();
+        http.Respond(MakoUrls.Page(BaseUrlTemplate, showPath), showJson);
+        MakoCatalog catalog = await CreateCatalogAsync(http);
+
+        await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
+        int requestsAfterSeasons = http.Requests.Count;
+
+        IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync(showPath, latestSeasonPath, CancellationToken.None);
+
+        Assert.Equal(requestsAfterSeasons, http.Requests.Count);
+        Assert.Equal("S3 Episode", Assert.Single(episodes).Name);
+    }
+
+    /// <summary>
+    /// The wrong-season guard: when a show's page displays an EARLIER season than the latest,
+    /// opening that displayed season is still free (remembered), but opening the actual latest
+    /// season costs a request and returns THAT season's own episodes — proving the two are never
+    /// confused with one another.
+    /// </summary>
+    [Fact]
+    public async Task ADisplayedSeasonThatIsNotTheLatestIsFreeWhileTheLatestStillCostsARequestWithItsOwnEpisodes()
+    {
+        const string showPath = "/x/show-past";
+        const string displayedSeasonPath = "/x/show-past-s1";
+        const string latestSeasonPath = "/x/show-past-s3";
+        string showJson = InlineShowPageJson(showPath, seasonCount: 3, displayedSeasonNumber: 1, episodeTitle: "S1 Episode");
+        string latestSeasonJson = InlineSeasonPageJson(latestSeasonPath, episodeTitle: "S3 Episode");
+        FakeMakoHttp http = new();
+        http.Respond(MakoUrls.Page(BaseUrlTemplate, showPath), showJson);
+        http.Respond(MakoUrls.Page(BaseUrlTemplate, latestSeasonPath), latestSeasonJson);
+        MakoCatalog catalog = await CreateCatalogAsync(http);
+
+        await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
+        int requestsAfterSeasons = http.Requests.Count;
+
+        IReadOnlyList<Episode> displayedEpisodes = await catalog.GetEpisodesAsync(showPath, displayedSeasonPath, CancellationToken.None);
+        Assert.Equal(requestsAfterSeasons, http.Requests.Count);
+        Assert.Equal("S1 Episode", Assert.Single(displayedEpisodes).Name);
+
+        IReadOnlyList<Episode> latestEpisodes = await catalog.GetEpisodesAsync(showPath, latestSeasonPath, CancellationToken.None);
+        Assert.Equal(requestsAfterSeasons + 1, http.Requests.Count);
+        Assert.Equal("S3 Episode", Assert.Single(latestEpisodes).Name);
+    }
+
+    [Fact]
+    public async Task APastSeasonPageIsNotRefetchedJustAfterSixHoursButIsAfterSevenDays()
+    {
+        FakeClock clock = new();
+        FakeMakoHttp http = new();
+        http.Respond(SeasonOneUrl, SeasonOnePageJson);
+        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
+
+        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
+        int requestsAfterFirst = http.Requests.Count;
+
+        clock.Advance(TimeSpan.FromHours(6) + TimeSpan.FromMinutes(1));
+        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
+        Assert.Equal(requestsAfterFirst, http.Requests.Count);
+
+        clock.Advance(TimeSpan.FromDays(7));
+        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
+        Assert.Equal(requestsAfterFirst + 1, http.Requests.Count);
+    }
+
+    /// <summary>
+    /// The real fixture's own displayed season IS its own highest-numbered season — both
+    /// <see cref="DisplayedSeasonPath"/> — the exact case where a naive, unconditional
+    /// <c>Remember</c> would overwrite the show page's own 12h entry with the season's 6h one,
+    /// silently downgrading it. The guard must skip the remember when the two ids already
+    /// coincide, so the show page keeps its full 12h lifetime. Fetched directly under
+    /// <see cref="DisplayedSeasonPath"/> (not <see cref="ShemeshPagePath"/>, which is now a
+    /// distinct cache key from its own displayed season) so the coincidence is genuine.
+    /// </summary>
+    [Fact]
+    public async Task TheShowPageIsNotDowngradedToTheCurrentSeasonLifetimeWhenItsOwnPathIsTheDisplayedSeason()
+    {
+        FakeClock clock = new();
+        FakeMakoHttp http = new();
+        http.Respond(DisplayedSeasonUrl, ShowPageJson);
+        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
+
+        await catalog.GetSeasonsAsync(DisplayedSeasonPath, CancellationToken.None);
+        int requestsAfterFirst = http.Requests.Count;
+
+        // Past the 6h "current season" lifetime, but still within the show page's own 12h one.
+        clock.Advance(TimeSpan.FromHours(6) + TimeSpan.FromMinutes(1));
+        await catalog.GetSeasonsAsync(DisplayedSeasonPath, CancellationToken.None);
+
+        Assert.Equal(requestsAfterFirst, http.Requests.Count);
+    }
+
+    [Fact]
+    public async Task TheLatestSeasonPageIsRefetchedAfterSixHoursWhenOpenedDirectly()
+    {
+        FakeClock clock = new();
+        FakeMakoHttp http = new();
+        http.Respond(DisplayedSeasonUrl, ShowPageJson);
+        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
+
+        // Opened directly through GetEpisodesAsync, never through GetSeasonsAsync, so this is a
+        // fresh cache entry governed purely by the "is this the latest season" 6h lifetime.
+        await catalog.GetEpisodesAsync(ShemeshPagePath, DisplayedSeasonPath, CancellationToken.None);
+        int requestsAfterFirst = http.Requests.Count;
+
+        clock.Advance(TimeSpan.FromHours(6));
+        await catalog.GetEpisodesAsync(ShemeshPagePath, DisplayedSeasonPath, CancellationToken.None);
+
+        Assert.Equal(requestsAfterFirst + 1, http.Requests.Count);
+    }
+
+    [Fact]
+    public async Task TheShowPageSurvivesTwelveHoursIndependentlyOfTheRememberedLatestSeason()
+    {
+        const string showPath = "/x/show-lifetime";
+        string showJson = InlineShowPageJson(showPath, seasonCount: 3, displayedSeasonNumber: 3, episodeTitle: "S3 Episode");
+        FakeClock clock = new();
+        FakeMakoHttp http = new();
+        http.Respond(MakoUrls.Page(BaseUrlTemplate, showPath), showJson);
+        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
+
+        await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
+        int requestsAfterFirst = http.Requests.Count;
+
+        // Past the remembered latest-season entry's own 6h lifetime, but the show page's key is
+        // a separate cache entry with its own 12h lifetime — unaffected.
+        clock.Advance(TimeSpan.FromHours(6) + TimeSpan.FromMinutes(1));
+        await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
+        Assert.Equal(requestsAfterFirst, http.Requests.Count);
+
+        clock.Advance(TimeSpan.FromHours(12));
+        await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
+        Assert.Equal(requestsAfterFirst + 1, http.Requests.Count);
     }
 
     [Fact]
@@ -293,6 +467,62 @@ public class MakoCatalogTests
         http.Respond(SeasonOneUrl, SeasonOnePageJson);
         return http;
     }
+
+    /// <summary>A minimal show page with <paramref name="seasonCount"/> seasons and a single
+    /// episode under whichever season is marked <c>current</c> — the season the page displays.</summary>
+    private static string InlineShowPageJson(string showPath, int seasonCount, int displayedSeasonNumber, string episodeTitle)
+    {
+        string seasonsJson = string.Join(
+            ",\n",
+            Enumerable.Range(1, seasonCount).Select(number =>
+                $$"""{ "seasonTitle": "עונה {{number}}", "current": {{(number == displayedSeasonNumber ? "true" : "false")}}, "pageUrl": "{{showPath}}-s{{number}}" }"""));
+
+        return $$"""
+            {
+              "pageUrl": "{{showPath}}",
+              "seasons": [ {{seasonsJson}} ],
+              "menu": [
+                {
+                  "id": "allEpisodes",
+                  "vods": [
+                    {
+                      "componentLayout": "vod",
+                      "title": "{{episodeTitle}}",
+                      "itemVcmId": "vcm-{{showPath}}",
+                      "channelId": "chan-{{showPath}}",
+                      "galleryChannelId": "gal-{{showPath}}",
+                      "extraInfo": "פרק 1@01.01.20"
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+    }
+
+    /// <summary>A season's own page (no <c>seasons</c> array of its own) with a single episode —
+    /// standing in for a season fetched directly rather than remembered from the show page.</summary>
+    private static string InlineSeasonPageJson(string seasonPath, string episodeTitle) =>
+        $$"""
+        {
+          "pageUrl": "{{seasonPath}}",
+          "menu": [
+            {
+              "id": "allEpisodes",
+              "vods": [
+                {
+                  "componentLayout": "vod",
+                  "title": "{{episodeTitle}}",
+                  "itemVcmId": "vcm-{{seasonPath}}",
+                  "channelId": "chan-{{seasonPath}}",
+                  "galleryChannelId": "gal-{{seasonPath}}",
+                  "extraInfo": "פרק 1@01.01.20"
+                }
+              ]
+            }
+          ]
+        }
+        """;
 
     private static string EncryptedPlaylist(bool isProtected) =>
         PayloadCipher.Encrypt(
