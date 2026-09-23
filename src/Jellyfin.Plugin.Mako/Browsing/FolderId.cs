@@ -14,16 +14,18 @@ public sealed record FolderId(FolderKind Kind, string Value)
 {
     private const char Separator = '|';
     // Jellyfin derives a channel item's identity from this id and stores the item's type with it.
-    // The prefixes changed when show and season folders became Series and Season items: an item
-    // already stored as a plain folder cannot be reloaded as a Series, so new ids were needed.
-    private const string ShowPrefix = "series";
-    private const string SeasonPrefix = "series-season";
+    // Prefixes changed twice: once when shows became Series items (step A), once in step C when
+    // every show had to be created afresh so Jellyfin would copy its genres — it copies them
+    // only when it first creates an item.
+    private const string ShowPrefix = "mako-series";
+    private const string SeasonPrefix = "mako-season";
+    private const int SeasonValueParts = 2;
 
     public static FolderId Root { get; } = new(FolderKind.Root, string.Empty);
 
     public static FolderId ForShow(string showId) => new(FolderKind.Show, showId);
 
-    public static FolderId ForSeason(string seasonId) => new(FolderKind.Season, seasonId);
+    public static FolderId ForSeason(string showId, string seasonId) => new(FolderKind.Season, $"{showId}{Separator}{seasonId}");
 
     public static FolderId Parse(string? raw)
     {
@@ -44,7 +46,7 @@ public sealed record FolderId(FolderKind Kind, string Value)
         return prefix switch
         {
             ShowPrefix => ForShow(value),
-            SeasonPrefix => ForSeason(value),
+            SeasonPrefix => ParseSeason(value, raw),
             _ => throw new FormatException($"'{raw}' is not a mako folder id."),
         };
     }
@@ -56,4 +58,28 @@ public sealed record FolderId(FolderKind Kind, string Value)
         FolderKind.Root => string.Empty,
         _ => throw new InvalidOperationException($"Folder kind '{Kind}' has no id format."),
     };
+
+    /// <summary>The show path and season path a season id carries; mako's season page names no show,
+    /// so the id is the only place the show can come from.</summary>
+    public (string ShowId, string SeasonId) SeasonParts()
+    {
+        if (Kind != FolderKind.Season)
+        {
+            throw new InvalidOperationException($"A {Kind} folder id has no season parts.");
+        }
+
+        string[] parts = Value.Split(Separator);
+        return (parts[0], parts[1]);
+    }
+
+    private static FolderId ParseSeason(string value, string raw)
+    {
+        string[] parts = value.Split(Separator);
+        if (parts.Length != SeasonValueParts || parts.Any(string.IsNullOrEmpty))
+        {
+            throw new FormatException($"'{raw}' is not a mako folder id.");
+        }
+
+        return new FolderId(FolderKind.Season, value);
+    }
 }

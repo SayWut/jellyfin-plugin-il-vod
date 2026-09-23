@@ -34,9 +34,9 @@ public static class ChannelItemMapper
         Genres = show.Genres.ToList(),
     };
 
-    public static ChannelItemInfo ToFolder(Season season) => new()
+    public static ChannelItemInfo ToFolder(Season season, string showId) => new()
     {
-        Id = FolderId.ForSeason(season.Id).ToString(),
+        Id = FolderId.ForSeason(showId, season.Id).ToString(),
         Name = season.Name,
         Type = ChannelItemType.Folder,
         FolderType = SeasonFolder,

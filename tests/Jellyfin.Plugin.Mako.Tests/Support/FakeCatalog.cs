@@ -43,6 +43,9 @@ public sealed class FakeCatalog : ICatalog
     /// <summary>How many times any browse method was called, failed or not.</summary>
     public int BrowseCalls { get; private set; }
 
+    /// <summary>The show and season id <see cref="GetEpisodesAsync"/> was last called with.</summary>
+    public (string ShowId, string SeasonId)? LastEpisodesRequest { get; private set; }
+
     public Task<IReadOnlyList<Show>> GetShowsAsync(CancellationToken cancellationToken)
     {
         BrowseCalls++;
@@ -61,9 +64,10 @@ public sealed class FakeCatalog : ICatalog
         return Task.FromResult(seasons);
     }
 
-    public Task<IReadOnlyList<Episode>> GetEpisodesAsync(string seasonId, CancellationToken cancellationToken)
+    public Task<IReadOnlyList<Episode>> GetEpisodesAsync(string showId, string seasonId, CancellationToken cancellationToken)
     {
         BrowseCalls++;
+        LastEpisodesRequest = (showId, seasonId);
         if (BrowseFailure is { } failure)
         {
             return Task.FromException<IReadOnlyList<Episode>>(failure);

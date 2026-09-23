@@ -11,7 +11,7 @@ public interface ICatalog
 
     Task<IReadOnlyList<Season>> GetSeasonsAsync(string showId, CancellationToken cancellationToken);
 
-    Task<IReadOnlyList<Episode>> GetEpisodesAsync(string seasonId, CancellationToken cancellationToken);
+    Task<IReadOnlyList<Episode>> GetEpisodesAsync(string showId, string seasonId, CancellationToken cancellationToken);
 
     Task<StreamLink> GetStreamLinkAsync(string episodeId, CancellationToken cancellationToken);
 }

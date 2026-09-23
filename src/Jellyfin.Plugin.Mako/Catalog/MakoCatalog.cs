@@ -68,7 +68,8 @@ public sealed class MakoCatalog : ICatalog
         return showPage.Seasons;
     }
 
-    public async Task<IReadOnlyList<Episode>> GetEpisodesAsync(string seasonId, CancellationToken cancellationToken)
+    // showId is unused for now — C3 makes the fetched page's episodes carry the show it names.
+    public async Task<IReadOnlyList<Episode>> GetEpisodesAsync(string showId, string seasonId, CancellationToken cancellationToken)
     {
         PinnedShow pinned = _readPinnedShow();
         CacheLifetimes lifetimes = _readLifetimes();

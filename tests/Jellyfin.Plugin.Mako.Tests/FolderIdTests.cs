@@ -24,15 +24,6 @@ public class FolderIdTests
     }
 
     [Fact]
-    public void SeasonIdSurvivesARoundTrip()
-    {
-        FolderId parsed = FolderId.Parse(FolderId.ForSeason("shemesh-s1").ToString());
-
-        Assert.Equal(FolderKind.Season, parsed.Kind);
-        Assert.Equal("shemesh-s1", parsed.Value);
-    }
-
-    [Fact]
     public void RootSerialisesToAnEmptyString()
     {
         Assert.Equal(string.Empty, FolderId.Root.ToString());
@@ -45,5 +36,37 @@ public class FolderIdTests
     public void UnknownFormatIsRejected(string raw)
     {
         Assert.Throws<FormatException>(() => FolderId.Parse(raw));
+    }
+
+    [Fact]
+    public void AShowIdUsesTheNewPrefixSoJellyfinCreatesEveryShowAfreshWithItsGenres()
+    {
+        Assert.Equal("mako-series|/mako-vod-keshet/shemesh", FolderId.ForShow("/mako-vod-keshet/shemesh").ToString());
+    }
+
+    [Fact]
+    public void ASeasonIdCarriesItsShowsPathAndRoundTrips()
+    {
+        FolderId season = FolderId.ForSeason("/mako-vod-keshet/shemesh", "/mako-vod-keshet/shemesh-s1");
+
+        Assert.Equal("mako-season|/mako-vod-keshet/shemesh|/mako-vod-keshet/shemesh-s1", season.ToString());
+        Assert.Equal(season, FolderId.Parse(season.ToString()));
+        Assert.Equal(("/mako-vod-keshet/shemesh", "/mako-vod-keshet/shemesh-s1"), season.SeasonParts());
+    }
+
+    [Theory]
+    [InlineData("mako-season|/only-one-part")]
+    [InlineData("mako-season|/a|/b|/c")]
+    [InlineData("series|/mako-vod-keshet/shemesh")]
+    [InlineData("series-season|/mako-vod-keshet/shemesh-s1")]
+    public void OldPrefixesAndMalformedSeasonValuesAreNotFolderIds(string raw)
+    {
+        Assert.Throws<FormatException>(() => FolderId.Parse(raw));
+    }
+
+    [Fact]
+    public void SeasonPartsOfANonSeasonIsAProgrammingError()
+    {
+        Assert.Throws<InvalidOperationException>(() => FolderId.ForShow("/x").SeasonParts());
     }
 }

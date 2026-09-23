@@ -46,30 +46,40 @@ public class MakoChannelTests
         Assert.Equal(2, result.Items.Count);
         Assert.Equal(2, result.TotalRecordCount);
         Assert.All(result.Items, item => Assert.Equal(ChannelItemType.Folder, item.Type));
-        Assert.Equal("series|shemesh", result.Items[0].Id);
+        Assert.Equal("mako-series|shemesh", result.Items[0].Id);
     }
 
     [Fact]
     public async Task OpeningAShowListsItsSeasons()
     {
-        ChannelItemResult result = await Open(ChannelOver(new FakeCatalog()), "series|shemesh");
+        ChannelItemResult result = await Open(ChannelOver(new FakeCatalog()), "mako-series|shemesh");
 
-        Assert.Equal(new[] { "series-season|shemesh-s1", "series-season|shemesh-s2" }, result.Items.Select(item => item.Id));
+        Assert.Equal(new[] { "mako-season|shemesh|shemesh-s1", "mako-season|shemesh|shemesh-s2" }, result.Items.Select(item => item.Id));
     }
 
     [Fact]
     public async Task OpeningASeasonListsItsPlayableEpisodes()
     {
-        ChannelItemResult result = await Open(ChannelOver(new FakeCatalog()), "series-season|shemesh-s1");
+        ChannelItemResult result = await Open(ChannelOver(new FakeCatalog()), "mako-season|shemesh|shemesh-s1");
 
         Assert.Equal(3, result.Items.Count);
         Assert.All(result.Items, item => Assert.Equal(ChannelItemType.Media, item.Type));
     }
 
+    [Fact]
+    public async Task OpeningASeasonPassesBothItsShowAndItselfToTheCatalogue()
+    {
+        var catalog = new FakeCatalog();
+
+        await Open(ChannelOver(catalog), "mako-season|shemesh|shemesh-s1");
+
+        Assert.Equal(("shemesh", "shemesh-s1"), catalog.LastEpisodesRequest);
+    }
+
     [Theory]
     [InlineData(null)]
-    [InlineData("series|shemesh")]
-    [InlineData("series-season|shemesh-s1")]
+    [InlineData("mako-series|shemesh")]
+    [InlineData("mako-season|shemesh|shemesh-s1")]
     public async Task AFolderOpenedByJellyfinItselfIsRefusedWithoutTouchingTheCatalogue(string? folderId)
     {
         var catalog = new FakeCatalog();
@@ -144,7 +154,7 @@ public class MakoChannelTests
         FakeCatalog catalog = new() { BrowseFailure = new MakoRequestException("HTTP 500 for www.mako.co.il/mako-vod/shemesh") };
         var logger = new RecordingLogger<MakoChannel>();
 
-        await Assert.ThrowsAsync<MakoRequestException>(() => Open(ChannelOver(catalog, logger), "series|shemesh"));
+        await Assert.ThrowsAsync<MakoRequestException>(() => Open(ChannelOver(catalog, logger), "mako-series|shemesh"));
 
         Assert.NotEmpty(logger.Warnings);
     }
@@ -157,7 +167,7 @@ public class MakoChannelTests
         FakeCatalog catalog = new() { BrowseFailure = new FormatException("mako page is not valid JSON") };
         var logger = new RecordingLogger<MakoChannel>();
 
-        await Assert.ThrowsAsync<FormatException>(() => Open(ChannelOver(catalog, logger), "series|shemesh"));
+        await Assert.ThrowsAsync<FormatException>(() => Open(ChannelOver(catalog, logger), "mako-series|shemesh"));
 
         Assert.NotEmpty(logger.Warnings);
     }
@@ -172,7 +182,7 @@ public class MakoChannelTests
         FakeCatalog catalog = new() { BrowseFailure = new ArgumentException("not a mako page path", "pagePath") };
         var logger = new RecordingLogger<MakoChannel>();
 
-        ChannelItemResult result = await Open(ChannelOver(catalog, logger), "series-season|@evil.example/x");
+        ChannelItemResult result = await Open(ChannelOver(catalog, logger), "mako-season|shemesh|@evil.example/x");
 
         Assert.Empty(result.Items);
         Assert.Equal(0, result.TotalRecordCount);

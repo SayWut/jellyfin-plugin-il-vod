@@ -18,7 +18,7 @@ public class ChannelItemMapperTests
 
         Assert.Equal(ChannelItemType.Folder, item.Type);
         Assert.Equal(ChannelFolderType.Series, item.FolderType);
-        Assert.Equal("series|shemesh", item.Id);
+        Assert.Equal("mako-series|shemesh", item.Id);
         Assert.Equal("שמש", item.Name);
         Assert.Equal("https://img.test/p.jpg", item.ImageUrl);
         Assert.Equal("תיאור", item.Overview);
@@ -28,11 +28,13 @@ public class ChannelItemMapperTests
     [Fact]
     public void SeasonBecomesAFolderNumberedByItsSeason()
     {
-        ChannelItemInfo item = ChannelItemMapper.ToFolder(new Season("shemesh-s2", 2, "עונה 2"));
+        var season = new Season("shemesh-s2", 2, "עונה 2");
+
+        ChannelItemInfo item = ChannelItemMapper.ToFolder(season, "/mako-vod-keshet/shemesh");
 
         Assert.Equal(ChannelItemType.Folder, item.Type);
         Assert.Equal(ChannelFolderType.Season, item.FolderType);
-        Assert.Equal("series-season|shemesh-s2", item.Id);
+        Assert.Equal("mako-season|/mako-vod-keshet/shemesh|" + season.Id, item.Id);
         Assert.Equal("עונה 2", item.Name);
         Assert.Equal(2, item.IndexNumber);
     }

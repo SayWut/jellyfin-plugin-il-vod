@@ -29,7 +29,7 @@ namespace Jellyfin.Plugin.Mako;
 public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
 {
     private const string ChannelName = "mako";
-    private const string ContentVersion = "4";
+    private const string ContentVersion = "5";
     private const string ChannelDescription = "mako 12+ VOD, fetched on demand.";
     private const string ChannelHomePageUrl = "https://www.mako.co.il/mako-vod";
 
@@ -170,10 +170,11 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
 
             case FolderKind.Show:
                 IReadOnlyList<Season> seasons = await catalog.GetSeasonsAsync(folder.Value, cancellationToken).ConfigureAwait(false);
-                return seasons.Select(ChannelItemMapper.ToFolder).ToList();
+                return seasons.Select(season => ChannelItemMapper.ToFolder(season, folder.Value)).ToList();
 
             case FolderKind.Season:
-                IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync(folder.Value, cancellationToken).ConfigureAwait(false);
+                (string showId, string seasonId) = folder.SeasonParts();
+                IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync(showId, seasonId, cancellationToken).ConfigureAwait(false);
                 return episodes.Select(ChannelItemMapper.ToPlayable).ToList();
 
             default:

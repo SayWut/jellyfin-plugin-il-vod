@@ -103,7 +103,7 @@ public class MakoCatalogTests
         MakoCatalog catalog = await CreateCatalogAsync(http);
         await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
 
-        IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync(SeasonOnePagePath, CancellationToken.None);
+        IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
 
         Episode first = Assert.Single(episodes, episode => episode.Number == 1);
         EpisodeKey key = EpisodeKey.Parse(first.Id);
@@ -143,7 +143,7 @@ public class MakoCatalogTests
         await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
         int requestsAfterSeasons = http.Requests.Count;
 
-        IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync(latestSeasonPath, CancellationToken.None);
+        IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync(showPath, latestSeasonPath, CancellationToken.None);
 
         Assert.Equal(requestsAfterSeasons, http.Requests.Count);
         Assert.Equal("S3 Episode", Assert.Single(episodes).Name);
@@ -171,11 +171,11 @@ public class MakoCatalogTests
         await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
         int requestsAfterSeasons = http.Requests.Count;
 
-        IReadOnlyList<Episode> displayedEpisodes = await catalog.GetEpisodesAsync(displayedSeasonPath, CancellationToken.None);
+        IReadOnlyList<Episode> displayedEpisodes = await catalog.GetEpisodesAsync(showPath, displayedSeasonPath, CancellationToken.None);
         Assert.Equal(requestsAfterSeasons, http.Requests.Count);
         Assert.Equal("S1 Episode", Assert.Single(displayedEpisodes).Name);
 
-        IReadOnlyList<Episode> latestEpisodes = await catalog.GetEpisodesAsync(latestSeasonPath, CancellationToken.None);
+        IReadOnlyList<Episode> latestEpisodes = await catalog.GetEpisodesAsync(showPath, latestSeasonPath, CancellationToken.None);
         Assert.Equal(requestsAfterSeasons + 1, http.Requests.Count);
         Assert.Equal("S3 Episode", Assert.Single(latestEpisodes).Name);
     }
@@ -188,15 +188,15 @@ public class MakoCatalogTests
         http.Respond(SeasonOneUrl, SeasonOnePageJson);
         MakoCatalog catalog = await CreateCatalogAsync(http, clock);
 
-        await catalog.GetEpisodesAsync(SeasonOnePagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
         int requestsAfterFirst = http.Requests.Count;
 
         clock.Advance(TimeSpan.FromHours(6) + TimeSpan.FromMinutes(1));
-        await catalog.GetEpisodesAsync(SeasonOnePagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
         Assert.Equal(requestsAfterFirst, http.Requests.Count);
 
         clock.Advance(TimeSpan.FromDays(7));
-        await catalog.GetEpisodesAsync(SeasonOnePagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
         Assert.Equal(requestsAfterFirst + 1, http.Requests.Count);
     }
 
@@ -235,11 +235,11 @@ public class MakoCatalogTests
 
         // Opened directly through GetEpisodesAsync, never through GetSeasonsAsync, so this is a
         // fresh cache entry governed purely by the "is this the latest season" 6h lifetime.
-        await catalog.GetEpisodesAsync(PinnedPagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(PinnedPagePath, PinnedPagePath, CancellationToken.None);
         int requestsAfterFirst = http.Requests.Count;
 
         clock.Advance(TimeSpan.FromHours(6));
-        await catalog.GetEpisodesAsync(PinnedPagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(PinnedPagePath, PinnedPagePath, CancellationToken.None);
 
         Assert.Equal(requestsAfterFirst + 1, http.Requests.Count);
     }
@@ -378,10 +378,10 @@ public class MakoCatalogTests
         http.Respond(SeasonOneUrl, HtmlErrorPage);
         MakoChannel channel = ChannelOver(await CreateCatalogAsync(http));
 
-        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForSeason(SeasonOnePagePath)));
+        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForSeason(PinnedPagePath, SeasonOnePagePath)));
         Assert.Single(http.Requests);
 
-        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForSeason(SeasonOnePagePath)));
+        await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForSeason(PinnedPagePath, SeasonOnePagePath)));
         Assert.Equal(2, http.Requests.Count);
     }
 

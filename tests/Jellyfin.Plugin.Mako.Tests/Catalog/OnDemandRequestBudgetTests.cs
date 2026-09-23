@@ -82,15 +82,15 @@ public class OnDemandRequestBudgetTests
 
         // | GetEpisodesAsync(current season) | 1 (served from the show page, remembered under the
         // DISPLAYED season's own — different — path) |
-        await catalog.GetEpisodesAsync(DisplayedSeasonPath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(PinnedPagePath, DisplayedSeasonPath, CancellationToken.None);
         Assert.Equal(1, BrowseHostRequestCount(http));
 
         // | GetEpisodesAsync(season 1) | 2 |
-        await catalog.GetEpisodesAsync(SeasonOnePagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
         Assert.Equal(2, BrowseHostRequestCount(http));
 
         // | GetEpisodesAsync(season 1) again | 2 |
-        await catalog.GetEpisodesAsync(SeasonOnePagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
         Assert.Equal(2, BrowseHostRequestCount(http));
 
         // | GetSeasonsAsync(show) again | 2 |
@@ -125,7 +125,7 @@ public class OnDemandRequestBudgetTests
         MakoCatalog catalog = await CreateCatalogAsync(http);
 
         await catalog.GetSeasonsAsync(PinnedPagePath, CancellationToken.None);
-        await catalog.GetEpisodesAsync(SeasonOnePagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(PinnedPagePath, SeasonOnePagePath, CancellationToken.None);
 
         foreach (string untouchedSeasonSlug in new[] { "shemesh-s2", "shemesh-s3", "shemesh-s4", "shemesh-s5" })
         {
