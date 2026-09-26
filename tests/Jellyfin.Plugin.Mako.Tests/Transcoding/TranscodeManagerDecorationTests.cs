@@ -61,35 +61,108 @@ public class TranscodeManagerDecorationTests
     }
 
     [Fact]
-    public void LeavesARegistrationByInstanceUntouched()
+    public void WrapsARegistrationByInstance()
     {
-        var services = new ServiceCollection();
-        var instance = new FakeTranscodeManager(NullLoggerFactory.Instance, new CallRecorder());
+        var recorder = new CallRecorder();
+        ServiceCollection services = ServicesWithLogging();
+        var instance = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
         services.AddSingleton<ITranscodeManager>(instance);
 
         bool installed = TranscodeManagerDecoration.Apply(services);
 
-        Assert.False(installed);
-        Assert.False(ProbeSizeLimiterStatus.IsInstalled);
+        Assert.True(installed);
+        Assert.True(ProbeSizeLimiterStatus.IsInstalled);
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        Assert.Same(instance, provider.GetRequiredService<ITranscodeManager>());
+        ITranscodeManager resolved = provider.GetRequiredService<ITranscodeManager>();
+
+        Assert.IsType<ProbeSizeLimitingTranscodeManager>(resolved);
+
+        resolved.PingTranscodingJob("session-instance", null);
+
+        Assert.Equal("session-instance", recorder.LastPingedPlaySessionId);
     }
 
     [Fact]
-    public void LeavesARegistrationByFactoryUntouched()
+    public void WrapsARegistrationByFactory()
     {
-        var services = new ServiceCollection();
         var recorder = new CallRecorder();
+        ServiceCollection services = ServicesWithLogging();
         services.AddSingleton<ITranscodeManager>(_ => new FakeTranscodeManager(NullLoggerFactory.Instance, recorder));
 
         bool installed = TranscodeManagerDecoration.Apply(services);
 
-        Assert.False(installed);
-        Assert.False(ProbeSizeLimiterStatus.IsInstalled);
+        Assert.True(installed);
+        Assert.True(ProbeSizeLimiterStatus.IsInstalled);
 
         using ServiceProvider provider = services.BuildServiceProvider();
-        Assert.IsType<FakeTranscodeManager>(provider.GetRequiredService<ITranscodeManager>());
+        ITranscodeManager resolved = provider.GetRequiredService<ITranscodeManager>();
+
+        Assert.IsType<ProbeSizeLimitingTranscodeManager>(resolved);
+
+        resolved.PingTranscodingJob("session-factory", null);
+
+        Assert.Equal("session-factory", recorder.LastPingedPlaySessionId);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void NestsInsideAnotherDecoratorInEitherOrder(bool makoDecoratesFirst)
+    {
+        var recorder = new CallRecorder();
+        ServiceCollection services = ServicesWithLogging();
+        services.AddSingleton(recorder);
+        services.AddSingleton<ITranscodeManager, FakeTranscodeManager>();
+
+        if (makoDecoratesFirst)
+        {
+            TranscodeManagerDecoration.Apply(services);
+            ApplyForwardingDecoration(services);
+        }
+        else
+        {
+            ApplyForwardingDecoration(services);
+            TranscodeManagerDecoration.Apply(services);
+        }
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        ITranscodeManager resolved = provider.GetRequiredService<ITranscodeManager>();
+
+        resolved.PingTranscodingJob("session-nested", null);
+
+        Assert.Equal("session-nested", recorder.LastPingedPlaySessionId);
+    }
+
+    // Stands in for a second, independent decorating plugin: wraps the last ITranscodeManager
+    // registration behind ForwardingWrapper the same way TranscodeManagerDecoration.Apply wraps
+    // it behind ProbeSizeLimitingTranscodeManager, so the test can nest the two in either order.
+    private static void ApplyForwardingDecoration(IServiceCollection services)
+    {
+        ServiceDescriptor registration = services.Last(descriptor => descriptor.ServiceType == typeof(ITranscodeManager));
+        Func<IServiceProvider, ITranscodeManager> buildInner = InnerFactoryOf(registration);
+
+        services.Remove(registration);
+        services.Add(ServiceDescriptor.Describe(
+            typeof(ITranscodeManager),
+            provider => new ForwardingWrapper(buildInner(provider)),
+            registration.Lifetime));
+    }
+
+    private static Func<IServiceProvider, ITranscodeManager> InnerFactoryOf(ServiceDescriptor registration)
+    {
+        if (registration.ImplementationInstance is ITranscodeManager instance)
+        {
+            return _ => instance;
+        }
+
+        if (registration.ImplementationFactory is { } factory)
+        {
+            return provider => (ITranscodeManager)factory(provider);
+        }
+
+        Type implementationType = registration.ImplementationType!;
+        return provider => (ITranscodeManager)ActivatorUtilities.CreateInstance(provider, implementationType);
     }
 
     [Fact]
@@ -181,5 +254,53 @@ public class TranscodeManagerDecorationTests
 
         private static InvalidOperationException Unexpected() =>
             new("NeverCalledTranscodeManager was called; it should have been superseded by the later registration.");
+    }
+
+    // Stands in for a second decorating plugin's own wrapper: forwards every member to
+    // whatever it wraps, unchanged, so nesting it around or inside
+    // ProbeSizeLimitingTranscodeManager proves both directions actually delegate.
+    private sealed class ForwardingWrapper : ITranscodeManager
+    {
+        private readonly ITranscodeManager _inner;
+
+        public ForwardingWrapper(ITranscodeManager inner) => _inner = inner;
+
+        public TranscodingJob? GetTranscodingJob(string playSessionId) => _inner.GetTranscodingJob(playSessionId);
+
+        public TranscodingJob? GetTranscodingJob(string path, TranscodingJobType type) => _inner.GetTranscodingJob(path, type);
+
+        public void PingTranscodingJob(string playSessionId, bool? isUserPaused) =>
+            _inner.PingTranscodingJob(playSessionId, isUserPaused);
+
+        public Task KillTranscodingJobs(string deviceId, string? playSessionId, Func<string, bool> deleteFiles) =>
+            _inner.KillTranscodingJobs(deviceId, playSessionId, deleteFiles);
+
+        public void ReportTranscodingProgress(
+            TranscodingJob job,
+            StreamState state,
+            TimeSpan? transcodingPosition,
+            float? framerate,
+            double? percentComplete,
+            long? bytesTranscoded,
+            int? bitRate) =>
+            _inner.ReportTranscodingProgress(job, state, transcodingPosition, framerate, percentComplete, bytesTranscoded, bitRate);
+
+        public Task<TranscodingJob> StartFfMpeg(
+            StreamState state,
+            string outputPath,
+            string commandLineArguments,
+            Guid userId,
+            TranscodingJobType transcodingJobType,
+            CancellationTokenSource cancellationTokenSource,
+            string? workingDirectory = null) =>
+            _inner.StartFfMpeg(state, outputPath, commandLineArguments, userId, transcodingJobType, cancellationTokenSource, workingDirectory);
+
+        public TranscodingJob? OnTranscodeBeginRequest(string path, TranscodingJobType type) =>
+            _inner.OnTranscodeBeginRequest(path, type);
+
+        public void OnTranscodeEndRequest(TranscodingJob job) => _inner.OnTranscodeEndRequest(job);
+
+        public ValueTask<IDisposable> LockAsync(string outputPath, CancellationToken cancellationToken) =>
+            _inner.LockAsync(outputPath, cancellationToken);
     }
 }

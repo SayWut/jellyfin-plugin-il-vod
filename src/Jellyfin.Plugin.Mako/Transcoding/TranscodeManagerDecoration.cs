@@ -7,18 +7,17 @@ namespace Jellyfin.Plugin.Mako.Transcoding;
 /// <summary>
 /// Replaces Jellyfin's registered <see cref="ITranscodeManager"/> with one wrapped in
 /// <see cref="ProbeSizeLimitingTranscodeManager"/>, so ffmpeg's probe size can be limited for
-/// mako's own streams. Every check here fails safe: if Core's registration is not the shape
-/// this expects, the container is left exactly as it was and the server runs as before.
+/// mako's own streams. Every check here fails safe: if Core has no such registration at all,
+/// the container is left exactly as it was and the server runs as before.
 /// </summary>
 public static class TranscodeManagerDecoration
 {
     /// <summary>
-    /// Finds the last <see cref="ITranscodeManager"/> registration and, if it was registered by
-    /// implementation type (as Jellyfin Core registers it), replaces it with one that wraps the
-    /// original behind <see cref="ProbeSizeLimitingTranscodeManager"/>, preserving the original
-    /// registration's lifetime. Does nothing when there is no such registration, or it was
-    /// registered by instance or factory instead of by type — there is no implementation type to
-    /// construct through DI in that case, so the collection is left untouched.
+    /// Finds the last <see cref="ITranscodeManager"/> registration — however it was registered,
+    /// by type (as Jellyfin Core registers it), by factory or by instance (as another decorating
+    /// plugin's own wrapper would leave it) — and replaces it with one that wraps the original
+    /// behind <see cref="ProbeSizeLimitingTranscodeManager"/>, preserving the original
+    /// registration's lifetime. Does nothing when there is no such registration.
     /// </summary>
     /// <returns>
     /// True when the wrapper was installed. No logger exists yet at this point in server
@@ -28,24 +27,43 @@ public static class TranscodeManagerDecoration
     public static bool Apply(IServiceCollection services)
     {
         ServiceDescriptor? registration = services.LastOrDefault(descriptor => descriptor.ServiceType == typeof(ITranscodeManager));
-        if (registration?.ImplementationType is not Type implementationType)
+        if (registration is null)
         {
             ProbeSizeLimiterStatus.IsInstalled = false;
             return false;
         }
 
+        Func<IServiceProvider, ITranscodeManager> buildInner = InnerFactoryOf(registration);
         services.Remove(registration);
         services.Add(ServiceDescriptor.Describe(
             typeof(ITranscodeManager),
-            provider => CreateDecorator(provider, implementationType),
+            provider => CreateDecorator(provider, buildInner),
             registration.Lifetime));
 
         ProbeSizeLimiterStatus.IsInstalled = true;
         return true;
     }
 
-    private static ProbeSizeLimitingTranscodeManager CreateDecorator(IServiceProvider provider, Type implementationType) =>
+    // Builds the inner manager the same way regardless of how Core (or an earlier decorator)
+    // registered it, so a second decorating plugin can always wrap what this one leaves behind.
+    private static Func<IServiceProvider, ITranscodeManager> InnerFactoryOf(ServiceDescriptor registration)
+    {
+        if (registration.ImplementationInstance is ITranscodeManager instance)
+        {
+            return _ => instance;
+        }
+
+        if (registration.ImplementationFactory is { } factory)
+        {
+            return provider => (ITranscodeManager)factory(provider);
+        }
+
+        Type implementationType = registration.ImplementationType!;
+        return provider => (ITranscodeManager)ActivatorUtilities.CreateInstance(provider, implementationType);
+    }
+
+    private static ProbeSizeLimitingTranscodeManager CreateDecorator(IServiceProvider provider, Func<IServiceProvider, ITranscodeManager> buildInner) =>
         new(
-            (ITranscodeManager)ActivatorUtilities.CreateInstance(provider, implementationType),
+            buildInner(provider),
             provider.GetRequiredService<ILogger<ProbeSizeLimitingTranscodeManager>>());
 }
