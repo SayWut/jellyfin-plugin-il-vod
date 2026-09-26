@@ -21,12 +21,25 @@ public sealed class ProbeSizeLimitingTranscodeManager : ITranscodeManager, IDisp
 {
     private readonly ITranscodeManager _inner;
     private readonly ILogger<ProbeSizeLimitingTranscodeManager> _logger;
+    private readonly bool _ownsInner;
     private bool _disposed;
 
-    public ProbeSizeLimitingTranscodeManager(ITranscodeManager inner, ILogger<ProbeSizeLimitingTranscodeManager> logger)
+    /// <param name="inner">The manager this one wraps.</param>
+    /// <param name="logger">Where this decorator logs.</param>
+    /// <param name="ownsInner">
+    /// Whether <see cref="Dispose"/> may dispose <paramref name="inner"/>. The caller — the
+    /// decoration that decides how <paramref name="inner"/> was built — must pass <c>false</c>
+    /// for an inner that came from an existing instance (an <c>AddSingleton(instance)</c>
+    /// registration, which .NET DI itself never disposes): this decorator disposing it anyway
+    /// would dispose an object the container does not own and the caller may still be holding a
+    /// reference to. Defaults to <c>true</c>, matching every other registration shape, where the
+    /// inner is built for and owned by this decorator.
+    /// </param>
+    public ProbeSizeLimitingTranscodeManager(ITranscodeManager inner, ILogger<ProbeSizeLimitingTranscodeManager> logger, bool ownsInner = true)
     {
         _inner = inner;
         _logger = logger;
+        _ownsInner = ownsInner;
         _logger.LogInformation("mako: ffmpeg probe-size limiter installed");
     }
 
@@ -79,7 +92,7 @@ public sealed class ProbeSizeLimitingTranscodeManager : ITranscodeManager, IDisp
         }
 
         _disposed = true;
-        if (_inner is IDisposable disposableInner)
+        if (_ownsInner && _inner is IDisposable disposableInner)
         {
             disposableInner.Dispose();
         }

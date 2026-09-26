@@ -73,7 +73,7 @@ public class TranscodeManagerDecorationTests
         Assert.True(installed);
         Assert.True(ProbeSizeLimiterStatus.IsInstalled);
 
-        using ServiceProvider provider = services.BuildServiceProvider();
+        ServiceProvider provider = services.BuildServiceProvider();
         ITranscodeManager resolved = provider.GetRequiredService<ITranscodeManager>();
 
         Assert.IsType<ProbeSizeLimitingTranscodeManager>(resolved);
@@ -81,6 +81,13 @@ public class TranscodeManagerDecorationTests
         resolved.PingTranscodingJob("session-instance", null);
 
         Assert.Equal("session-instance", recorder.LastPingedPlaySessionId);
+
+        // .NET DI never disposes a singleton registered by instance; the decorator wrapping it
+        // must honour that and not dispose it either, since the caller who registered the
+        // instance may still be holding a reference to it.
+        provider.Dispose();
+
+        Assert.False(recorder.WasDisposed);
     }
 
     [Fact]
@@ -202,6 +209,7 @@ public class TranscodeManagerDecorationTests
         provider.Dispose();
 
         Assert.True(recorder.WasDisposed);
+        Assert.Equal(1, recorder.DisposeCallCount);
     }
 
     // Registers just enough logging plumbing for ActivatorUtilities to satisfy

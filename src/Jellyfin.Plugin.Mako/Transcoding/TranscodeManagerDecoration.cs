@@ -33,11 +33,11 @@ public static class TranscodeManagerDecoration
             return false;
         }
 
-        Func<IServiceProvider, ITranscodeManager> buildInner = InnerFactoryOf(registration);
+        (Func<IServiceProvider, ITranscodeManager> buildInner, bool ownsInner) = InnerFactoryOf(registration);
         services.Remove(registration);
         services.Add(ServiceDescriptor.Describe(
             typeof(ITranscodeManager),
-            provider => CreateDecorator(provider, buildInner),
+            provider => CreateDecorator(provider, buildInner, ownsInner),
             registration.Lifetime));
 
         ProbeSizeLimiterStatus.IsInstalled = true;
@@ -45,25 +45,30 @@ public static class TranscodeManagerDecoration
     }
 
     // Builds the inner manager the same way regardless of how Core (or an earlier decorator)
-    // registered it, so a second decorating plugin can always wrap what this one leaves behind.
-    private static Func<IServiceProvider, ITranscodeManager> InnerFactoryOf(ServiceDescriptor registration)
+    // registered it, so a second decorating plugin can always wrap what this one leaves behind
+    // — and decides who owns the result. An instance registration is never disposed by .NET DI
+    // itself, so this decorator must not dispose it either; a factory or type registration
+    // builds a fresh, container-owned instance, which this decorator disposing on the
+    // container's behalf is correct.
+    private static (Func<IServiceProvider, ITranscodeManager> Build, bool OwnsInner) InnerFactoryOf(ServiceDescriptor registration)
     {
         if (registration.ImplementationInstance is ITranscodeManager instance)
         {
-            return _ => instance;
+            return (_ => instance, false);
         }
 
         if (registration.ImplementationFactory is { } factory)
         {
-            return provider => (ITranscodeManager)factory(provider);
+            return (provider => (ITranscodeManager)factory(provider), true);
         }
 
         Type implementationType = registration.ImplementationType!;
-        return provider => (ITranscodeManager)ActivatorUtilities.CreateInstance(provider, implementationType);
+        return (provider => (ITranscodeManager)ActivatorUtilities.CreateInstance(provider, implementationType), true);
     }
 
-    private static ProbeSizeLimitingTranscodeManager CreateDecorator(IServiceProvider provider, Func<IServiceProvider, ITranscodeManager> buildInner) =>
+    private static ProbeSizeLimitingTranscodeManager CreateDecorator(IServiceProvider provider, Func<IServiceProvider, ITranscodeManager> buildInner, bool ownsInner) =>
         new(
             buildInner(provider),
-            provider.GetRequiredService<ILogger<ProbeSizeLimitingTranscodeManager>>());
+            provider.GetRequiredService<ILogger<ProbeSizeLimitingTranscodeManager>>(),
+            ownsInner);
 }
