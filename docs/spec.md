@@ -6,9 +6,10 @@ Date: 2026-09-20; step B section revised 2026-09-21 after step A; step C added 2
 
 A Jellyfin **Channel** plugin, written in C#, that shows mako 12+ VOD inside
 Jellyfin without downloading or pre-indexing anything. One plugin serves one
-provider; this one serves mako. It is a separate project in this repository,
-under `jellyfin-plugin-mako/`. It is not part of `stack/`: `stack/deploy.sh`
-does not deploy it, and nothing in `stack/` refers to it.
+provider; this one serves mako. It is its own repository. It began under
+`jellyfin-plugin-mako/` in oneplus-media-server and moved out on 2026-09-28, with its history.
+It is not part of that repository's `stack/`: `stack/deploy.sh` does not deploy it,
+and nothing in `stack/` refers to it.
 
 This document covers the **prototype only**. The prototype exists to answer one
 question before any larger build: does a Channel plugin do what is needed, on

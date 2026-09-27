@@ -19,6 +19,13 @@ tasks.
 
 ## Where things stand
 
+**2026-09-28 — moved to its own repository.** The plugin moved out of oneplus-media-server
+(`jellyfin-plugin-mako/`, branch `claude/jellyfin-plugin-mako`) to
+`/media/ofek/B1/ProgramingProcjects/jellyfin/jellyfin-plugin-mako`. `git filter-repo
+--subdirectory-filter` kept all 60 commits, and the branch is now `main`. The finished plans in
+`docs/plan*.md` still show the old `jellyfin-plugin-mako/…` paths, because that is how the work
+was done at the time. After the move: 311/311 tests pass and `scripts/build.sh` builds.
+
 Design approved 2026-09-20. **Step A passed its gate on 2026-09-21: the static plugin
 browses and plays on web, Android TV and Fladder** (`docs/step-a-results.md`). Step B
 (live mako calls) is next and has no plan yet.

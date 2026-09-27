@@ -1,7 +1,9 @@
 # jellyfin-plugin-mako
 
 A Jellyfin Channel plugin that shows mako 12+ VOD inside Jellyfin. It fetches only what a
-user opens or plays — nothing is downloaded, synced or crawled. Separate from `stack/`.
+user opens or plays — nothing is downloaded, synced or crawled. It is a standalone repository
+that moved out of oneplus-media-server on 2026-09-28, with its history. That repository's `stack/`
+does not deploy it.
 
 Status: **step C** — a live catalogue of every show under mako's real genres, fetched on
 demand. See `docs/spec.md` for the design and `docs/plan-step-c.md` for the tasks.
@@ -16,6 +18,9 @@ Needs the .NET 10 SDK.
 ## Install on the phone
 
     SSH_HOST=<ip> SSH_USER=<user> ./scripts/install.sh
+
+The phone's SSH host and user are in `oneplus-ssh.personal.md` at the root of the
+oneplus-media-server repository.
 
 Copies the plugin into `~/config/jellyfin/plugins/Mako_0.1.0.0/`, asks before restarting
 Jellyfin, and prints the plugin's status (Active / NotSupported / Malfunctioned).
