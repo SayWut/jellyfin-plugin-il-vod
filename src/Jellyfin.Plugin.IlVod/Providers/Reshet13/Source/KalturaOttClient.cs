@@ -79,22 +79,30 @@ public sealed class KalturaOttClient
     }
 
     /// <summary>
-    /// Every asset a list query matches, asking page after page (1-based) until Kaltura's
-    /// <c>totalCount</c> is reached — or a page comes back empty, which is how Kaltura answers a
-    /// page past the end.
+    /// Every asset a list query matches, once each, asking page after page (1-based) until
+    /// Kaltura's <c>totalCount</c> is reached — or a page brings no asset not already seen, which is
+    /// how Kaltura answers a page past the end. Kaltura's orders tie (episodes share an
+    /// <c>EpisodeNumber</c> across seasons), so an asset may come back on two pages: it is kept once.
     /// </summary>
+    /// <exception cref="FormatException">The walk ended short of <c>totalCount</c>, or took more
+    /// than one page with no <c>totalCount</c> to check against. A short list is never an answer:
+    /// Jellyfin would delete whatever it lacks.</exception>
     public async Task<IReadOnlyList<JsonElement>> ListAllAsync(Func<int, KalturaQuery> queryForPage, CancellationToken cancellationToken)
     {
         List<JsonElement> assets = [];
+        HashSet<string> seenAssetIds = [];
+        int pagesWithNewAssets = 0;
         for (int pageIndex = 1; ; pageIndex++)
         {
-            JsonElement page = await CallAsync(queryForPage(pageIndex), cancellationToken).ConfigureAwait(false);
-            int countBefore = assets.Count;
-            assets.AddRange(KalturaJson.Items(page, "objects"));
+            KalturaQuery query = queryForPage(pageIndex);
+            JsonElement page = await CallAsync(query, cancellationToken).ConfigureAwait(false);
+            int added = AddUnseen(assets, seenAssetIds, KalturaJson.Items(page, "objects"));
+            pagesWithNewAssets += added > 0 ? 1 : 0;
 
-            if (assets.Count == countBefore || assets.Count >= TotalCountOf(page))
+            long? totalCount = TotalCountOf(page);
+            if (added == 0 || assets.Count >= totalCount)
             {
-                return assets;
+                return CompleteOrThrow(assets, totalCount, pagesWithNewAssets, query);
             }
         }
     }
@@ -208,5 +216,34 @@ public sealed class KalturaOttClient
             ? throw new Reshet13UnavailableException($"{query.Name} for {query.Subject} failed with Kaltura error {code}")
             : result;
 
-    private static long TotalCountOf(JsonElement page) => KalturaJson.WholeNumber(KalturaJson.Property(page, "totalCount")) ?? 0;
+    /// <returns>How many of <paramref name="pageAssets"/> were new. An asset with no id cannot be
+    /// told apart from another, so it is always kept — the parser skips it anyway.</returns>
+    private static int AddUnseen(List<JsonElement> assets, HashSet<string> seenAssetIds, IEnumerable<JsonElement> pageAssets)
+    {
+        int countBefore = assets.Count;
+        foreach (JsonElement asset in pageAssets)
+        {
+            if (KalturaJson.Property(asset, "id") is not JsonElement id || seenAssetIds.Add(id.GetRawText()))
+            {
+                assets.Add(asset);
+            }
+        }
+
+        return assets.Count - countBefore;
+    }
+
+    private static IReadOnlyList<JsonElement> CompleteOrThrow(
+        List<JsonElement> assets, long? totalCount, int pagesWithNewAssets, KalturaQuery lastQuery)
+    {
+        if (totalCount is long total && assets.Count < total)
+        {
+            throw new FormatException($"{lastQuery.Name} for {lastQuery.Subject} ended the list at {assets.Count} of {total} assets");
+        }
+
+        return totalCount is null && pagesWithNewAssets > 1
+            ? throw new FormatException($"{lastQuery.Name} for {lastQuery.Subject} spread the list over pages with no totalCount")
+            : assets;
+    }
+
+    private static long? TotalCountOf(JsonElement page) => KalturaJson.WholeNumber(KalturaJson.Property(page, "totalCount"));
 }

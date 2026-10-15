@@ -38,6 +38,10 @@ public static class KalturaQueries
         });
 
     /// <summary>One page of a series' episodes, ordered by their <c>EpisodeNumber</c> sort index.</summary>
+    /// <remarks>The index ties across seasons, so a tied episode may sit on both sides of a page
+    /// boundary; <see cref="KalturaOttClient.ListAllAsync"/> keeps it once and checks the total.
+    /// Kaltura offers no order without ties: names, creation dates and a creation-date tie-breaker
+    /// all repeat within a long show (checked live on series 57, 2026-10-16).</remarks>
     /// <exception cref="ArgumentException"><paramref name="seriesId"/> is not a Kaltura id.</exception>
     public static KalturaQuery EpisodesPage(string seriesId, int pageIndex) =>
         new(AssetService, ListAction, $"series {seriesId} episodes page {pageIndex}", new JsonObject

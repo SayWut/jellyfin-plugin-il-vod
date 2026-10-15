@@ -170,7 +170,7 @@ public class KalturaOttClientTests
     }
 
     [Fact]
-    public async Task ListingStopsAtAnEmptyPageEvenWhenTheTotalCountPromisedMore()
+    public async Task AWalkThatEndsShortOfTheTotalCountIsAFormatExceptionNamingTheCountsNeverTheSession()
     {
         FakeReshet13Http http = new();
         http.RespondToPost(LoginUrl, Any, LoginJson);
@@ -178,10 +178,82 @@ public class KalturaOttClientTests
         http.RespondToPost(ListUrl, IsPage(2), ListAnswer(totalCount: 5));
         KalturaOttClient client = CreateClient(http);
 
+        FormatException exception = await Assert.ThrowsAsync<FormatException>(
+            () => client.ListAllAsync(KalturaQueries.SeriesPage, CancellationToken.None));
+
+        Assert.Contains("1 of 5", exception.Message, StringComparison.Ordinal);
+        Assert.DoesNotContain(Ks, exception.Message, StringComparison.Ordinal);
+        Assert.Equal(2, http.Posts.Count(call => call.Url == ListUrl));
+    }
+
+    [Fact]
+    public async Task AnAssetRepeatedOnALaterPageIsListedOnce()
+    {
+        // Kaltura orders episodes by EpisodeNumber, which ties across seasons, so a tied asset can
+        // land on both sides of a page boundary.
+        FakeReshet13Http http = new();
+        http.RespondToPost(LoginUrl, Any, LoginJson);
+        http.RespondToPost(ListUrl, IsPage(1), ListAnswer(totalCount: 3, "{\"id\":1}", "{\"id\":2}"));
+        http.RespondToPost(ListUrl, IsPage(2), ListAnswer(totalCount: 3, "{\"id\":2}", "{\"id\":3}"));
+        KalturaOttClient client = CreateClient(http);
+
         IReadOnlyList<JsonElement> assets = await client.ListAllAsync(KalturaQueries.SeriesPage, CancellationToken.None);
 
-        Assert.Single(assets);
+        Assert.Equal([1, 2, 3], assets.Select(asset => asset.GetProperty("id").GetInt32()));
+    }
+
+    [Fact]
+    public async Task ARepeatThatPushedAnAssetOffEveryPageIsAFormatException()
+    {
+        FakeReshet13Http http = new();
+        http.RespondToPost(LoginUrl, Any, LoginJson);
+        http.RespondToPost(ListUrl, IsPage(1), ListAnswer(totalCount: 3, "{\"id\":1}", "{\"id\":2}"));
+        http.RespondToPost(ListUrl, IsPage(2), ListAnswer(totalCount: 3, "{\"id\":2}"));
+        KalturaOttClient client = CreateClient(http);
+
+        await Assert.ThrowsAsync<FormatException>(
+            () => client.ListAllAsync(KalturaQueries.SeriesPage, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task APageOfNothingButRepeatsEndsTheWalk()
+    {
+        FakeReshet13Http http = new();
+        http.RespondToPost(LoginUrl, Any, LoginJson);
+        http.RespondToPost(ListUrl, Any, ListAnswer(totalCount: 3, "{\"id\":1}"));
+        KalturaOttClient client = CreateClient(http);
+
+        await Assert.ThrowsAsync<FormatException>(
+            () => client.ListAllAsync(KalturaQueries.SeriesPage, CancellationToken.None));
         Assert.Equal(2, http.Posts.Count(call => call.Url == ListUrl));
+    }
+
+    [Fact]
+    public async Task WithoutATotalCountOnePageOfAssetsIsTheWholeList()
+    {
+        FakeReshet13Http http = new();
+        http.RespondToPost(LoginUrl, Any, LoginJson);
+        http.RespondToPost(ListUrl, IsPage(1), ListAnswerWithoutTotalCount("{\"id\":1}", "{\"id\":2}"));
+        http.RespondToPost(ListUrl, IsPage(2), ListAnswerWithoutTotalCount());
+        KalturaOttClient client = CreateClient(http);
+
+        IReadOnlyList<JsonElement> assets = await client.ListAllAsync(KalturaQueries.SeriesPage, CancellationToken.None);
+
+        Assert.Equal(2, assets.Count);
+    }
+
+    [Fact]
+    public async Task WithoutATotalCountAWalkOverSeveralPagesIsAFormatException()
+    {
+        FakeReshet13Http http = new();
+        http.RespondToPost(LoginUrl, Any, LoginJson);
+        http.RespondToPost(ListUrl, IsPage(1), ListAnswerWithoutTotalCount("{\"id\":1}"));
+        http.RespondToPost(ListUrl, IsPage(2), ListAnswerWithoutTotalCount("{\"id\":2}"));
+        http.RespondToPost(ListUrl, IsPage(3), ListAnswerWithoutTotalCount());
+        KalturaOttClient client = CreateClient(http);
+
+        await Assert.ThrowsAsync<FormatException>(
+            () => client.ListAllAsync(KalturaQueries.SeriesPage, CancellationToken.None));
     }
 
     /// <summary>The two saved session errors as Kaltura sent them; any other code in the same shape.</summary>
@@ -194,6 +266,9 @@ public class KalturaOttClientTests
 
     internal static string ListAnswer(int totalCount, params string[] objects) =>
         $"{{\"executionTime\":0.01,\"result\":{{\"objectType\":\"KalturaAssetListResponse\",\"totalCount\":{totalCount},\"objects\":[{string.Join(',', objects)}]}}}}";
+
+    private static string ListAnswerWithoutTotalCount(params string[] objects) =>
+        $"{{\"executionTime\":0.01,\"result\":{{\"objectType\":\"KalturaAssetListResponse\",\"objects\":[{string.Join(',', objects)}]}}}}";
 
     private static KalturaOttClient CreateClient(FakeReshet13Http http) =>
         new(http, new RecordingLogger<KalturaOttClient>());
