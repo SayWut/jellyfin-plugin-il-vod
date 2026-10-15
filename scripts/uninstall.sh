@@ -3,7 +3,7 @@
 #   SSH_HOST=<ip> SSH_USER=<user> ./scripts/uninstall.sh
 set -euo pipefail
 
-PLUGIN_FOLDER_GLOB='Mako_*'
+PLUGIN_FOLDER_GLOB='IlVod_*'
 
 HOST="${SSH_HOST:?set SSH_HOST (see oneplus-ssh.personal.md)}"
 USER_="${SSH_USER:?set SSH_USER (see oneplus-ssh.personal.md)}"
@@ -15,7 +15,7 @@ list_cmd=": \"\${HOME:?remote HOME is empty}\"; ls -d \$HOME/config/jellyfin/plu
 found="$("${SSH[@]}" "$list_cmd" || true)"
 
 if [ -z "$found" ]; then
-    echo "No Mako plugin folder on the phone. Nothing changed."
+    echo "No IL-VOD plugin folder on the phone. Nothing changed."
     exit 0
 fi
 

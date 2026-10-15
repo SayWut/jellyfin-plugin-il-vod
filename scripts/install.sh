@@ -4,7 +4,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PLUGIN_FOLDER="Mako_0.1.0.0"
+PLUGIN_FOLDER="IlVod_0.1.0.0"
 LOCAL_DIR="$PROJECT_ROOT/artifacts/$PLUGIN_FOLDER"
 REMOTE_PLUGINS_RELATIVE='config/jellyfin/plugins'
 REMOTE_PLUGINS_DIR='$HOME/'"$REMOTE_PLUGINS_RELATIVE"
@@ -19,7 +19,7 @@ PORT="${SSH_PORT:-8022}"
 KEY="${SSH_KEY:-$HOME/.ssh/oneplus_media}"
 SSH=(ssh -n -i "$KEY" -p "$PORT" -o ConnectTimeout=10 "$USER_@$HOST")
 
-[ -f "$LOCAL_DIR/Jellyfin.Plugin.Mako.dll" ] || { echo "Nothing to install: run scripts/build.sh first." >&2; exit 1; }
+[ -f "$LOCAL_DIR/Jellyfin.Plugin.IlVod.dll" ] || { echo "Nothing to install: run scripts/build.sh first." >&2; exit 1; }
 
 echo "Copying $PLUGIN_FOLDER to the phone..."
 "${SSH[@]}" "mkdir -p $REMOTE_PLUGINS_DIR/$PLUGIN_FOLDER"
@@ -50,7 +50,7 @@ echo "Waiting for a new Jellyfin process to answer..."
 "
 
 echo "Plugin status:"
-MAKO_STATUS_QUERY='.[] | select(.Name == "Mako") | "\(.Name) \(.Version): \(.Status)"'
+PLUGIN_STATUS_QUERY='.[] | select(.Name == "IL-VOD") | "\(.Name) \(.Version): \(.Status)"'
 if ! plugin_status=$("${SSH[@]}" "
     set -o pipefail
     . \"\$HOME/stack.env\"; . \"\$HOME/stack/lib/api.sh\"
@@ -58,14 +58,14 @@ if ! plugin_status=$("${SSH[@]}" "
     # with the real one, so the API can refuse connections for a moment after first answering.
     curl -sS -f -m 20 --retry $STATUS_QUERY_RETRIES --retry-delay $STATUS_QUERY_RETRY_DELAY_SECONDS --retry-all-errors \
         -H \"\$(jellyfin_auth \"\$JELLYFIN_KEY\")\" \"$JELLYFIN_URL/Plugins\" \
-        | jq -r '$MAKO_STATUS_QUERY'
+        | jq -r '$PLUGIN_STATUS_QUERY'
 "); then
     echo "Could not read /Plugins from Jellyfin (is JELLYFIN_KEY valid?)." >&2
     exit 1
 fi
 
 if [ -z "$plugin_status" ]; then
-    echo "Mako is not listed by /Plugins: the folder was not discovered. Check ~/config/jellyfin/log/ on the phone." >&2
+    echo "IL-VOD is not listed by /Plugins: the folder was not discovered. Check ~/config/jellyfin/log/ on the phone." >&2
     exit 1
 fi
 

@@ -1,8 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="src/Jellyfin.Plugin.Mako/Jellyfin.Plugin.Mako.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/Jellyfin.Plugin.Mako.Tests/Jellyfin.Plugin.Mako.Tests.csproj" />
-  </Folder>
-</Solution>
