@@ -76,102 +76,66 @@
             var page = document.querySelector('#IlVodConfigPage');
             var providers = [];
 
+            // jellyfin-web's emby-* elements come from an old custom-elements polyfill whose
+            // document.createElement takes no options object (it throws on { is: ... }), and
+            // emby-input needs a parent the moment it is created. So every such element is
+            // written as markup into a container that is already on the page.
+            function escapeHtml(text) {
+                return String(text == null ? '' : text)
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            }
+
             function providerName(id) {
                 var match = providers.filter(function (provider) { return provider.Id === id; })[0];
                 return match ? match.DisplayName : id;
             }
 
             function renderProviders(disabledIds) {
-                var container = page.querySelector('#IlVodProviders');
-                container.textContent = '';
-                providers.forEach(function (provider) {
-                    var wrapper = document.createElement('div');
-                    wrapper.className = 'checkboxContainer';
-                    var label = document.createElement('label');
-                    var checkbox = document.createElement('input', { is: 'emby-checkbox' });
-                    checkbox.setAttribute('is', 'emby-checkbox');
-                    checkbox.type = 'checkbox';
-                    checkbox.className = 'ilVodProvider';
-                    checkbox.dataset.providerId = provider.Id;
-                    checkbox.checked = disabledIds.indexOf(provider.Id) === -1;
-                    var text = document.createElement('span');
-                    text.textContent = provider.DisplayName;
-                    label.appendChild(checkbox);
-                    label.appendChild(text);
-                    wrapper.appendChild(label);
-                    container.appendChild(wrapper);
-                });
+                page.querySelector('#IlVodProviders').innerHTML = providers.map(function (provider) {
+                    var checked = disabledIds.indexOf(provider.Id) === -1 ? ' checked' : '';
+                    return '<div class="checkboxContainer"><label>'
+                        + '<input is="emby-checkbox" type="checkbox" class="ilVodProvider" data-provider-id="' + escapeHtml(provider.Id) + '"' + checked + ' />'
+                        + '<span>' + escapeHtml(provider.DisplayName) + '</span>'
+                        + '</label></div>';
+                }).join('');
             }
 
-            function textInput(value, placeholder, className) {
-                var input = document.createElement('input', { is: 'emby-input' });
-                input.setAttribute('is', 'emby-input');
-                input.type = 'text';
-                input.className = className;
-                input.value = value || '';
-                input.placeholder = placeholder || '';
-                return input;
+            function sharedNameInput(value, placeholder) {
+                return '<input is="emby-input" type="text" class="ilVodSharedName" list="IlVodSharedCategories"'
+                    + ' value="' + escapeHtml(value) + '" placeholder="' + escapeHtml(placeholder) + '" />';
             }
 
             // A row the provider's defaults name: the provider's category is fixed text.
             function addDefaultRow(providerId, sourceName, defaultName, overrideName) {
-                var row = document.createElement('tr');
-                row.dataset.providerId = providerId;
-                row.dataset.sourceName = sourceName;
-                row.dataset.defaultName = defaultName;
-                var provider = document.createElement('td');
-                provider.textContent = providerName(providerId);
-                var source = document.createElement('td');
-                source.textContent = sourceName;
-                var shared = document.createElement('td');
-                var input = textInput(overrideName, defaultName, 'ilVodSharedName');
-                input.setAttribute('list', 'IlVodSharedCategories');
-                shared.appendChild(input);
-                row.appendChild(provider);
-                row.appendChild(source);
-                row.appendChild(shared);
-                page.querySelector('#IlVodCategories').appendChild(row);
+                page.querySelector('#IlVodCategories').insertAdjacentHTML('beforeend',
+                    '<tr data-provider-id="' + escapeHtml(providerId) + '" data-source-name="' + escapeHtml(sourceName) + '"'
+                    + ' data-default-name="' + escapeHtml(defaultName) + '">'
+                    + '<td>' + escapeHtml(providerName(providerId)) + '</td>'
+                    + '<td>' + escapeHtml(sourceName) + '</td>'
+                    + '<td>' + sharedNameInput(overrideName, defaultName) + '</td>'
+                    + '</tr>');
             }
 
             // A row the user adds for a category the provider's defaults do not name.
             function addCustomRow(providerId, sourceName, sharedName) {
-                var row = document.createElement('tr');
-                row.dataset.custom = 'true';
-                var provider = document.createElement('td');
-                var select = document.createElement('select', { is: 'emby-select' });
-                select.setAttribute('is', 'emby-select');
-                select.className = 'ilVodProviderId';
-                providers.forEach(function (candidate) {
-                    var option = document.createElement('option');
-                    option.value = candidate.Id;
-                    option.textContent = candidate.DisplayName;
-                    select.appendChild(option);
-                });
-                if (providerId) {
-                    select.value = providerId;
-                }
-                provider.appendChild(select);
-                var source = document.createElement('td');
-                source.appendChild(textInput(sourceName, '', 'ilVodSourceName'));
-                var shared = document.createElement('td');
-                var input = textInput(sharedName, '', 'ilVodSharedName');
-                input.setAttribute('list', 'IlVodSharedCategories');
-                shared.appendChild(input);
-                row.appendChild(provider);
-                row.appendChild(source);
-                row.appendChild(shared);
-                page.querySelector('#IlVodCategories').appendChild(row);
+                var options = providers.map(function (candidate) {
+                    var selected = candidate.Id === providerId ? ' selected' : '';
+                    return '<option value="' + escapeHtml(candidate.Id) + '"' + selected + '>' + escapeHtml(candidate.DisplayName) + '</option>';
+                }).join('');
+                page.querySelector('#IlVodCategories').insertAdjacentHTML('beforeend',
+                    '<tr data-custom="true">'
+                    + '<td><select is="emby-select" class="ilVodProviderId">' + options + '</select></td>'
+                    + '<td><input is="emby-input" type="text" class="ilVodSourceName" value="' + escapeHtml(sourceName) + '" /></td>'
+                    + '<td>' + sharedNameInput(sharedName, '') + '</td>'
+                    + '</tr>');
             }
 
             function renderCategories(overrides, sharedCategories) {
-                page.querySelector('#IlVodCategories').textContent = '';
-                var list = page.querySelector('#IlVodSharedCategories');
-                list.textContent = '';
-                sharedCategories.forEach(function (name) {
-                    var option = document.createElement('option');
-                    option.value = name;
-                    list.appendChild(option);
-                });
+                page.querySelector('#IlVodCategories').innerHTML = '';
+                page.querySelector('#IlVodSharedCategories').innerHTML = sharedCategories.map(function (name) {
+                    return '<option value="' + escapeHtml(name) + '"></option>';
+                }).join('');
 
                 var shown = {};
                 providers.forEach(function (provider) {
@@ -209,6 +173,13 @@
                 return overrides;
             }
 
+            // Whatever goes wrong, the loading animation stops and the reason is shown.
+            function showFailure(error) {
+                Dashboard.hideLoadingMsg();
+                console.error('IL-VOD settings:', error);
+                Dashboard.alert({ title: 'IL-VOD', message: 'The settings could not be loaded or saved: ' + (error && error.message ? error.message : error) });
+            }
+
             page.addEventListener('pageshow', function () {
                 Dashboard.showLoadingMsg();
                 Promise.all([
@@ -223,7 +194,7 @@
                     page.querySelector('#CatalogueCacheHours').value = mako.CatalogueCacheHours;
                     page.querySelector('#AppVersion').value = mako.AppVersion || '';
                     Dashboard.hideLoadingMsg();
-                });
+                }).catch(showFailure);
             });
 
             page.querySelector('#IlVodAddCategory').addEventListener('click', function () {
@@ -244,10 +215,10 @@
                     config.Mako = config.Mako || {};
                     config.Mako.CatalogueCacheHours = parseInt(page.querySelector('#CatalogueCacheHours').value, 10);
                     config.Mako.AppVersion = page.querySelector('#AppVersion').value.trim();
-                    ApiClient.updatePluginConfiguration(IlVodConfig.pluginUniqueId, config).then(function (result) {
+                    return ApiClient.updatePluginConfiguration(IlVodConfig.pluginUniqueId, config).then(function (result) {
                         Dashboard.processPluginConfigurationUpdateResult(result);
                     });
-                });
+                }).catch(showFailure);
                 return false;
             });
         })();
