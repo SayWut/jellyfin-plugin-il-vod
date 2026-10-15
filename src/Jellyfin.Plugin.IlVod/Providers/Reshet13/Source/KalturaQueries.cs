@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Reshet13.Source;
@@ -43,14 +44,16 @@ public static class KalturaQueries
     /// Kaltura offers no order without ties: names, creation dates and a creation-date tie-breaker
     /// all repeat within a long show (checked live on series 57, 2026-10-16).</remarks>
     /// <exception cref="ArgumentException"><paramref name="seriesId"/> is not a Kaltura id.</exception>
-    public static KalturaQuery EpisodesPage(string seriesId, int pageIndex) =>
-        new(AssetService, ListAction, $"series {seriesId} episodes page {pageIndex}", new JsonObject
+    public static KalturaQuery EpisodesPage(string seriesId, int pageIndex)
+    {
+        string checkedSeriesId = RequireWellFormed(seriesId);
+        return new(AssetService, ListAction, $"series {checkedSeriesId} episodes page {pageIndex}", new JsonObject
         {
             ["filter"] = new JsonObject
             {
                 ["objectType"] = "KalturaSearchAssetFilter",
                 ["typeIn"] = EpisodeAssetType,
-                ["kSql"] = AssetsOfSeries(seriesId, EpisodeAssetType),
+                ["kSql"] = AssetsOfSeries(checkedSeriesId, EpisodeAssetType),
                 ["dynamicOrderBy"] = new JsonObject
                 {
                     ["objectType"] = "KalturaDynamicOrderBy",
@@ -60,31 +63,40 @@ public static class KalturaQueries
             },
             ["pager"] = Pager(pageIndex, ListPageSize),
         });
+    }
 
     /// <summary>One page of a series' season assets — read only for their names.</summary>
     /// <exception cref="ArgumentException"><paramref name="seriesId"/> is not a Kaltura id.</exception>
-    public static KalturaQuery SeasonAssetsPage(string seriesId, int pageIndex) =>
-        new(AssetService, ListAction, $"series {seriesId} season assets page {pageIndex}", new JsonObject
+    public static KalturaQuery SeasonAssetsPage(string seriesId, int pageIndex)
+    {
+        string checkedSeriesId = RequireWellFormed(seriesId);
+        return new(AssetService, ListAction, $"series {checkedSeriesId} season assets page {pageIndex}", new JsonObject
         {
             ["filter"] = new JsonObject
             {
                 ["objectType"] = "KalturaSearchAssetFilter",
-                ["kSql"] = AssetsOfSeries(seriesId, SeasonAssetType),
+                ["kSql"] = AssetsOfSeries(checkedSeriesId, SeasonAssetType),
             },
             ["pager"] = Pager(pageIndex, SeasonAssetPageSize),
         });
+    }
 
     /// <summary>One asset by its own id.</summary>
     /// <exception cref="ArgumentException"><paramref name="assetId"/> is not a Kaltura id.</exception>
-    public static KalturaQuery Asset(string assetId) =>
-        new(AssetService, GetAction, $"asset {RequireWellFormed(assetId)}", new JsonObject
+    public static KalturaQuery Asset(string assetId)
+    {
+        string checkedAssetId = RequireWellFormed(assetId);
+        return new(AssetService, GetAction, $"asset {checkedAssetId}", new JsonObject
         {
-            ["id"] = assetId,
+            ["id"] = checkedAssetId,
             ["assetReferenceType"] = "media",
         });
+    }
 
-    private static string AssetsOfSeries(string seriesId, string assetType) =>
-        $"(and SeriesID = '{RequireWellFormed(seriesId)}' asset_type = '{assetType}')";
+    /// <param name="checkedSeriesId">An id already through <see cref="RequireWellFormed"/>: it is
+    /// spliced into the <c>kSql</c> text.</param>
+    private static string AssetsOfSeries(string checkedSeriesId, string assetType) =>
+        $"(and SeriesID = '{checkedSeriesId}' asset_type = '{assetType}')";
 
     private static JsonObject Pager(int pageIndex, int pageSize) => new()
     {
@@ -93,9 +105,10 @@ public static class KalturaQueries
         ["pageSize"] = pageSize,
     };
 
-    /// <summary>The guard that keeps an id from Jellyfin from ever rewriting a <c>kSql</c> filter.</summary>
-    private static string RequireWellFormed(string id) =>
+    /// <summary>The guard that keeps an id from Jellyfin from ever rewriting a <c>kSql</c> filter:
+    /// every factory passes its id through here once, first, and uses only what comes back.</summary>
+    private static string RequireWellFormed(string id, [CallerArgumentExpression(nameof(id))] string parameterName = "") =>
         KalturaIds.IsWellFormed(id)
             ? id
-            : throw new ArgumentException($"'{id}' is not a Kaltura id", nameof(id));
+            : throw new ArgumentException($"'{id}' is not a Kaltura id", parameterName);
 }
