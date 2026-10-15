@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
 using System.Text.Json;
+using Jellyfin.Plugin.IlVod.Hls;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
@@ -71,7 +72,7 @@ public sealed class StreamResolver
             ? await AuthorizeAsync(config, episode, media, cancellationToken).ConfigureAwait(false)
             : media.Url;
 
-        (MakoStreamVariant? variant, TimeSpan? duration) = await DescribeMasterPlaylistAsync(finalUrl, cancellationToken).ConfigureAwait(false);
+        (HlsVariant? variant, TimeSpan? duration) = await DescribeMasterPlaylistAsync(finalUrl, cancellationToken).ConfigureAwait(false);
 
         _logger.LogInformation(
             "mako: resolved stream for {VcmId} (protected: {Protected}, cdn: {Cdn})",
@@ -281,7 +282,7 @@ public sealed class StreamResolver
     /// playback; <c>MakoTransformer</c> then describes it as mako's default. Never logs
     /// <paramref name="finalUrl"/> itself, only its redacted host and path (N3).
     /// </summary>
-    private async Task<(MakoStreamVariant? Variant, TimeSpan? Duration)> DescribeMasterPlaylistAsync(string finalUrl, CancellationToken cancellationToken)
+    private async Task<(HlsVariant? Variant, TimeSpan? Duration)> DescribeMasterPlaylistAsync(string finalUrl, CancellationToken cancellationToken)
     {
         try
         {

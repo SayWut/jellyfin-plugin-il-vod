@@ -1,8 +1,7 @@
-using Jellyfin.Plugin.IlVod.Providers.Mako;
-using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
+using Jellyfin.Plugin.IlVod.Hls;
 using Jellyfin.Plugin.IlVod.Tests.Support;
 
-namespace Jellyfin.Plugin.IlVod.Tests.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Tests.Hls;
 
 public class MasterPlaylistTests
 {
@@ -11,7 +10,7 @@ public class MasterPlaylistTests
     [Fact]
     public void PicksTheHighestBandwidthVariant()
     {
-        MakoStreamVariant description = MasterPlaylist.Describe(FixturePlaylist)!;
+        HlsVariant description = MasterPlaylist.Describe(FixturePlaylist)!;
 
         Assert.Equal(576, description.Width);
         Assert.Equal(432, description.Height);
@@ -21,7 +20,7 @@ public class MasterPlaylistTests
     [Fact]
     public void FallsBackToMainWhenThereAreNoCodecs()
     {
-        MakoStreamVariant description = MasterPlaylist.Describe(FixturePlaylist)!;
+        HlsVariant description = MasterPlaylist.Describe(FixturePlaylist)!;
 
         Assert.Equal("Main", description.VideoProfile);
         Assert.Null(description.VideoLevel);
@@ -38,7 +37,7 @@ public class MasterPlaylistTests
             variant.m3u8
             """;
 
-        MakoStreamVariant description = MasterPlaylist.Describe(playlist)!;
+        HlsVariant description = MasterPlaylist.Describe(playlist)!;
 
         Assert.Equal("High", description.VideoProfile);
         Assert.Equal(3.1, description.VideoLevel);

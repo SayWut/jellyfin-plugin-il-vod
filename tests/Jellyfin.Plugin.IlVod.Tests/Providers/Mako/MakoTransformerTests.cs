@@ -1,7 +1,8 @@
 using System.Reflection;
 using Jellyfin.Plugin.IlVod.Core;
-using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Hls;
 using Jellyfin.Plugin.IlVod.Providers.Mako.Transform;
+using Jellyfin.Plugin.IlVod.Providers.Mako;
 
 namespace Jellyfin.Plugin.IlVod.Tests.Providers.Mako;
 
@@ -81,7 +82,7 @@ public class MakoTransformerTests
     [Fact]
     public void AStreamWithAVariantIsDescribedFromItInMakosFormat()
     {
-        MakoResolvedStream stream = new("https://cdn/master.m3u8", new MakoStreamVariant(1920, 1080, 5_000_000, "High", 4.0), TimeSpan.FromMinutes(25));
+        MakoResolvedStream stream = new("https://cdn/master.m3u8", new HlsVariant(1920, 1080, 5_000_000, "High", 4.0), TimeSpan.FromMinutes(25));
 
         StreamLink link = Transformer.ToStreamLink(stream);
 

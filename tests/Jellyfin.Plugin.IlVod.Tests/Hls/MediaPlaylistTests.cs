@@ -1,6 +1,6 @@
-using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
+using Jellyfin.Plugin.IlVod.Hls;
 
-namespace Jellyfin.Plugin.IlVod.Tests.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Tests.Hls;
 
 public class MediaPlaylistTests
 {

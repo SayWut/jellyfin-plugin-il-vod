@@ -1,4 +1,5 @@
 using Jellyfin.Plugin.IlVod.Core;
+using Jellyfin.Plugin.IlVod.Hls;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Mako;
 
@@ -6,7 +7,7 @@ namespace Jellyfin.Plugin.IlVod.Providers.Mako;
 public static class MakoStreams
 {
     /// <summary>The H.264 profile assumed when a master playlist names no <c>CODECS</c>.</summary>
-    public const string UnmeasuredProfile = "Main";
+    public const string UnmeasuredProfile = MasterPlaylist.UnmeasuredProfile;
 
     /// <summary>
     /// mako serves planar 8-bit H.264 in an MP4-style (length-prefixed, not Annex B) bitstream,

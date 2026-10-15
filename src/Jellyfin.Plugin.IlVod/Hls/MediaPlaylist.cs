@@ -1,10 +1,10 @@
 using System.Globalization;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
+namespace Jellyfin.Plugin.IlVod.Hls;
 
 /// <summary>
-/// An HLS media (variant) playlist — the one that lists segments. mako states an episode's
-/// length nowhere in its own data, so this is the only place it can be measured.
+/// An HLS media (variant) playlist — the one that lists segments: where an episode's length can be
+/// measured when a provider states it nowhere in its own data (mako does not).
 /// </summary>
 public static class MediaPlaylist
 {

@@ -1,3 +1,5 @@
+using Jellyfin.Plugin.IlVod.Hls;
+
 namespace Jellyfin.Plugin.IlVod.Providers.Mako;
 
 // mako's content in its own terms: what Source/ reads off mako's pages and Transform/ turns into
@@ -28,9 +30,6 @@ public sealed record MakoEpisodeEntry(EpisodeKey Key, string Title, string? Extr
 /// which the episode entries carry themselves.</summary>
 public sealed record MakoSeasonPage(string ShowName, int SeasonNumber, IReadOnlyList<MakoEpisodeEntry> Episodes);
 
-/// <summary>The highest-bandwidth variant of a master playlist, as far as it describes itself.</summary>
-public sealed record MakoStreamVariant(int? Width, int? Height, int? BitsPerSecond, string VideoProfile, double? VideoLevel);
-
 /// <summary>What pressing play resolved to: the final (possibly signed) URL, the stream's best
 /// variant when the master playlist could be read, and the length when it could be measured.</summary>
-public sealed record MakoResolvedStream(string Url, MakoStreamVariant? Variant, TimeSpan? Duration);
+public sealed record MakoResolvedStream(string Url, HlsVariant? Variant, TimeSpan? Duration);

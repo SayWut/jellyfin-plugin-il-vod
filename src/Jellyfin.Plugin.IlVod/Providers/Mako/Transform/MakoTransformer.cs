@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Jellyfin.Plugin.IlVod.Core;
+using Jellyfin.Plugin.IlVod.Hls;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Mako.Transform;
 

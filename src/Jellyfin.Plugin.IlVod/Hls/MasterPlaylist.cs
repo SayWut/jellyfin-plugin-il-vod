@@ -1,14 +1,17 @@
 using System.Globalization;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
+namespace Jellyfin.Plugin.IlVod.Hls;
 
 /// <summary>
 /// Reads the highest-bandwidth variant of an HLS master playlist and turns its resolution,
-/// bitrate and (when present) H.264 <c>CODECS</c> attribute into a <see cref="MakoStreamVariant"/>,
+/// bitrate and (when present) H.264 <c>CODECS</c> attribute into a <see cref="HlsVariant"/>,
 /// from which Jellyfin is told whether it can copy the video instead of re-encoding it (spec §5.2).
 /// </summary>
 public static class MasterPlaylist
 {
+    /// <summary>The H.264 profile assumed when a variant names no <c>CODECS</c>.</summary>
+    public const string UnmeasuredProfile = "Main";
+
     private const string StreamInfTag = "#EXT-X-STREAM-INF:";
     private const string BandwidthAttribute = "BANDWIDTH";
     private const string ResolutionAttribute = "RESOLUTION";
@@ -31,7 +34,7 @@ public static class MasterPlaylist
         };
 
     /// <summary>The highest-bandwidth variant; <c>null</c> when the playlist lists none.</summary>
-    public static MakoStreamVariant? Describe(string masterPlaylistText) =>
+    public static HlsVariant? Describe(string masterPlaylistText) =>
         ParseVariants(masterPlaylistText).MaxBy(variant => variant.BitsPerSecond) is { } best
             ? Describe(best)
             : null;
@@ -44,10 +47,10 @@ public static class MasterPlaylist
             .MaxBy(variant => variant.BitsPerSecond)
             ?.Uri;
 
-    private static MakoStreamVariant Describe(StreamVariant variant)
+    private static HlsVariant Describe(StreamVariant variant)
     {
         (string profile, double? level) = ProfileAndLevelFrom(variant.Codecs);
-        return new MakoStreamVariant(variant.Width, variant.Height, variant.BitsPerSecond, profile, level);
+        return new HlsVariant(variant.Width, variant.Height, variant.BitsPerSecond, profile, level);
     }
 
     private static IEnumerable<StreamVariant> ParseVariants(string masterPlaylistText)
@@ -102,13 +105,13 @@ public static class MasterPlaylist
         string hexBytes = avcCodec?[AvcCodecPrefix.Length..] ?? string.Empty;
         if (hexBytes.Length < AvcCodecHexLength)
         {
-            return (MakoStreams.UnmeasuredProfile, null);
+            return (UnmeasuredProfile, null);
         }
 
         string profileByte = hexBytes[..2];
         string levelByte = hexBytes[4..6];
 
-        string profile = VideoProfileByAvcProfileByte.GetValueOrDefault(profileByte, MakoStreams.UnmeasuredProfile);
+        string profile = VideoProfileByAvcProfileByte.GetValueOrDefault(profileByte, UnmeasuredProfile);
         double? level = int.TryParse(levelByte, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int levelValue)
             ? levelValue / LevelHexDivisor
             : null;
