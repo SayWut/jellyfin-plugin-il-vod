@@ -91,6 +91,26 @@ public class KalturaAssetsTests
     }
 
     [Fact]
+    public void ANegativeIndexIsNoIndexSoTheEpisodeLandsInASeasonThatOpens()
+    {
+        string asset = """{"id":5,"name":"x","metas":{"SeasonNumber":{"value":-1},"EpisodeNumber":{"value":"-3"}}}""";
+
+        Reshet13Episode episode = KalturaAssets.ParseEpisode(Element(asset));
+
+        Assert.Null(episode.SeasonIndex);
+        Assert.Null(episode.EpisodeIndex);
+        Assert.Equal(Reshet13SeasonId.NoSeason, Reshet13SeasonId.Of(episode.SeasonIndex));
+    }
+
+    [Fact]
+    public void ASeasonAssetWithANegativeIndexLendsNoName()
+    {
+        string asset = """{"id":5,"name":"עונה 9","metas":{"SeasonNumber":{"value":-1}}}""";
+
+        Assert.Empty(KalturaAssets.ParseSeasonNames([Element(asset)]));
+    }
+
+    [Fact]
     public void EveryEpisodeOfTheFixtureIsReadInKalturasOrder()
     {
         IReadOnlyList<Reshet13Episode> episodes = EpisodesOf57();

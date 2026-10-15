@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using Jellyfin.Plugin.IlVod.Cache;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Hls;
+using Jellyfin.Plugin.IlVod.Net;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Reshet13.Source;
@@ -89,13 +90,14 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
         return new Reshet13SeasonPage(
             ShowNameOf(showId, showPage),
             seasonIndex,
-            SeasonAssetNameOf(showPage, seasonIndex),
+            showPage.SeasonAssetNameOf(seasonIndex),
             [.. showPage.Episodes.Where(episode => episode.SeasonIndex == seasonIndex)]);
     }
 
     /// <summary>
     /// The clean manifest of the episode's video, described from its master playlist. The episode
-    /// comes from an opened show when it can, else from one <c>asset/get</c>.
+    /// comes from an opened show when it can, else from one <c>asset/get</c>; one that states no
+    /// length costs one more request, to measure it.
     /// </summary>
     /// <exception cref="StreamUnavailableException"><paramref name="episodeId"/> is not an asset id,
     /// not an episode, or has no HLS file to play.</exception>
@@ -112,9 +114,8 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
 
         string manifestUrl = Reshet13Urls.CleanManifest(
             episode.EntryId ?? throw new StreamUnavailableException($"reshet13 asset {episodeId} has no HLS file"));
-        HlsVariant? variant = await DescribeManifestAsync(manifestUrl, cancellationToken).ConfigureAwait(false);
 
-        return new Reshet13Stream(manifestUrl, variant, episode.Duration);
+        return await DescribeStreamAsync(manifestUrl, episode.Duration, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -175,9 +176,6 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
         }
     }
 
-    private static string? SeasonAssetNameOf(Reshet13ShowPage showPage, int? seasonIndex) =>
-        seasonIndex is int index && showPage.SeasonAssetNames.TryGetValue(index, out string? name) ? name : null;
-
     private string ShowNameOf(string showId, Reshet13ShowPage showPage) =>
         showPage.Episodes.Select(episode => episode.SeriesName).FirstOrDefault(name => !string.IsNullOrEmpty(name))
             ?? CachedSeriesNameOf(showId)
@@ -205,21 +203,65 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
     }
 
     /// <summary>
+    /// The stream described from its master playlist, and its length: Kaltura's when it states
+    /// one, else measured from the best variant — one more request, and only in that case.
+    /// </summary>
+    private async Task<Reshet13Stream> DescribeStreamAsync(string manifestUrl, TimeSpan? statedDuration, CancellationToken cancellationToken)
+    {
+        if (await ReadMasterPlaylistAsync(manifestUrl, cancellationToken).ConfigureAwait(false) is not string masterPlaylistText)
+        {
+            return new Reshet13Stream(manifestUrl, null, statedDuration);
+        }
+
+        TimeSpan? duration = statedDuration
+            ?? await MeasureDurationAsync(manifestUrl, masterPlaylistText, cancellationToken).ConfigureAwait(false);
+        return new Reshet13Stream(manifestUrl, MasterPlaylist.Describe(masterPlaylistText), duration);
+    }
+
+    /// <summary>
     /// Best-effort, the same ruling as mako's <c>StreamResolver</c>: the manifest URL is right
     /// whether or not its playlist could be read just now, so a failure leaves the stream
     /// undescribed (no variant) rather than failing playback; the player reads the playlist itself.
     /// </summary>
-    private async Task<HlsVariant?> DescribeManifestAsync(string manifestUrl, CancellationToken cancellationToken)
+    private async Task<string?> ReadMasterPlaylistAsync(string manifestUrl, CancellationToken cancellationToken)
     {
         try
         {
-            return MasterPlaylist.Describe(await _http.GetTextAsync(manifestUrl, cancellationToken).ConfigureAwait(false));
+            return await _http.GetTextAsync(manifestUrl, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             _logger.LogWarning(
                 "reshet13: could not describe the master playlist at {HostAndPath} ({Reason}); using the default stream description",
-                Reshet13Urls.RedactedUrl(manifestUrl),
+                SafeUrl.Redacted(manifestUrl),
+                exception.GetType().Name);
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Jellyfin treats a source with no run time as a live stream — players join late and cannot
+    /// rewind — so an episode Kaltura states no length for is measured the way mako's are: the
+    /// best variant playlist lists every segment, and their sum is the length. Best-effort too: a
+    /// failure leaves the length unstated rather than failing playback.
+    /// </summary>
+    private async Task<TimeSpan?> MeasureDurationAsync(string manifestUrl, string masterPlaylistText, CancellationToken cancellationToken)
+    {
+        if (MasterPlaylist.BestVariantUri(masterPlaylistText) is not string variantUri
+            || !Uri.TryCreate(new Uri(manifestUrl), variantUri, out Uri? variantUrl))
+        {
+            return null;
+        }
+
+        try
+        {
+            return MediaPlaylist.TotalDuration(await _http.GetTextAsync(variantUrl.AbsoluteUri, cancellationToken).ConfigureAwait(false));
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            _logger.LogWarning(
+                "reshet13: could not measure the length from {HostAndPath} ({Reason}); Jellyfin will treat the stream as live",
+                SafeUrl.Redacted(variantUrl.AbsoluteUri),
                 exception.GetType().Name);
             return null;
         }

@@ -39,7 +39,7 @@ public sealed class Reshet13Transformer : IContentTransformer<Reshet13ShowIndex,
     public IReadOnlyList<Season> ToSeasons(Reshet13ShowPage showPage) =>
         showPage.Episodes
             .GroupBy(episode => episode.SeasonIndex)
-            .Select(season => ToSeason(season.Key, SeasonAssetNameOf(showPage, season.Key), season.ToList()))
+            .Select(season => ToSeason(season.Key, showPage.SeasonAssetNameOf(season.Key), season.ToList()))
             .OrderBy(season => season.Number)
             .ThenBy(season => season.Name, StringComparer.Ordinal)
             .ToList();
@@ -70,9 +70,6 @@ public sealed class Reshet13Transformer : IContentTransformer<Reshet13ShowIndex,
 
     private static Show ToShow(Reshet13Series series) =>
         new(series.SeriesId, series.Name, KalturaImages.PosterUrl(series.Images), series.Overview, series.Genres);
-
-    private static string? SeasonAssetNameOf(Reshet13ShowPage showPage, int? seasonIndex) =>
-        seasonIndex is { } index ? showPage.SeasonAssetNames.GetValueOrDefault(index) : null;
 
     /// <summary>The one place a season gets its name and number, so the season list and the
     /// episodes filed under it can never disagree.</summary>

@@ -89,28 +89,4 @@ public class MakoUrlsTests
 
         Assert.Equal("https://apps.mako.co.il/mobile/config/12Plus/android/mobile/43.0/mainConfig.json", url);
     }
-
-    [Fact]
-    public void RedactedUrlStripsTheQueryString()
-    {
-        string redacted = MakoUrls.RedactedUrl("https://www.mako.co.il/mako-vod-keshet/shemesh?hdnea=SECRET&platform=mobileApp");
-
-        Assert.Equal("www.mako.co.il/mako-vod-keshet/shemesh", redacted);
-    }
-
-    [Fact]
-    public void RedactedUrlStripsTheFragment()
-    {
-        string redacted = MakoUrls.RedactedUrl("https://www.mako.co.il/mako-vod-keshet/shemesh#player");
-
-        Assert.Equal("www.mako.co.il/mako-vod-keshet/shemesh", redacted);
-    }
-
-    [Fact]
-    public void RedactedUrlOfAMalformedUrlIsThePlaceholderAndNeverThrows()
-    {
-        string redacted = MakoUrls.RedactedUrl("not a url at all");
-
-        Assert.Equal("<unparseable url>", redacted);
-    }
 }

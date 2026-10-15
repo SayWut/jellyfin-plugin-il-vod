@@ -10,7 +10,7 @@ namespace Jellyfin.Plugin.IlVod.Tests.Providers.Reshet13;
 
 public class Reshet13SourceTests
 {
-    private static readonly Reshet13Lifetimes Lifetimes = Reshet13Lifetimes.Default;
+    private static readonly Reshet13Lifetimes Lifetimes = new(Catalogue: TimeSpan.FromHours(24), Show: TimeSpan.FromHours(6));
     private static readonly TimeSpan PastEveryLifetime = TimeSpan.FromDays(2);
 
     private readonly FakeClock _clock = new();
@@ -330,6 +330,49 @@ public class Reshet13SourceTests
         Assert.Null(stream.Variant);
         Assert.Equal(TimeSpan.FromSeconds(3822), stream.Duration);
         Assert.Single(logger.Warnings);
+    }
+
+    [Fact]
+    public async Task AnEpisodeThatStatesNoLengthIsMeasuredFromItsBestVariant()
+    {
+        FakeReshet13Http http = SeededHttp();
+        Reshet13Source source = CreateSource(http);
+        await source.FetchShowAsync(SeriesId, CancellationToken.None);
+
+        Reshet13Stream stream = await source.FetchStreamAsync(UnstatedLengthAssetId, CancellationToken.None);
+
+        Assert.Equal([UnstatedLengthManifestUrl, BestVariantUrl], http.Gets.Select(call => call.Url));
+        Assert.Equal(VariantPlaylistLength, stream.Duration);
+        Assert.Equal(1280, stream.Variant?.Width);
+    }
+
+    [Fact]
+    public async Task AnEpisodeThatStatesItsLengthIsNotMeasured()
+    {
+        FakeReshet13Http http = SeededHttp();
+        Reshet13Source source = CreateSource(http);
+        await source.FetchShowAsync(SeriesId, CancellationToken.None);
+
+        await source.FetchStreamAsync(KnownAssetId, CancellationToken.None);
+
+        Assert.DoesNotContain(http.Gets, call => call.Url == BestVariantUrl);
+    }
+
+    [Fact]
+    public async Task AVariantThatCannotBeReadLeavesTheLengthUnstatedAndNeverNamesItsSignature()
+    {
+        FakeReshet13Http http = SeededHttp();
+        http.FailGet(BestVariantUrl);
+        RecordingLogger<Reshet13Source> logger = new();
+        Reshet13Source source = CreateSource(http, new TimedCache(_clock), logger);
+        await source.FetchShowAsync(SeriesId, CancellationToken.None);
+
+        Reshet13Stream stream = await source.FetchStreamAsync(UnstatedLengthAssetId, CancellationToken.None);
+
+        Assert.Null(stream.Duration);
+        Assert.Equal(1280, stream.Variant?.Width);
+        string warning = Assert.Single(logger.Warnings);
+        Assert.DoesNotContain("Signature", warning, StringComparison.Ordinal);
     }
 
     [Fact]

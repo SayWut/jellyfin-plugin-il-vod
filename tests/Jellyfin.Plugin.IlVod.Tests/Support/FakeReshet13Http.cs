@@ -1,3 +1,4 @@
+using Jellyfin.Plugin.IlVod.Net;
 using Jellyfin.Plugin.IlVod.Providers.Reshet13.Source;
 
 namespace Jellyfin.Plugin.IlVod.Tests.Support;
@@ -60,7 +61,7 @@ public sealed class FakeReshet13Http : IReshet13Http
 
         if (rule.Failing)
         {
-            throw new Reshet13UnavailableException($"HTTP 500 for {Reshet13Urls.RedactedUrl(url)}");
+            throw new Reshet13UnavailableException($"HTTP 500 for {SafeUrl.Redacted(url)}");
         }
 
         return Task.FromResult(rule.Answers.Count > 1 ? rule.Answers.Dequeue() : rule.Answers.Peek());
@@ -71,7 +72,7 @@ public sealed class FakeReshet13Http : IReshet13Http
         Record(new Reshet13Call(GetMethod, url, null));
         if (_failingGets.Contains(url))
         {
-            throw new Reshet13UnavailableException($"HTTP 500 for {Reshet13Urls.RedactedUrl(url)}");
+            throw new Reshet13UnavailableException($"HTTP 500 for {SafeUrl.Redacted(url)}");
         }
 
         return _getResponses.TryGetValue(url, out string? text)

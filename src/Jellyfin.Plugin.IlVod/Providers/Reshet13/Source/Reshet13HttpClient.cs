@@ -1,4 +1,5 @@
 using System.Text;
+using Jellyfin.Plugin.IlVod.Net;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Reshet13.Source;
@@ -38,7 +39,7 @@ public sealed class Reshet13HttpClient : IReshet13Http
     private async Task<string> SendAsync(Func<HttpRequestMessage> createRequest, CancellationToken cancellationToken)
     {
         using HttpRequestMessage request = createRequest();
-        string redactedUrl = Reshet13Urls.RedactedUrl(request.RequestUri!.ToString());
+        string redactedUrl = SafeUrl.Redacted(request.RequestUri!.ToString());
         _logger.LogInformation("reshet13: request {Method} {HostAndPath}", request.Method, redactedUrl);
 
         using HttpResponseMessage response = await SendOrThrowAsync(request, redactedUrl, cancellationToken).ConfigureAwait(false);

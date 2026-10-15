@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Json.Nodes;
 using System.Text.Json;
 using Jellyfin.Plugin.IlVod.Hls;
+using Jellyfin.Plugin.IlVod.Net;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
@@ -295,7 +296,7 @@ public sealed class StreamResolver
             _logger.LogWarning(
                 exception,
                 "mako: could not describe the master playlist at {HostAndPath}; using the default stream description",
-                MakoUrls.RedactedUrl(finalUrl));
+                SafeUrl.Redacted(finalUrl));
             return (null, null);
         }
     }
@@ -324,7 +325,7 @@ public sealed class StreamResolver
         {
             _logger.LogWarning(
                 "mako: could not measure the duration from {HostAndPath} ({Reason}); Jellyfin will treat the stream as live",
-                MakoUrls.RedactedUrl(variantUrl.AbsoluteUri),
+                SafeUrl.Redacted(variantUrl.AbsoluteUri),
                 exception.GetType().Name);
             return null;
         }

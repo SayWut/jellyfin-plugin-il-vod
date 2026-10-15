@@ -1,4 +1,5 @@
 using Jellyfin.Plugin.IlVod.Cache;
+using Jellyfin.Plugin.IlVod.Configuration;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Reshet13;
 using Jellyfin.Plugin.IlVod.Providers.Reshet13.Source;
@@ -44,7 +45,8 @@ public class Reshet13RequestBudgetTests
         await catalog.GetEpisodesAsync(SeriesId, Reshet13SeasonId.NoSeason, CancellationToken.None);
         Assert.Equal(4, http.Calls.Count);
 
-        // | Press play (entry id known from the show page) | + 1 (the manifest GET) |
+        // | Press play (entry id known from the show page) | + 1 (the manifest GET): Kaltura states
+        // this episode's length, so no variant playlist is read to measure it |
         StreamLink link = await catalog.GetStreamLinkAsync(KnownAssetId, CancellationToken.None);
         Assert.Equal(5, http.Calls.Count);
         Assert.Equal(KnownManifestUrl, http.Calls[^1].Url);
@@ -53,6 +55,11 @@ public class Reshet13RequestBudgetTests
         // | Same episode again within the stream-link lifetime | unchanged |
         await catalog.GetStreamLinkAsync(KnownAssetId, CancellationToken.None);
         Assert.Equal(5, http.Calls.Count);
+
+        // | Press play on an episode Kaltura states no length for | + 2 (the manifest, then its best variant, to measure it) |
+        await catalog.GetStreamLinkAsync(UnstatedLengthAssetId, CancellationToken.None);
+        Assert.Equal(7, http.Calls.Count);
+        Assert.Equal(BestVariantUrl, http.Calls[^1].Url);
 
         Assert.Single(http.Calls, call => call.Url == LoginUrl);
     }
@@ -88,7 +95,7 @@ public class Reshet13RequestBudgetTests
             new KalturaOttClient(http, new RecordingLogger<KalturaOttClient>()),
             http,
             new TimedCache(clock),
-            () => Reshet13Lifetimes.Default,
+            () => Reshet13ServiceCollectionExtensions.LifetimesFrom(new PluginConfiguration()),
             new RecordingLogger<Reshet13Source>());
 
         return new SourceCatalog<Reshet13ShowIndex, Reshet13ShowPage, Reshet13SeasonPage, Reshet13Stream>(

@@ -39,7 +39,7 @@ public static partial class KalturaAssets
         Dictionary<int, string> names = [];
         foreach (JsonElement asset in seasonAssets)
         {
-            if (MetaNumber(asset, "SeasonNumber") is int seasonIndex && NonBlank(KalturaJson.String(asset, "name")) is string name)
+            if (MetaSortIndex(asset, "SeasonNumber") is int seasonIndex && NonBlank(KalturaJson.String(asset, "name")) is string name)
             {
                 names.TryAdd(seasonIndex, name);
             }
@@ -68,8 +68,8 @@ public static partial class KalturaAssets
         return new Reshet13Episode(
             assetId,
             name,
-            MetaNumber(asset, "SeasonNumber"),
-            MetaNumber(asset, "EpisodeNumber"),
+            MetaSortIndex(asset, "SeasonNumber"),
+            MetaSortIndex(asset, "EpisodeNumber"),
             TagValues(asset, "SeasonName").FirstOrDefault(),
             TagValues(asset, "SeriesName").FirstOrDefault(),
             hlsFile is JsonElement file ? DurationOf(file) : null,
@@ -114,8 +114,10 @@ public static partial class KalturaAssets
     private static string? MetaString(JsonElement asset, string meta) =>
         MetaValue(asset, meta) is { ValueKind: JsonValueKind.String } value ? value.GetString() : null;
 
-    private static int? MetaNumber(JsonElement asset, string meta) =>
-        KalturaJson.WholeNumber(MetaValue(asset, meta)) is long number and >= int.MinValue and <= int.MaxValue ? (int)number : null;
+    /// <summary>A <c>SeasonNumber</c> or <c>EpisodeNumber</c> sort index. A negative one is no
+    /// index: a season id is the index's digits, and a sign would make a season that never opens.</summary>
+    private static int? MetaSortIndex(JsonElement asset, string meta) =>
+        KalturaJson.WholeNumber(MetaValue(asset, meta)) is long number and >= 0 and <= int.MaxValue ? (int)number : null;
 
     /// <summary>A tag's values (<c>tags.Genre.objects[].value</c>), as the asset lists them.</summary>
     private static IReadOnlyList<string> TagValues(JsonElement asset, string tag) =>

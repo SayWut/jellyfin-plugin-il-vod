@@ -23,26 +23,11 @@ public static class MakoUrls
     private const string ConsumerPlaceholder = "%CONSUMER%";
     private const string PlayerConsumer = "mobileApp";
 
-    /// <summary>What a URL that fails to parse becomes in <see cref="RedactedUrl"/> — building a safe message must never itself throw.</summary>
-    private const string UnparseableUrlPlaceholder = "<unparseable url>";
-
     /// <summary>Never names the offending path: the message reaches a log line and a user-facing warning.</summary>
     private const string NotAMakoPagePathMessage = "not a mako page path";
 
     /// <summary>A minimal, unquestionably safe page path, used only to read a template's own host.</summary>
     private const string HostProbePagePath = "/";
-
-    /// <summary>
-    /// The one place that implements N3 ("never a query string in a log line or exception
-    /// message"): reduces a URL to its host and path, dropping the query string and any fragment.
-    /// A URL that fails to parse never throws — it becomes <see cref="UnparseableUrlPlaceholder"/>
-    /// instead, since a helper whose whole job is building a safe error message must not add a new
-    /// way to fail while doing it.
-    /// </summary>
-    public static string RedactedUrl(string url) =>
-        Uri.TryCreate(url, UriKind.Absolute, out Uri? uri)
-            ? $"{uri.Host}{uri.AbsolutePath}"
-            : UnparseableUrlPlaceholder;
 
     public static string MainConfigUrl(string appVersion) =>
         string.Format(CultureInfo.InvariantCulture, MainConfigUrlTemplate, appVersion);
