@@ -47,6 +47,19 @@ public class MakoUrlsTests
         Assert.StartsWith("not a mako page path", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>The full show list's path carries no query of its own, so the platform parameter
+    /// the real main-config template appends must open the query rather than join one.</summary>
+    [Fact]
+    public void TheFullIndexIsTheIndexPathWithOnlyThePlatformQuery()
+    {
+        MakoConfig config = MakoConfig.Parse(
+            FixtureFile.ReadText("main-config.json"), FixtureFile.ReadText("core-config.json"), FixtureFile.ReadText("notes-config.json"));
+
+        string url = MakoUrls.Page(config.BaseUrlTemplate, MakoIndexPaths.FullIndex);
+
+        Assert.Equal("https://www.mako.co.il/mako-vod-index?platform=mobileApp", url);
+    }
+
     [Fact]
     public void PageKeepsTheRequestOnMakosOwnHost()
     {

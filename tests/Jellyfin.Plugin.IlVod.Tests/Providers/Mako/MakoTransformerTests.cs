@@ -31,7 +31,8 @@ public class MakoTransformerTests
         [
             new MakoGenreList("דרמה", [new IndexEntry("/a", "א", "https://img/a.jpg"), new IndexEntry("/b", "ב", null)]),
             new MakoGenreList("קומדיה", [new IndexEntry("/b", "ב", null), new IndexEntry("/c", "ג", null)]),
-        ]);
+        ],
+        AllShows: []);
 
         IReadOnlyList<Show> shows = Transformer.ToShows(index);
 
@@ -43,11 +44,45 @@ public class MakoTransformerTests
     [Fact]
     public void AShowListedTwiceInOneGenreCarriesThatGenreOnce()
     {
-        MakoShowIndex index = new([new MakoGenreList("דרמה", [new IndexEntry("/a", "א", null), new IndexEntry("/a", "א", null)])]);
+        MakoShowIndex index = new([new MakoGenreList("דרמה", [new IndexEntry("/a", "א", null), new IndexEntry("/a", "א", null)])], AllShows: []);
 
         Show show = Assert.Single(Transformer.ToShows(index));
 
         Assert.Equal(["דרמה"], show.Genres);
+    }
+
+    /// <summary>About 245 of mako's shows are in no category list; they come from the full show
+    /// list, after every listed show, with no genre (the aggregation layer files them under אחר).</summary>
+    [Fact]
+    public void AShowNoCategoryListNamesIsAppendedWithNoGenres()
+    {
+        MakoShowIndex index = new(
+            [new MakoGenreList("דרמה", [new IndexEntry("/a", "א", null)])],
+            AllShows: [new IndexEntry("/z", "ז", "https://img/z.jpg"), new IndexEntry("/a", "א", null)]);
+
+        IReadOnlyList<Show> shows = Transformer.ToShows(index);
+
+        Assert.Equal(["/a", "/z"], shows.Select(show => show.Id));
+        Assert.Equivalent(new Show("/z", "ז", "https://img/z.jpg", Overview: null, Genres: []), shows[1], strict: true);
+    }
+
+    /// <summary>The full list naming a show again — even first — changes neither its genres nor
+    /// its position, and a show only a genre lists (mako has a few) is kept.</summary>
+    [Fact]
+    public void AGenreShowKeepsItsGenresAndPositionWhateverTheFullListSays()
+    {
+        MakoShowIndex index = new(
+        [
+            new MakoGenreList("דרמה", [new IndexEntry("/a", "א", null), new IndexEntry("/genre-only", "ג", null)]),
+            new MakoGenreList("החדשות", [new IndexEntry("/news", "ח", null)]),
+        ],
+        AllShows: [new IndexEntry("/z", "ז", null), new IndexEntry("/news", "ח", null), new IndexEntry("/a", "א", null)]);
+
+        IReadOnlyList<Show> shows = Transformer.ToShows(index);
+
+        Assert.Equal(["/a", "/genre-only", "/news", "/z"], shows.Select(show => show.Id));
+        Assert.Equal(["דרמה"], shows[0].Genres);
+        Assert.Equal(["החדשות"], shows[2].Genres);
     }
 
     [Fact]

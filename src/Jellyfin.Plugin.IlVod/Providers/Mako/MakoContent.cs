@@ -5,17 +5,19 @@ namespace Jellyfin.Plugin.IlVod.Providers.Mako;
 // mako's content in its own terms: what Source/ reads off mako's pages and Transform/ turns into
 // the shared model. Neither half knows the other; these records are all they share.
 
-/// <summary>A real genre in mako's genre menu, and the page path of its show list.</summary>
+/// <summary>A category list in mako's genre menu — a real genre, or a provider list allowlisted
+/// as one (the news) — and the page path of its show list. Its name becomes its shows' genre.</summary>
 public sealed record Genre(string Name, string PagePath);
 
-/// <summary>One show in a genre's list: mako's page path for it (its id), name and poster.</summary>
+/// <summary>One show in a show list: mako's page path for it (its id), name and poster.</summary>
 public sealed record IndexEntry(string PagePath, string Name, string? PosterUrl);
 
-/// <summary>One genre and every show its list names, in mako's order.</summary>
+/// <summary>One category and every show its list names, in mako's order.</summary>
 public sealed record MakoGenreList(string GenreName, IReadOnlyList<IndexEntry> Entries);
 
-/// <summary>Everything the channel's root is built from: each real genre's list.</summary>
-public sealed record MakoShowIndex(IReadOnlyList<MakoGenreList> Genres);
+/// <summary>Everything the channel's root is built from: each category's list, and mako's full
+/// show list, which also names the shows no category list does.</summary>
+public sealed record MakoShowIndex(IReadOnlyList<MakoGenreList> Genres, IReadOnlyList<IndexEntry> AllShows);
 
 /// <summary>A season as a show page lists it. <paramref name="Number"/> is read from the title
 /// ("עונה 3"), or the season's position when the title names none.</summary>

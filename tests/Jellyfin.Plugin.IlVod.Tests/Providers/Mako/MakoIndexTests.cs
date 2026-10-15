@@ -9,22 +9,51 @@ public class MakoIndexTests
     private static readonly string MenuJson = FixtureFile.ReadText("genre-menu.json");
     private static readonly string ComedyJson = FixtureFile.ReadText("genre-list-comedy.json");
 
+    /// <summary>The lists whose names become show genres: the five real genres plus the one
+    /// provider list allowlisted as a category (החדשות), still in the menu's own order.</summary>
     [Fact]
-    public void OnlyTheRealGenresAreKeptFromTheMenu()
+    public void TheCategoryListsAreTheRealGenresAndTheNewsInMenuOrder()
     {
         IReadOnlyList<Genre> genres = MakoIndex.ParseGenres(MenuJson);
 
-        Assert.Equal(new[] { "ריאליטי", "דוקומנטרי", "דרמה", "קומדיה", "בישול" }, genres.Select(genre => genre.Name));
-        Assert.All(genres, genre => Assert.StartsWith("/mako-vod-index?filter=genre&vcmId=", genre.PagePath, StringComparison.Ordinal));
+        Assert.Equal(new[] { "ריאליטי", "דוקומנטרי", "דרמה", "קומדיה", "בישול", "החדשות" }, genres.Select(genre => genre.Name));
+        Assert.All(genres.Take(5), genre => Assert.StartsWith("/mako-vod-index?filter=genre&vcmId=", genre.PagePath, StringComparison.Ordinal));
+        Assert.Equal("/mako-vod-index?filter=provider&vcmId=ee06c13070733210VgnVCM2000002a0c10acRCRD", genres[5].PagePath);
+    }
+
+    /// <summary>Podcast and ערוץ 24 shows are not in mako's full show list at all, so their
+    /// provider lists stay out; the A–B list and playlists only regroup shows listed elsewhere.</summary>
+    [Fact]
+    public void PodcastsChannel24TheAbcListAndPlaylistsAreNotCategoryLists()
+    {
+        IReadOnlyList<Genre> genres = MakoIndex.ParseGenres(MenuJson);
+
+        Assert.DoesNotContain(genres, genre => genre.Name is "פודקאסטים" or "ערוץ 24" or "פלייליסטים" or "כל התכניות");
+        Assert.DoesNotContain(genres, genre => genre.PagePath.Contains("ABC_Programs_Slider", StringComparison.Ordinal));
+        Assert.DoesNotContain(genres, genre => genre.PagePath.Contains("filter=playlists", StringComparison.Ordinal));
+    }
+
+    /// <summary>The allowlist is a menu title on a provider list: the same title on any other
+    /// kind of entry, or another provider list, is not a category.</summary>
+    [Theory]
+    [InlineData("החדשות", "/mako-vod-index?filter=provider&vcmId=ee06", true)]
+    [InlineData("פודקאסטים", "/mako-vod-index?filter=provider&vcmId=d5aa", false)]
+    [InlineData("ערוץ 24", "/mako-vod-index?filter=provider&vcmId=3377", false)]
+    [InlineData("החדשות", "/mako-vod-index?filter=playlists", false)]
+    [InlineData("החדשות", "/mako-vod-keshet/news?filter=provider", false)]
+    [InlineData("דרמה", "/mako-vod-index?filter=genre&vcmId=05fc", true)]
+    public void OnlyARealGenreOrAnAllowlistedProviderListIsACategoryList(string title, string pagePath, bool expected)
+    {
+        Assert.Equal(expected, MakoIndexPaths.IsCategoryList(title, pagePath));
     }
 
     [Fact]
-    public void ProvidersTheAbcListAndPlaylistsAreNotGenres()
+    public void TheFullIndexYieldsEveryShowItNames()
     {
-        IReadOnlyList<Genre> genres = MakoIndex.ParseGenres(MenuJson);
+        IReadOnlyList<IndexEntry> entries = MakoIndex.ParseEntries(FixtureFile.ReadText("mako-index-all.json"));
 
-        Assert.DoesNotContain(genres, genre => genre.Name is "החדשות" or "פודקאסטים" or "ערוץ 24" or "פלייליסטים" or "כל התכניות");
-        Assert.DoesNotContain(genres, genre => genre.PagePath.Contains("ABC_Programs_Slider", StringComparison.Ordinal));
+        Assert.Equal(19, entries.Count);
+        Assert.Equal("חדשות הבוקר עם ניב רסקין", Assert.Single(entries, entry => entry.PagePath == "/mako-vod-keshet/morning_news").Name);
     }
 
     [Fact]

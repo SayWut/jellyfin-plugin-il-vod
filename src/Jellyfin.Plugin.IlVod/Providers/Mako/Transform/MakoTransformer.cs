@@ -23,33 +23,28 @@ public sealed class MakoTransformer : IContentTransformer<MakoShowIndex, ShowPag
     private static readonly Regex AirDatePattern = new(@"@(\d{2})\.(\d{2})\.(\d{2})", RegexOptions.Compiled);
 
     /// <summary>
-    /// One show per distinct page path, in the order mako first lists it, carrying every genre
-    /// whose list names it — mako's own genre names, unmapped.
+    /// One show per distinct page path, in the order the category lists first name it, carrying
+    /// every category whose list names it — mako's own names, unmapped. Then every show only the
+    /// full list names, in its order, with no genre: the aggregation layer files those under its
+    /// fallback category. The full list never changes a listed show's genres or position.
     /// </summary>
     public IReadOnlyList<Show> ToShows(MakoShowIndex index)
     {
-        Dictionary<string, Show> showsByPath = new(StringComparer.Ordinal);
-        List<string> order = [];
+        OrderedDictionary<string, Show> showsByPath = new(StringComparer.Ordinal);
         foreach (MakoGenreList genre in index.Genres)
         {
             foreach (IndexEntry entry in genre.Entries)
             {
-                if (showsByPath.TryGetValue(entry.PagePath, out Show? known))
-                {
-                    if (!known.Genres.Contains(genre.GenreName, StringComparer.Ordinal))
-                    {
-                        showsByPath[entry.PagePath] = known with { Genres = [.. known.Genres, genre.GenreName] };
-                    }
-
-                    continue;
-                }
-
-                showsByPath[entry.PagePath] = new Show(entry.PagePath, entry.Name, entry.PosterUrl, Overview: null, Genres: [genre.GenreName]);
-                order.Add(entry.PagePath);
+                AddGenre(showsByPath, entry, genre.GenreName);
             }
         }
 
-        return order.Select(path => showsByPath[path]).ToList();
+        foreach (IndexEntry entry in index.AllShows)
+        {
+            showsByPath.TryAdd(entry.PagePath, ToShow(entry, genres: []));
+        }
+
+        return [.. showsByPath.Values];
     }
 
     public IReadOnlyList<Season> ToSeasons(ShowPage showPage) =>
@@ -83,6 +78,24 @@ public sealed class MakoTransformer : IContentTransformer<MakoShowIndex, ShowPag
 
         return new StreamLink(stream.Url, HlsContainer, description with { Duration = stream.Duration });
     }
+
+    /// <summary>Adds <paramref name="entry"/>'s show under <paramref name="genreName"/>, or adds
+    /// that genre to the show already there — in place, so it keeps its first position — unless
+    /// the same list named it twice.</summary>
+    private static void AddGenre(OrderedDictionary<string, Show> showsByPath, IndexEntry entry, string genreName)
+    {
+        if (!showsByPath.TryGetValue(entry.PagePath, out Show? known))
+        {
+            showsByPath.Add(entry.PagePath, ToShow(entry, [genreName]));
+        }
+        else if (!known.Genres.Contains(genreName, StringComparer.Ordinal))
+        {
+            showsByPath[entry.PagePath] = known with { Genres = [.. known.Genres, genreName] };
+        }
+    }
+
+    private static Show ToShow(IndexEntry entry, IReadOnlyList<string> genres) =>
+        new(entry.PagePath, entry.Name, entry.PosterUrl, Overview: null, Genres: genres);
 
     private static int EpisodeNumberFrom(string? extraInfo, int position)
     {
