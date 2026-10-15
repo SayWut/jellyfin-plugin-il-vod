@@ -4,8 +4,9 @@ namespace Jellyfin.Plugin.IlVod.Tests.Configuration;
 
 /// <summary>
 /// The defaults a freshly installed plugin plays with, before a user ever opens the settings page
-/// (spec §5): the app version and the five cache lifetimes (spec §5.3, §6.3), as whole numbers so
-/// the settings page (task B10, C5) never has to serialise a <see cref="TimeSpan"/>.
+/// (spec §5): every provider on, no category overrides, mako's app version and the five cache
+/// lifetimes (spec §5.3, §6.3), as whole numbers so the settings page never has to serialise a
+/// <see cref="TimeSpan"/>.
 /// </summary>
 public class PluginConfigurationTests
 {
@@ -14,12 +15,48 @@ public class PluginConfigurationTests
     {
         var configuration = new PluginConfiguration();
 
-        Assert.Equal("43.0", configuration.AppVersion);
-        Assert.Equal(24, configuration.CatalogueCacheHours);
-        Assert.Equal(12, configuration.ShowPageCacheHours);
-        Assert.Equal(7, configuration.PastSeasonCacheDays);
-        Assert.Equal(6, configuration.CurrentSeasonCacheHours);
+        Assert.Empty(configuration.DisabledProviderIds);
+        Assert.Empty(configuration.CategoryOverrides);
+        Assert.Equal("43.0", configuration.Mako.AppVersion);
+        Assert.Equal(24, configuration.Mako.CatalogueCacheHours);
+        Assert.Equal(12, configuration.Mako.ShowPageCacheHours);
+        Assert.Equal(7, configuration.Mako.PastSeasonCacheDays);
+        Assert.Equal(6, configuration.Mako.CurrentSeasonCacheHours);
         Assert.Equal(5, configuration.StreamLinkCacheMinutes);
+    }
+
+    /// <summary>A settings page or config file that leaves a list or section out must not leave
+    /// the plugin holding a null it will dereference on the next channel open.</summary>
+    [Fact]
+    public void AMissingListOrSectionReadsAsEmptyOrDefaultNeverNull()
+    {
+        PluginConfiguration configuration = new() { DisabledProviderIds = null!, CategoryOverrides = null!, Mako = null! };
+
+        Assert.Empty(configuration.DisabledProviderIds);
+        Assert.Empty(configuration.CategoryOverrides);
+        Assert.Equal("43.0", configuration.Mako.AppVersion);
+    }
+
+    [Fact]
+    public void TheConfigurationRoundTripsThroughTheXmlSerializerJellyfinUses()
+    {
+        PluginConfiguration configuration = new()
+        {
+            DisabledProviderIds = ["mako"],
+            CategoryOverrides = [new CategoryOverride { ProviderId = "mako", SourceName = "דוקומנטרי", SharedName = "דוקו" }],
+            Mako = new MakoSettings { AppVersion = "44.0" },
+        };
+        System.Xml.Serialization.XmlSerializer serializer = new(typeof(PluginConfiguration));
+        using StringWriter writer = new();
+        serializer.Serialize(writer, configuration);
+
+        using StringReader reader = new(writer.ToString());
+        PluginConfiguration read = (PluginConfiguration)serializer.Deserialize(reader)!;
+
+        Assert.Equal(["mako"], read.DisabledProviderIds);
+        CategoryOverride row = Assert.Single(read.CategoryOverrides);
+        Assert.Equal(("mako", "דוקומנטרי", "דוקו"), (row.ProviderId, row.SourceName, row.SharedName));
+        Assert.Equal("44.0", read.Mako.AppVersion);
     }
 
     [Fact]

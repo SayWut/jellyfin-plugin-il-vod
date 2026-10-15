@@ -6,12 +6,44 @@
 </head>
 <body>
 <div id="IlVodConfigPage" data-role="page" class="page type-interior pluginConfigurationPage"
-     data-require="emby-input,emby-button">
+     data-require="emby-input,emby-button,emby-checkbox,emby-select">
     <div data-role="content">
         <div class="content-primary">
             <form id="IlVodConfigForm">
                 <div class="verticalSection">
-                    <h2 class="sectionTitle">Mako</h2>
+                    <h2 class="sectionTitle">Providers</h2>
+                    <div class="fieldDescription">
+                        Only checked providers are loaded. A provider turned off leaves the channel the next time
+                        the channel's shows are refreshed.
+                    </div>
+                    <div id="IlVodProviders"></div>
+                </div>
+
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">Categories</h2>
+                    <div class="fieldDescription">
+                        Each provider names its categories its own way. Type the shared category a provider's
+                        category should be shown as; leave a row empty to keep the provider's default. A category
+                        no row names is shown as the provider spells it.
+                    </div>
+                    <table class="detailTable" style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th style="text-align: start;">Provider</th>
+                            <th style="text-align: start;">Provider's category</th>
+                            <th style="text-align: start;">Shown as</th>
+                        </tr>
+                        </thead>
+                        <tbody id="IlVodCategories"></tbody>
+                    </table>
+                    <datalist id="IlVodSharedCategories"></datalist>
+                    <button is="emby-button" type="button" id="IlVodAddCategory" class="raised emby-button">
+                        <span>Add a category</span>
+                    </button>
+                </div>
+
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">mako</h2>
                     <div class="inputContainer">
                         <label class="inputLabel inputLabelUnfocused" for="CatalogueCacheHours">Catalogue cache (hours)</label>
                         <input id="CatalogueCacheHours" name="CatalogueCacheHours" type="number" min="1" is="emby-input" />
@@ -28,6 +60,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div>
                     <button is="emby-button" type="submit" class="raised button-submit block emby-button">
                         <span>Save</span>
@@ -39,27 +72,185 @@
     <script type="text/javascript">
         var IlVodConfig = { pluginUniqueId: 'b8239c51-1963-42d7-82ee-d98ce3e75db4' };
 
-        document.querySelector('#IlVodConfigPage').addEventListener('pageshow', function () {
-            Dashboard.showLoadingMsg();
-            ApiClient.getPluginConfiguration(IlVodConfig.pluginUniqueId).then(function (config) {
-                document.querySelector('#CatalogueCacheHours').value = config.CatalogueCacheHours;
-                document.querySelector('#AppVersion').value = config.AppVersion || '';
-                Dashboard.hideLoadingMsg();
-            });
-        });
+        (function () {
+            var page = document.querySelector('#IlVodConfigPage');
+            var providers = [];
 
-        document.querySelector('#IlVodConfigForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            Dashboard.showLoadingMsg();
-            ApiClient.getPluginConfiguration(IlVodConfig.pluginUniqueId).then(function (config) {
-                config.CatalogueCacheHours = parseInt(document.querySelector('#CatalogueCacheHours').value, 10);
-                config.AppVersion = document.querySelector('#AppVersion').value.trim();
-                ApiClient.updatePluginConfiguration(IlVodConfig.pluginUniqueId, config).then(function (result) {
-                    Dashboard.processPluginConfigurationUpdateResult(result);
+            function providerName(id) {
+                var match = providers.filter(function (provider) { return provider.Id === id; })[0];
+                return match ? match.DisplayName : id;
+            }
+
+            function renderProviders(disabledIds) {
+                var container = page.querySelector('#IlVodProviders');
+                container.textContent = '';
+                providers.forEach(function (provider) {
+                    var wrapper = document.createElement('div');
+                    wrapper.className = 'checkboxContainer';
+                    var label = document.createElement('label');
+                    var checkbox = document.createElement('input', { is: 'emby-checkbox' });
+                    checkbox.setAttribute('is', 'emby-checkbox');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'ilVodProvider';
+                    checkbox.dataset.providerId = provider.Id;
+                    checkbox.checked = disabledIds.indexOf(provider.Id) === -1;
+                    var text = document.createElement('span');
+                    text.textContent = provider.DisplayName;
+                    label.appendChild(checkbox);
+                    label.appendChild(text);
+                    wrapper.appendChild(label);
+                    container.appendChild(wrapper);
+                });
+            }
+
+            function textInput(value, placeholder, className) {
+                var input = document.createElement('input', { is: 'emby-input' });
+                input.setAttribute('is', 'emby-input');
+                input.type = 'text';
+                input.className = className;
+                input.value = value || '';
+                input.placeholder = placeholder || '';
+                return input;
+            }
+
+            // A row the provider's defaults name: the provider's category is fixed text.
+            function addDefaultRow(providerId, sourceName, defaultName, overrideName) {
+                var row = document.createElement('tr');
+                row.dataset.providerId = providerId;
+                row.dataset.sourceName = sourceName;
+                row.dataset.defaultName = defaultName;
+                var provider = document.createElement('td');
+                provider.textContent = providerName(providerId);
+                var source = document.createElement('td');
+                source.textContent = sourceName;
+                var shared = document.createElement('td');
+                var input = textInput(overrideName, defaultName, 'ilVodSharedName');
+                input.setAttribute('list', 'IlVodSharedCategories');
+                shared.appendChild(input);
+                row.appendChild(provider);
+                row.appendChild(source);
+                row.appendChild(shared);
+                page.querySelector('#IlVodCategories').appendChild(row);
+            }
+
+            // A row the user adds for a category the provider's defaults do not name.
+            function addCustomRow(providerId, sourceName, sharedName) {
+                var row = document.createElement('tr');
+                row.dataset.custom = 'true';
+                var provider = document.createElement('td');
+                var select = document.createElement('select', { is: 'emby-select' });
+                select.setAttribute('is', 'emby-select');
+                select.className = 'ilVodProviderId';
+                providers.forEach(function (candidate) {
+                    var option = document.createElement('option');
+                    option.value = candidate.Id;
+                    option.textContent = candidate.DisplayName;
+                    select.appendChild(option);
+                });
+                if (providerId) {
+                    select.value = providerId;
+                }
+                provider.appendChild(select);
+                var source = document.createElement('td');
+                source.appendChild(textInput(sourceName, '', 'ilVodSourceName'));
+                var shared = document.createElement('td');
+                var input = textInput(sharedName, '', 'ilVodSharedName');
+                input.setAttribute('list', 'IlVodSharedCategories');
+                shared.appendChild(input);
+                row.appendChild(provider);
+                row.appendChild(source);
+                row.appendChild(shared);
+                page.querySelector('#IlVodCategories').appendChild(row);
+            }
+
+            function renderCategories(overrides, sharedCategories) {
+                page.querySelector('#IlVodCategories').textContent = '';
+                var list = page.querySelector('#IlVodSharedCategories');
+                list.textContent = '';
+                sharedCategories.forEach(function (name) {
+                    var option = document.createElement('option');
+                    option.value = name;
+                    list.appendChild(option);
+                });
+
+                var shown = {};
+                providers.forEach(function (provider) {
+                    Object.keys(provider.DefaultCategories || {}).forEach(function (sourceName) {
+                        var match = overrides.filter(function (row) {
+                            return row.ProviderId === provider.Id && row.SourceName === sourceName;
+                        })[0];
+                        shown[provider.Id + '\n' + sourceName] = true;
+                        addDefaultRow(provider.Id, sourceName, provider.DefaultCategories[sourceName], match ? match.SharedName : '');
+                    });
+                });
+                overrides.forEach(function (row) {
+                    if (!shown[row.ProviderId + '\n' + row.SourceName]) {
+                        addCustomRow(row.ProviderId, row.SourceName, row.SharedName);
+                    }
+                });
+            }
+
+            function readOverrides() {
+                var overrides = [];
+                page.querySelectorAll('#IlVodCategories tr').forEach(function (row) {
+                    var sharedName = row.querySelector('.ilVodSharedName').value.trim();
+                    if (!sharedName) {
+                        return;
+                    }
+                    if (row.dataset.custom) {
+                        var sourceName = row.querySelector('.ilVodSourceName').value.trim();
+                        if (sourceName) {
+                            overrides.push({ ProviderId: row.querySelector('.ilVodProviderId').value, SourceName: sourceName, SharedName: sharedName });
+                        }
+                    } else if (sharedName !== row.dataset.defaultName) {
+                        overrides.push({ ProviderId: row.dataset.providerId, SourceName: row.dataset.sourceName, SharedName: sharedName });
+                    }
+                });
+                return overrides;
+            }
+
+            page.addEventListener('pageshow', function () {
+                Dashboard.showLoadingMsg();
+                Promise.all([
+                    ApiClient.getPluginConfiguration(IlVodConfig.pluginUniqueId),
+                    ApiClient.getJSON(ApiClient.getUrl('IlVod/Providers'))
+                ]).then(function (results) {
+                    var config = results[0];
+                    providers = results[1].Providers || [];
+                    renderProviders(config.DisabledProviderIds || []);
+                    renderCategories(config.CategoryOverrides || [], results[1].SharedCategories || []);
+                    var mako = config.Mako || {};
+                    page.querySelector('#CatalogueCacheHours').value = mako.CatalogueCacheHours;
+                    page.querySelector('#AppVersion').value = mako.AppVersion || '';
+                    Dashboard.hideLoadingMsg();
                 });
             });
-            return false;
-        });
+
+            page.querySelector('#IlVodAddCategory').addEventListener('click', function () {
+                addCustomRow(providers.length ? providers[0].Id : '', '', '');
+            });
+
+            page.querySelector('#IlVodConfigForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(IlVodConfig.pluginUniqueId).then(function (config) {
+                    config.DisabledProviderIds = [];
+                    page.querySelectorAll('.ilVodProvider').forEach(function (checkbox) {
+                        if (!checkbox.checked) {
+                            config.DisabledProviderIds.push(checkbox.dataset.providerId);
+                        }
+                    });
+                    config.CategoryOverrides = readOverrides();
+                    config.Mako = config.Mako || {};
+                    config.Mako.CatalogueCacheHours = parseInt(page.querySelector('#CatalogueCacheHours').value, 10);
+                    config.Mako.AppVersion = page.querySelector('#AppVersion').value.trim();
+                    ApiClient.updatePluginConfiguration(IlVodConfig.pluginUniqueId, config).then(function (result) {
+                        Dashboard.processPluginConfigurationUpdateResult(result);
+                    });
+                });
+                return false;
+            });
+        })();
     </script>
 </div>
 </body>

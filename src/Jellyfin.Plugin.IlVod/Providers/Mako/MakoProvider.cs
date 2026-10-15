@@ -22,11 +22,10 @@ public sealed class MakoProvider : IContentProvider
         Id: "mako",
         DisplayName: "mako 12+",
         HomePageUrl: "https://www.mako.co.il/mako-vod",
-        ProbeSize: ProbeSize);
+        ProbeSize: ProbeSize,
+        DefaultCategories: MakoCategories.Default);
 
     public ProviderInfo Info => Description;
 
     public ICatalog Catalog { get; }
-
-    public IReadOnlyDictionary<string, string> DefaultCategories { get; } = new Dictionary<string, string>();
 }

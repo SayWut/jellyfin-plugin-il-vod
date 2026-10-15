@@ -8,14 +8,11 @@ public sealed class FakeProvider : IContentProvider
 {
     public FakeProvider(string id, ICatalog catalog, IReadOnlyDictionary<string, string>? defaultCategories = null, string? probeSize = null)
     {
-        Info = new ProviderInfo(id, $"{id} (fake)", $"https://{id}.test", probeSize);
+        Info = new ProviderInfo(id, $"{id} (fake)", $"https://{id}.test", probeSize, defaultCategories ?? new Dictionary<string, string>());
         Catalog = catalog;
-        DefaultCategories = defaultCategories ?? new Dictionary<string, string>();
     }
 
     public ProviderInfo Info { get; }
 
     public ICatalog Catalog { get; }
-
-    public IReadOnlyDictionary<string, string> DefaultCategories { get; }
 }

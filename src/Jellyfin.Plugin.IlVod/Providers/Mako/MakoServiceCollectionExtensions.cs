@@ -46,7 +46,7 @@ internal static class MakoServiceCollectionExtensions
         services.AddSingleton(provider => new MakoConfigLoader(
             provider.GetRequiredService<IMakoHttp>(),
             provider.GetRequiredService<MakoBrowseCache>().Value,
-            () => configuration().AppVersion));
+            () => configuration().Mako.AppVersion));
 
         services.AddSingleton(_ => new DeviceIdentity(PluginDataFolder.PathOf(dataFolder, DeviceIdentityFileName)));
 
@@ -54,7 +54,7 @@ internal static class MakoServiceCollectionExtensions
             provider.GetRequiredService<IMakoHttp>(),
             provider.GetRequiredService<MakoConfigLoader>(),
             provider.GetRequiredService<DeviceIdentity>(),
-            () => configuration().AppVersion,
+            () => configuration().Mako.AppVersion,
             provider.GetRequiredService<ILogger<StreamResolver>>()));
 
         services.AddSingleton(provider => new MakoPageSource(
@@ -81,10 +81,10 @@ internal static class MakoServiceCollectionExtensions
     /// <summary>internal (not private): a test reaches this directly, through the test project's
     /// <c>InternalsVisibleTo</c> grant, to pin the floor without building a whole service graph.</summary>
     internal static CatalogueLifetimes CatalogueLifetimesFrom(PluginConfiguration configuration) => new(
-        Catalogue: TimeSpan.FromHours(Math.Max(MinimumCatalogueCacheHours, configuration.CatalogueCacheHours)),
-        ShowPage: TimeSpan.FromHours(configuration.ShowPageCacheHours),
-        PastSeason: TimeSpan.FromDays(configuration.PastSeasonCacheDays),
-        CurrentSeason: TimeSpan.FromHours(configuration.CurrentSeasonCacheHours),
+        Catalogue: TimeSpan.FromHours(Math.Max(MinimumCatalogueCacheHours, configuration.Mako.CatalogueCacheHours)),
+        ShowPage: TimeSpan.FromHours(configuration.Mako.ShowPageCacheHours),
+        PastSeason: TimeSpan.FromDays(configuration.Mako.PastSeasonCacheDays),
+        CurrentSeason: TimeSpan.FromHours(configuration.Mako.CurrentSeasonCacheHours),
         StreamLink: TimeSpan.FromMinutes(configuration.StreamLinkCacheMinutes));
 
     /// <summary>

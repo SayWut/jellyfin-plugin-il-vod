@@ -16,17 +16,15 @@ public sealed class FakeCatalog : ICatalog
     private const string PlayableShowName = "שמש";
     private const int EpisodesPerSeason = 3;
 
-    private static readonly IReadOnlyList<Show> DefaultShows =
-    [
-        new Show(PlayableShowId, PlayableShowName, PosterUrl: null, Overview: null, Genres: []),
-        new Show(CardOnlyShowId, "ארץ נהדרת", PosterUrl: null, Overview: null, Genres: []),
-    ];
 
     private static readonly IReadOnlyList<Season> DefaultSeasons =
     [
         new Season("shemesh-s1", 1, "עונה 1"),
         new Season("shemesh-s2", 2, "עונה 2"),
     ];
+
+    /// <summary>The category names every show is listed with, as a provider would spell them.</summary>
+    public IReadOnlyList<string> Genres { get; set; } = [];
 
     /// <summary>Thrown from every browse method (<see cref="GetShowsAsync"/>,
     /// <see cref="GetSeasonsAsync"/>, <see cref="GetEpisodesAsync"/>) instead of answering, when set —
@@ -48,7 +46,12 @@ public sealed class FakeCatalog : ICatalog
     public Task<IReadOnlyList<Show>> GetShowsAsync(CancellationToken cancellationToken)
     {
         BrowseCalls++;
-        return BrowseFailure is { } failure ? Task.FromException<IReadOnlyList<Show>>(failure) : Task.FromResult(DefaultShows);
+        IReadOnlyList<Show> shows =
+        [
+            new Show(PlayableShowId, PlayableShowName, PosterUrl: null, Overview: null, Genres: Genres),
+            new Show(CardOnlyShowId, "ארץ נהדרת", PosterUrl: null, Overview: null, Genres: Genres),
+        ];
+        return BrowseFailure is { } failure ? Task.FromException<IReadOnlyList<Show>>(failure) : Task.FromResult(shows);
     }
 
     public Task<IReadOnlyList<Season>> GetSeasonsAsync(string showId, CancellationToken cancellationToken)

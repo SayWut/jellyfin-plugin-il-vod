@@ -39,7 +39,7 @@ public sealed class PluginServiceRegistratorTests
     [Fact]
     public void ACatalogueCacheHoursOfZeroFloorsToOneHour()
     {
-        PluginConfiguration configuration = new() { CatalogueCacheHours = 0 };
+        PluginConfiguration configuration = new() { Mako = new MakoSettings { CatalogueCacheHours = 0 } };
 
         CatalogueLifetimes lifetimes = MakoServiceCollectionExtensions.CatalogueLifetimesFrom(configuration);
 

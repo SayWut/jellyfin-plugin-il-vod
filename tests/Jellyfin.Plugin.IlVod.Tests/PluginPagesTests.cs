@@ -33,6 +33,16 @@ public class PluginPagesTests
         Assert.Contains("CatalogueCacheHours", html, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void SettingsPageListsProvidersAndCategoriesFromThePluginsOwnApi()
+    {
+        string html = EmbeddedSettingsPageHtml();
+
+        Assert.Contains("'IlVod/Providers'", html, StringComparison.Ordinal);
+        Assert.Contains("DisabledProviderIds", html, StringComparison.Ordinal);
+        Assert.Contains("CategoryOverrides", html, StringComparison.Ordinal);
+    }
+
     private static string EmbeddedSettingsPageHtml()
     {
         using Stream? resource = typeof(Plugin).Assembly.GetManifestResourceStream(Plugin.SettingsPageResource);

@@ -1,5 +1,6 @@
 using Jellyfin.Plugin.IlVod.Aggregation;
 using Jellyfin.Plugin.IlVod.Cache;
+using Jellyfin.Plugin.IlVod.Configuration;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
 using Jellyfin.Plugin.IlVod.Tests.Support;
@@ -125,6 +126,63 @@ public class AggregateCatalogTests
     }
 
     [Fact]
+    public async Task ADisabledProviderIsNeverAskedAndItsIdsNoLongerRoute()
+    {
+        FakeCatalog alpha = new();
+        PluginConfiguration configuration = new() { DisabledProviderIds = ["alpha"] };
+        AggregateCatalog catalog = CatalogOver(configuration, NewSnapshots(), new FakeProvider("alpha", alpha), new FakeProvider("beta", new FakeCatalog()));
+
+        IReadOnlyList<Show> shows = await catalog.GetShowsAsync(CancellationToken.None);
+        IReadOnlyList<Season> seasons = await catalog.GetSeasonsAsync("alpha:shemesh", CancellationToken.None);
+
+        Assert.All(shows, show => Assert.StartsWith("beta:", show.Id, StringComparison.Ordinal));
+        Assert.Empty(seasons);
+        Assert.Equal(0, alpha.BrowseCalls);
+    }
+
+    [Fact]
+    public async Task ReEnablingAProviderBringsItsShowsBackWithNoRestart()
+    {
+        PluginConfiguration configuration = new() { DisabledProviderIds = ["alpha"] };
+        AggregateCatalog catalog = CatalogOver(configuration, NewSnapshots(), new FakeProvider("alpha", new FakeCatalog()));
+        Assert.Empty(await catalog.GetShowsAsync(CancellationToken.None));
+
+        configuration.DisabledProviderIds = [];
+
+        Assert.Equal(2, (await catalog.GetShowsAsync(CancellationToken.None)).Count);
+    }
+
+    [Fact]
+    public async Task ShowsCarryTheSharedCategoriesTheirProvidersNamesMapTo()
+    {
+        FakeCatalog alpha = new() { Genres = ["דוקו", "אחר"] };
+        PluginConfiguration configuration = new()
+        {
+            CategoryOverrides = [new CategoryOverride { ProviderId = "alpha", SourceName = "אחר", SharedName = "קומדיה" }],
+        };
+        FakeProvider provider = new("alpha", alpha, defaultCategories: new Dictionary<string, string> { ["דוקו"] = "דוקומנטרי" });
+
+        IReadOnlyList<Show> shows = await CatalogOver(configuration, NewSnapshots(), provider).GetShowsAsync(CancellationToken.None);
+
+        Assert.All(shows, show => Assert.Equal(["דוקומנטרי", "קומדיה"], show.Genres));
+    }
+
+    [Fact]
+    public async Task ASnapshotIsKeptInTheProvidersOwnCategoriesSoANewMappingAppliesToIt()
+    {
+        FakeCatalog alpha = new() { Genres = ["אחר"] };
+        PluginConfiguration configuration = new();
+        AggregateCatalog catalog = CatalogOver(configuration, NewSnapshots(), new FakeProvider("alpha", alpha), new FakeProvider("beta", new FakeCatalog()));
+        await catalog.GetShowsAsync(CancellationToken.None);
+
+        alpha.BrowseFailure = new InvalidOperationException("down");
+        configuration.CategoryOverrides = [new CategoryOverride { ProviderId = "alpha", SourceName = "אחר", SharedName = "קומדיה" }];
+        IReadOnlyList<Show> shows = await catalog.GetShowsAsync(CancellationToken.None);
+
+        Assert.All(shows.Where(show => show.Id.StartsWith("alpha:", StringComparison.Ordinal)), show => Assert.Equal(["קומדיה"], show.Genres));
+    }
+
+    [Fact]
     public void TwoProvidersWithTheSameIdAreAProgrammingError()
     {
         Assert.Throws<ArgumentException>(() => CatalogOver(new FakeProvider("alpha", new FakeCatalog()), new FakeProvider("alpha", new FakeCatalog())));
@@ -135,9 +193,19 @@ public class AggregateCatalogTests
     private static (string Id, string Name, string? PosterUrl, string Genres) Comparable(Show show) =>
         (show.Id, show.Name, show.PosterUrl, string.Join("|", show.Genres));
 
+    private static ShowListSnapshots NewSnapshots() => new(new TimedCache(new FakeClock()));
+
     private static AggregateCatalog CatalogOver(params IContentProvider[] providers) =>
         CatalogOver(new ShowListSnapshots(new TimedCache(new FakeClock())), providers);
 
     private static AggregateCatalog CatalogOver(ShowListSnapshots snapshots, params IContentProvider[] providers) =>
-        new(providers, snapshots, new RecordingLogger<AggregateCatalog>());
+        CatalogOver(new PluginConfiguration(), snapshots, providers);
+
+    private static AggregateCatalog CatalogOver(PluginConfiguration configuration, ShowListSnapshots snapshots, params IContentProvider[] providers) =>
+        new(
+            providers,
+            () => configuration.DisabledProviderIds,
+            new CategoryMapper(() => configuration.CategoryOverrides),
+            snapshots,
+            new RecordingLogger<AggregateCatalog>());
 }

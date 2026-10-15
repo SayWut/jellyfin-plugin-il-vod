@@ -55,6 +55,8 @@ internal static class IlVodServiceCollectionExtensions
 
         services.AddSingleton<ICatalog>(provider => new AggregateCatalog(
             provider.GetServices<IContentProvider>(),
+            () => configuration().DisabledProviderIds,
+            new CategoryMapper(() => configuration().CategoryOverrides),
             provider.GetRequiredService<ShowListSnapshots>(),
             provider.GetRequiredService<ILogger<AggregateCatalog>>()));
 
