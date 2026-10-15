@@ -1,0 +1,9 @@
+{
+ "executionTime": 0.0196075,
+ "result": {
+  "objectType": "KalturaLoginSession",
+  "expiry": 1792705645,
+  "ks": "TEST-KS",
+  "refreshToken": "TEST-REFRESH"
+ }
+}

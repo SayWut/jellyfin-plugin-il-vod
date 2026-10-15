@@ -1,0 +1,733 @@
+{
+ "executionTime": 0.0210479,
+ "result": {
+  "objectType": "KalturaAssetListResponse",
+  "totalCount": 7,
+  "objects": [
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1686186772,
+    "endDate": 1918720800,
+    "externalId": "Season-818",
+    "id": 2184243,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "51a1f65a7cb542fc9199d62d4e5fb46a",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/51a1f65a7cb542fc9199d62d4e5fb46a/version/534",
+      "version": 534
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "28b8602db66d408ca5d30bcaf9d20185",
+      "imageTypeId": 151,
+      "imageTypeName": "2x3",
+      "isDefault": false,
+      "ratio": "2x3",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/28b8602db66d408ca5d30bcaf9d20185/version/0",
+      "version": 0
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 4
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "עונה 5"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Season"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1610272800
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1918720800
+     }
+    },
+    "name": "עונה 5",
+    "relatedEntities": {},
+    "startDate": 1610272800,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     }
+    },
+    "type": 1264,
+    "updateDate": 1782820006,
+    "entryId": "1_1q8xjm37",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Season"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1684429140,
+    "endDate": 1918720800,
+    "externalId": "Season-204",
+    "id": 2134041,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "e388c1913b824be7b6e27f9579028400",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/e388c1913b824be7b6e27f9579028400/version/517",
+      "version": 517
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 6
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "העונה החמה • קיץ 2021"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Season"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1610272800
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1918720800
+     }
+    },
+    "name": "העונה החמה • קיץ 2021",
+    "relatedEntities": {},
+    "startDate": 1610272800,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     }
+    },
+    "type": 1264,
+    "updateDate": 1782819713,
+    "entryId": "1_k5sg6v0z",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Season"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1684428748,
+    "endDate": 1918720800,
+    "externalId": "Season-531",
+    "id": 2134039,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "a4ebf60cdd304fcda36366dca9e36d25",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/a4ebf60cdd304fcda36366dca9e36d25/version/497",
+      "version": 497
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 5
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "עונה 4"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Season"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1610272800
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1918720800
+     }
+    },
+    "name": "עונה 4",
+    "relatedEntities": {},
+    "startDate": 1610272800,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     }
+    },
+    "type": 1264,
+    "updateDate": 1782819816,
+    "entryId": "1_5hykby4f",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Season"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1684428704,
+    "endDate": 1918720800,
+    "externalId": "Season-201",
+    "id": 2134038,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "a4cee082b52f4f50b4389e69d34f2d5a",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/a4cee082b52f4f50b4389e69d34f2d5a/version/516",
+      "version": 516
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 7
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "עונה 3"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Season"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1610272800
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1918720800
+     }
+    },
+    "name": "עונה 3",
+    "relatedEntities": {},
+    "startDate": 1610272800,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     }
+    },
+    "type": 1264,
+    "updateDate": 1782819514,
+    "entryId": "1_w84wnoen",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Season"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1684428671,
+    "endDate": 1918720800,
+    "externalId": "Season-198",
+    "id": 2134037,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "fa4b3575ef454c00bab3254a6a4501d3",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/fa4b3575ef454c00bab3254a6a4501d3/version/555",
+      "version": 555
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 8
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "עונה 2"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Season"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1610272800
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1918720800
+     }
+    },
+    "name": "עונה 2",
+    "relatedEntities": {},
+    "startDate": 1610272800,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     }
+    },
+    "type": 1264,
+    "updateDate": 1782819352,
+    "entryId": "1_2wqlf3fz",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Season"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1684428647,
+    "endDate": 1918720800,
+    "externalId": "Season-195",
+    "id": 2134036,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "53483500c7914e1db6e30086bc0982da",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/53483500c7914e1db6e30086bc0982da/version/554",
+      "version": 554
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 9
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "VIP עונה 1"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Season"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1610272800
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1918720800
+     }
+    },
+    "name": "VIP עונה 1",
+    "relatedEntities": {},
+    "startDate": 1610272800,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     }
+    },
+    "type": 1264,
+    "updateDate": 1782819287,
+    "entryId": "1_p7evfkul",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Season"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1684428603,
+    "endDate": 1918720800,
+    "externalId": "Season-192",
+    "id": 2134035,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "d22aa28bcfc442eab34fd137e3f60b63",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/d22aa28bcfc442eab34fd137e3f60b63/version/555",
+      "version": 555
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 10
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "עונה 1"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Season"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1610272800
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1918720800
+     }
+    },
+    "name": "עונה 1",
+    "relatedEntities": {},
+    "startDate": 1610272800,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     }
+    },
+    "type": 1264,
+    "updateDate": 1782819142,
+    "entryId": "1_0sweqmwg",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Season"
+   }
+  ]
+ }
+}

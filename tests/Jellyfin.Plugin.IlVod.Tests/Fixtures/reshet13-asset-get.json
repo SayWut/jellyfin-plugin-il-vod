@@ -1,0 +1,250 @@
+{
+ "executionTime": 0.0176469,
+ "result": {
+  "objectType": "KalturaMediaAsset",
+  "createDate": 1694721154,
+  "description": "\"אני זאת שעשיתי את העונה\": הדיירים חוזרים לבית לסגור חשבונות ולפתוח סודות. איך יובל מעתוק הגיבה כשסתיו קצין פתחה את הכל?",
+  "endDate": 4602821820,
+  "externalId": "entertainment-the-big-brother-season-05-episodes-60-full",
+  "id": 2361602,
+  "images": [
+   {
+    "objectType": "KalturaMediaImage",
+    "id": "7043e198e9784c98be706bba90ae189c",
+    "imageTypeId": 148,
+    "imageTypeName": "16x9",
+    "isDefault": false,
+    "ratio": "16x9",
+    "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/7043e198e9784c98be706bba90ae189c/version/405",
+    "version": 405
+   }
+  ],
+  "mediaFiles": [
+   {
+    "objectType": "KalturaMediaFile",
+    "additionalData": "",
+    "alternativeCdnAdapaterProfileId": 0,
+    "altExternalId": "",
+    "altStreamingCode": "",
+    "assetId": 2361602,
+    "catalogEndDate": 4070908800,
+    "cdnAdapaterProfileId": 618,
+    "duration": 3822,
+    "dynamicData": {},
+    "externalId": "1_iilurenz_1_n19dj8kk,1_iilurenz_1_xhtscb8r,1_iilurenz_1_10brb6bd,1_iilurenz_1_01uaw4j4,1_iilurenz_1_1jrjlwso,1_iilurenz_1_f7v7mg0f",
+    "externalStoreId": "",
+    "fileSize": 0,
+    "id": 3191856,
+    "isDefaultLanguage": false,
+    "labels": "",
+    "language": "",
+    "opl": "",
+    "orderNum": 0,
+    "startDate": 1694721155,
+    "status": true,
+    "type": "Dash_playready",
+    "typeId": 2908,
+    "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_iilurenz/format/mpegdash/tags/mbr/f/a.mpd"
+   },
+   {
+    "objectType": "KalturaMediaFile",
+    "additionalData": "",
+    "alternativeCdnAdapaterProfileId": 0,
+    "altExternalId": "",
+    "altStreamingCode": "",
+    "assetId": 2361602,
+    "catalogEndDate": 4070908800,
+    "cdnAdapaterProfileId": 618,
+    "duration": 3822,
+    "dynamicData": {},
+    "externalId": "1_iilurenz_1_n19dj8kk,1_iilurenz_1_xhtscb8r,1_iilurenz_1_10brb6bd,1_iilurenz_1_01uaw4j4,1_iilurenz_1_1jrjlwso,1_iilurenz_1_f7v7mg0f",
+    "externalStoreId": "",
+    "fileSize": 0,
+    "id": 3191857,
+    "isDefaultLanguage": false,
+    "labels": "",
+    "language": "",
+    "opl": "",
+    "orderNum": 0,
+    "startDate": 1694721155,
+    "status": true,
+    "type": "Hls_fairplay",
+    "typeId": 2909,
+    "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_iilurenz/format/applehttp/tags/mbr/f/a.m3u8"
+   },
+   {
+    "objectType": "KalturaMediaFile",
+    "additionalData": "",
+    "alternativeCdnAdapaterProfileId": 0,
+    "altExternalId": "",
+    "altStreamingCode": "",
+    "assetId": 2361602,
+    "catalogEndDate": 4070908800,
+    "cdnAdapaterProfileId": 618,
+    "duration": 3822,
+    "dynamicData": {},
+    "externalId": "1_iilurenz_1_n19dj8kk,1_iilurenz_1_xhtscb8r,1_iilurenz_1_10brb6bd,1_iilurenz_1_01uaw4j4,1_iilurenz_1_1jrjlwso,1_iilurenz_1_f7v7mg0f",
+    "externalStoreId": "",
+    "fileSize": 0,
+    "id": 3191859,
+    "isDefaultLanguage": false,
+    "labels": "",
+    "language": "",
+    "opl": "",
+    "orderNum": 0,
+    "startDate": 1694721155,
+    "status": true,
+    "type": "dash_widevine",
+    "typeId": 2910,
+    "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_iilurenz/format/mpegdash/tags/mbr/f/a.mpd"
+   },
+   {
+    "objectType": "KalturaMediaFile",
+    "additionalData": "",
+    "alternativeCdnAdapaterProfileId": 0,
+    "altExternalId": "",
+    "altStreamingCode": "",
+    "assetId": 2361602,
+    "catalogEndDate": 4070908800,
+    "cdnAdapaterProfileId": 618,
+    "duration": 3822,
+    "dynamicData": {},
+    "externalId": "1_iilurenz_1_n19dj8kk,1_iilurenz_1_xhtscb8r,1_iilurenz_1_10brb6bd,1_iilurenz_1_01uaw4j4,1_iilurenz_1_1jrjlwso,1_iilurenz_1_f7v7mg0f",
+    "externalStoreId": "",
+    "fileSize": 0,
+    "id": 3191858,
+    "isDefaultLanguage": false,
+    "labels": "",
+    "language": "",
+    "opl": "",
+    "orderNum": 0,
+    "startDate": 1694721155,
+    "status": true,
+    "type": "Hss_playready",
+    "typeId": 2913,
+    "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_iilurenz/format/sl/tags/mbr/f/a.ism"
+   }
+  ],
+  "metas": {
+   "RunTime": {
+    "objectType": "KalturaStringValue",
+    "value": "00:00"
+   },
+   "SeasonNumber": {
+    "objectType": "KalturaDoubleValue",
+    "value": 4
+   },
+   "Adult": {
+    "objectType": "KalturaBooleanValue",
+    "value": false
+   },
+   "ShortSummary": {
+    "objectType": "KalturaMultilingualStringValue",
+    "value": "האח הגדול, עונה 5, פרק 59: חוזרים הביתה"
+   },
+   "SeriesID": {
+    "objectType": "KalturaStringValue",
+    "value": "57"
+   },
+   "GeoBlockRule": {
+    "objectType": "KalturaStringValue",
+    "value": "Israel Only"
+   },
+   "EpisodeNumber": {
+    "objectType": "KalturaDoubleValue",
+    "value": 1
+   },
+   "LongSummary": {
+    "objectType": "KalturaMultilingualStringValue",
+    "value": "\"אני זאת שעשיתי את העונה\": הדיירים חוזרים לבית לסגור חשבונות ולפתוח סודות. איך יובל מעתוק הגיבה כשסתיו קצין פתחה את הכל?"
+   },
+   "MediaType": {
+    "objectType": "KalturaStringValue",
+    "value": "Episode"
+   },
+   "CatalogStartDateTime": {
+    "objectType": "KalturaLongValue",
+    "value": 1447148220
+   },
+   "PlaybackEndDateTime": {
+    "objectType": "KalturaLongValue",
+    "value": 4602821820
+   }
+  },
+  "name": "האח הגדול, עונה 5, פרק 59: חוזרים הביתה",
+  "relatedEntities": {},
+  "startDate": 1447148220,
+  "tags": {
+   "ParentalRating": {
+    "objectType": "KalturaMultilingualStringValueArray",
+    "objects": [
+     {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "P13"
+     }
+    ]
+   },
+   "Genre": {
+    "objectType": "KalturaMultilingualStringValueArray",
+    "objects": [
+     {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "ריאליטי"
+     }
+    ]
+   },
+   "CountryOfOrigin": {
+    "objectType": "KalturaMultilingualStringValueArray",
+    "objects": [
+     {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "Israel"
+     }
+    ]
+   },
+   "Provider": {
+    "objectType": "KalturaMultilingualStringValueArray",
+    "objects": [
+     {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "Reshet13"
+     }
+    ]
+   },
+   "SeriesName": {
+    "objectType": "KalturaMultilingualStringValueArray",
+    "objects": [
+     {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "האח הגדול"
+     }
+    ]
+   },
+   "Quality": {
+    "objectType": "KalturaMultilingualStringValueArray",
+    "objects": [
+     {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "HD"
+     }
+    ]
+   },
+   "SeasonName": {
+    "objectType": "KalturaMultilingualStringValueArray",
+    "objects": [
+     {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "עונה 5"
+     }
+    ]
+   }
+  },
+  "type": 1268,
+  "updateDate": 1782820178,
+  "entryId": "1_iilurenz",
+  "geoBlockRuleId": 400,
+  "inheritancePolicy": "Enable",
+  "status": true,
+  "typeDescription": "Episode"
+ }
+}

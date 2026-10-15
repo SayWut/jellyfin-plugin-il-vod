@@ -1,0 +1,10 @@
+{
+ "executionTime": 0.0011717,
+ "result": {
+  "error": {
+   "code": "500015",
+   "message": "Invalid KS format",
+   "objectType": "KalturaAPIException"
+  }
+ }
+}

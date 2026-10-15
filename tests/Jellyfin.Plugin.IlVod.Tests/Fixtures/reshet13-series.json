@@ -1,0 +1,695 @@
+{
+ "executionTime": 0.01,
+ "result": {
+  "objectType": "KalturaAssetListResponse",
+  "objects": [
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1684428573,
+    "description": "הבית הכי מפורסם במדינה! צפייה ישירה בפרקים מלאים של האח הגדול.",
+    "endDate": 4645641600,
+    "externalId": "Show-57",
+    "id": 2134034,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "c12495dcabed49538bd8ba94794939f9",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/c12495dcabed49538bd8ba94794939f9/version/803",
+      "version": 803
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "1e6ca3452ab54a3aa23be330b086c4dc",
+      "imageTypeId": 164,
+      "imageTypeName": "Portrait_9_16",
+      "isDefault": false,
+      "ratio": "9x16",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/1e6ca3452ab54a3aa23be330b086c4dc/version/541",
+      "version": 541
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "c4d596a9d5c644ccb3096470b27c91b7",
+      "imageTypeId": 147,
+      "imageTypeName": "Landscape",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/c4d596a9d5c644ccb3096470b27c91b7/version/0",
+      "version": 0
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "62077ca37c744da78585700571a6f6dd",
+      "imageTypeId": 151,
+      "imageTypeName": "2x3",
+      "isDefault": false,
+      "ratio": "2x3",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/62077ca37c744da78585700571a6f6dd/version/0",
+      "version": 0
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "האח הגדול"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "LongSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "הבית הכי מפורסם במדינה! צפייה ישירה בפרקים מלאים של האח הגדול."
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Series"
+     },
+     "Vertical_highLight": {
+      "objectType": "KalturaStringValue",
+      "value": "1_b19xjjrn"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1489968000
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4645641600
+     }
+    },
+    "name": "האח הגדול",
+    "relatedEntities": {},
+    "startDate": 1489968000,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     }
+    },
+    "type": 1259,
+    "updateDate": 1783864305,
+    "entryId": "1_p5su2wws",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Series"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1690290651,
+    "description": "ליהיא גרינר חוגגת במסיבת בריכה עם כל הדברים הכי מעניינים שקרו בערוץ 26",
+    "endDate": 4843324800,
+    "externalId": "Show-518",
+    "id": 2269888,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "aa051277231f452cb036b71c94ab88d3",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/aa051277231f452cb036b71c94ab88d3/version/11",
+      "version": 11
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "6c442517faef4da7906f8e60844e5166",
+      "imageTypeId": 164,
+      "imageTypeName": "Portrait_9_16",
+      "isDefault": false,
+      "ratio": "9x16",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/6c442517faef4da7906f8e60844e5166/version/11",
+      "version": 11
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "מסיבת בריכה"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "518"
+     },
+     "LongSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "ליהיא גרינר חוגגת במסיבת בריכה עם כל הדברים הכי מעניינים שקרו בערוץ 26"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Series"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1687651200
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4843324800
+     }
+    },
+    "name": "מסיבת בריכה",
+    "relatedEntities": {},
+    "startDate": 1687651200,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "בידור"
+       },
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "תכניות אירוח"
+       },
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "דיגיטל 13"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     }
+    },
+    "type": 1259,
+    "updateDate": 1693744992,
+    "entryId": "1_r07flpln",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Series"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1688281864,
+    "endDate": 4843584000,
+    "externalId": "Show-522",
+    "id": 2229416,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "c9a00d8f0f474f759b918094ef6dffbf",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/c9a00d8f0f474f759b918094ef6dffbf/version/1",
+      "version": 1
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "c5114820938a47f797e56234ef4a1a05",
+      "imageTypeId": 164,
+      "imageTypeName": "Portrait_9_16",
+      "isDefault": false,
+      "ratio": "9x16",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/c5114820938a47f797e56234ef4a1a05/version/1",
+      "version": 1
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "מפיקה שיודעת"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "522"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Series"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1687910400
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4843584000
+     }
+    },
+    "name": "מפיקה שיודעת",
+    "relatedEntities": {},
+    "startDate": 1687910400,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "דיגיטל 13"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     }
+    },
+    "type": 1259,
+    "updateDate": 1688281877,
+    "entryId": "1_tn9h95yy",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Series"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1698306334,
+    "description": "אללה אסלאם היא סדרה דוקומנטרית מקורית שנוצרה על ידי הבמאי דוד דרעי וצבי יחזקאלי.",
+    "endDate": 4853692800,
+    "externalId": "Show-569",
+    "id": 2435567,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "27d417ae88134545b01cbb6cb41cef1f",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/27d417ae88134545b01cbb6cb41cef1f/version/2",
+      "version": 2
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "aaf89a144bfd45598a5e0cb4d60015ad",
+      "imageTypeId": 164,
+      "imageTypeName": "Portrait_9_16",
+      "isDefault": false,
+      "ratio": "9x16",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/aaf89a144bfd45598a5e0cb4d60015ad/version/3",
+      "version": 3
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "2615b56aab2445cbaec1f91690d12ca3",
+      "imageTypeId": 147,
+      "imageTypeName": "Landscape",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/2615b56aab2445cbaec1f91690d12ca3/version/0",
+      "version": 0
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "אללה אסלאם"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "569"
+     },
+     "LongSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "אללה אסלאם היא סדרה דוקומנטרית מקורית שנוצרה על ידי הבמאי דוד דרעי וצבי יחזקאלי."
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Series"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1698019200
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4853692800
+     }
+    },
+    "name": "אללה אסלאם",
+    "relatedEntities": {},
+    "startDate": 1698019200,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "דוקו ותחקירים"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     }
+    },
+    "type": 1259,
+    "updateDate": 1698737034,
+    "entryId": "1_dj839fy2",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Series"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1741163943,
+    "endDate": 4896806400,
+    "externalId": "Show-685",
+    "id": 3601861,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "2a527d9220944e699ac356933dbdfa41",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/2a527d9220944e699ac356933dbdfa41/version/18",
+      "version": 18
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "bcebf336bb2c465eaee8d980b967c762",
+      "imageTypeId": 164,
+      "imageTypeName": "Portrait_9_16",
+      "isDefault": false,
+      "ratio": "9x16",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/bcebf336bb2c465eaee8d980b967c762/version/17",
+      "version": 17
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "7aa9831020fb4a3a903478050a04614f",
+      "imageTypeId": 151,
+      "imageTypeName": "2x3",
+      "isDefault": false,
+      "ratio": "2x3",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/7aa9831020fb4a3a903478050a04614f/version/0",
+      "version": 0
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "05c74c1f937547fe892ad7c65a69c651",
+      "imageTypeId": 147,
+      "imageTypeName": "Landscape",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/05c74c1f937547fe892ad7c65a69c651/version/0",
+      "version": 0
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "אזהרת מסע: אתונה"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "685"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Series"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1741132800
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4896806400
+     }
+    },
+    "name": "אזהרת מסע: אתונה",
+    "relatedEntities": {},
+    "startDate": 1741132800,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "דרמה"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     }
+    },
+    "type": 1259,
+    "updateDate": 1747986063,
+    "entryId": "1_wi9j7bvu",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Series"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1705481892,
+    "description": "משחק טלוויזיה חדש ומפתיע בהנחייתו של אברי גלעד ומנחי המשימות: טום באום, דודו ארז, דובדבני וקובץ' ועדי שילון. בואו לבחון את עצמכם ב\"הטוב מכולם\"",
+    "endDate": 4633027200,
+    "externalId": "Show-425",
+    "id": 2597163,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "212a0b255611404a903e76d611212790",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/212a0b255611404a903e76d611212790/version/1",
+      "version": 1
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "1c59d8128a744b5bb36f2087d91b718c",
+      "imageTypeId": 164,
+      "imageTypeName": "Portrait_9_16",
+      "isDefault": false,
+      "ratio": "9x16",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/1c59d8128a744b5bb36f2087d91b718c/version/1",
+      "version": 1
+     },
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "b961192449f14e2f90ab238370e20d6d",
+      "imageTypeId": 151,
+      "imageTypeName": "2x3",
+      "isDefault": false,
+      "ratio": "2x3",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/b961192449f14e2f90ab238370e20d6d/version/0",
+      "version": 0
+     }
+    ],
+    "mediaFiles": [],
+    "metas": {
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "הטוב מכולם"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "425"
+     },
+     "LongSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "משחק טלוויזיה חדש ומפתיע בהנחייתו של אברי גלעד ומנחי המשימות: טום באום, דודו ארז, דובדבני וקובץ' ועדי שילון. בואו לבחון את עצמכם ב\"הטוב מכולם\""
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Series"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1477353600
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4633027200
+     }
+    },
+    "name": "הטוב מכולם",
+    "relatedEntities": {},
+    "startDate": 1477353600,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "שעשועונים"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     }
+    },
+    "type": 1259,
+    "updateDate": 1705481900,
+    "entryId": "1_fjl3o3l8",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Series"
+   }
+  ],
+  "totalCount": 6
+ }
+}

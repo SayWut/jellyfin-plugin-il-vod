@@ -1,0 +1,9 @@
+#EXTM3U
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=509496,RESOLUTION=640x360,FRAME-RATE=25.000,CODECS="avc1.42c01e,mp4a.40.2"
+https://cfvod.kaltura.com/scf/enc/hls/p/2748741/sp/274874100/serveFlavor/entryId/1_f9hhlezq/v/1/ev/7/flavorId/1_5ouxll6u/name/a.mp4/index.m3u8?Policy=TEST&Signature=TEST&Key-Pair-Id=TEST
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=719794,RESOLUTION=854x480,FRAME-RATE=25.000,CODECS="avc1.42c01e,mp4a.40.2"
+https://cfvod.kaltura.com/scf/enc/hls/p/2748741/sp/274874100/serveFlavor/entryId/1_f9hhlezq/v/1/ev/7/flavorId/1_k3i2wtbc/name/a.mp4/index.m3u8?Policy=TEST&Signature=TEST&Key-Pair-Id=TEST
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1014840,RESOLUTION=960x540,FRAME-RATE=25.000,CODECS="avc1.4d401f,mp4a.40.2"
+https://cfvod.kaltura.com/scf/enc/hls/p/2748741/sp/274874100/serveFlavor/entryId/1_f9hhlezq/v/1/ev/7/flavorId/1_9dkiq1dn/name/a.mp4/index.m3u8?Policy=TEST&Signature=TEST&Key-Pair-Id=TEST
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1614347,RESOLUTION=1280x720,FRAME-RATE=25.000,CODECS="avc1.4d4020,mp4a.40.2"
+https://cfvod.kaltura.com/scf/enc/hls/p/2748741/sp/274874100/serveFlavor/entryId/1_f9hhlezq/v/1/ev/7/flavorId/1_b9j3w1m4/name/a.mp4/index.m3u8?Policy=TEST&Signature=TEST&Key-Pair-Id=TEST

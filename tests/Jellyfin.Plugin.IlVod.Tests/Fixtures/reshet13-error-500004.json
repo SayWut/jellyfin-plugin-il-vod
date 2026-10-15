@@ -1,0 +1,10 @@
+{
+ "executionTime": 0.0002364,
+ "result": {
+  "error": {
+   "code": "500004",
+   "message": "Service Forbidden",
+   "objectType": "KalturaAPIException"
+  }
+ }
+}

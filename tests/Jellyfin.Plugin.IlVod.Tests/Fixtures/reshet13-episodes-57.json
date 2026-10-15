@@ -1,0 +1,2101 @@
+{
+ "executionTime": 0.01,
+ "result": {
+  "objectType": "KalturaAssetListResponse",
+  "objects": [
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1687098730,
+    "description": "למי מהדיירים הייתה ירידה במספר העוקבים? ומה קורה עם החשבון של גיא? זה שהוא טוען שיש לו בו 300 אלף? וגם – ראש בראש בין הבסטיות של הבית. מי תנצח?",
+    "endDate": 32472151200,
+    "externalId": "5275f6c0-ec47-4b20-68f6-20dbfe66e079",
+    "id": 2207940,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "97386ca249224d08a266d74a089bfd5e",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/97386ca249224d08a266d74a089bfd5e/version/1",
+      "version": 1
+     }
+    ],
+    "mediaFiles": [
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2207940,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 0,
+      "dynamicData": {},
+      "externalId": "1_bd5ru1z4",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3114939,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1687099820,
+      "status": true,
+      "type": "Hls_fairplay",
+      "typeId": 2909,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_cizqgast/format/applehttp/tags/mbr/f/a.m3u8"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2207940,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 0,
+      "dynamicData": {},
+      "externalId": "1_bd5ru1z4",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3114938,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1687099820,
+      "status": true,
+      "type": "dash_widevine",
+      "typeId": 2910,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_cizqgast/format/mpegdash/tags/mbr/f/a.mpd"
+     }
+    ],
+    "metas": {
+     "Adult": {
+      "objectType": "KalturaBooleanValue",
+      "value": false
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1687098120
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 32472151200
+     }
+    },
+    "name": "פולואח, פרק 2, מה קורה עם החשבון של גיא?",
+    "relatedEntities": {},
+    "startDate": 1687098120,
+    "tags": {
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     }
+    },
+    "type": 1268,
+    "updateDate": 1687164894,
+    "entryId": "",
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Episode"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1783195782,
+    "description": "אחרי שהזכייה של גל הסעירה את המדינה, הדיירים חוזרים לבית \"האח הגדול\" לחשבון נפש בלי פילטרים. זו ההזדמנות האחרונה לפתוח הכול - האם גל זכתה בצדק? וכיצד היא הפכה לזוכה כל כך שנויה במחלוקת? | \"האח הגדול\", לצפייה ישירה",
+    "endDate": 4646367311,
+    "externalId": "entertainment-the-big-brother-season-08-episodes-66-full",
+    "id": 4480642,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "e3d4eec511f54487b6d9b506eaa8c03d",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/e3d4eec511f54487b6d9b506eaa8c03d/version/2",
+      "version": 2
+     }
+    ],
+    "mediaFiles": [
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 4480642,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3856,
+      "dynamicData": {},
+      "externalId": "1_f9hhlezq_1_5ouxll6u,1_f9hhlezq_1_k3i2wtbc,1_f9hhlezq_1_9dkiq1dn,1_f9hhlezq_1_b9j3w1m4,1_f9hhlezq_1_0cry43nv,1_f9hhlezq_1_7afih8da",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 4593580,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1783195783,
+      "status": true,
+      "type": "Dash_playready",
+      "typeId": 2908,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_f9hhlezq/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 4480642,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3856,
+      "dynamicData": {},
+      "externalId": "1_f9hhlezq_1_5ouxll6u,1_f9hhlezq_1_k3i2wtbc,1_f9hhlezq_1_9dkiq1dn,1_f9hhlezq_1_b9j3w1m4,1_f9hhlezq_1_0cry43nv,1_f9hhlezq_1_7afih8da",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 4593581,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1783195783,
+      "status": true,
+      "type": "Hls_fairplay",
+      "typeId": 2909,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_f9hhlezq/format/applehttp/tags/mbr/f/a.m3u8"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 4480642,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3856,
+      "dynamicData": {},
+      "externalId": "1_f9hhlezq_1_5ouxll6u,1_f9hhlezq_1_k3i2wtbc,1_f9hhlezq_1_9dkiq1dn,1_f9hhlezq_1_b9j3w1m4,1_f9hhlezq_1_0cry43nv,1_f9hhlezq_1_7afih8da",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 4593583,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1783195783,
+      "status": true,
+      "type": "dash_widevine",
+      "typeId": 2910,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_f9hhlezq/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 4480642,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3856,
+      "dynamicData": {},
+      "externalId": "1_f9hhlezq_1_5ouxll6u,1_f9hhlezq_1_k3i2wtbc,1_f9hhlezq_1_9dkiq1dn,1_f9hhlezq_1_b9j3w1m4,1_f9hhlezq_1_0cry43nv,1_f9hhlezq_1_7afih8da",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 4593582,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1783195783,
+      "status": true,
+      "type": "Hss_playready",
+      "typeId": 2913,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_f9hhlezq/format/sl/tags/mbr/f/a.ism"
+     }
+    ],
+    "metas": {
+     "RunTime": {
+      "objectType": "KalturaStringValue",
+      "value": "00:00"
+     },
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 1
+     },
+     "Adult": {
+      "objectType": "KalturaBooleanValue",
+      "value": false
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "האח הגדול, עונה 8: חוזרים הביתה"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "GeoBlockRule": {
+      "objectType": "KalturaStringValue",
+      "value": "Israel Only"
+     },
+     "EpisodeNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 1
+     },
+     "LongSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "אחרי שהזכייה של גל הסעירה את המדינה, הדיירים חוזרים לבית \"האח הגדול\" לחשבון נפש בלי פילטרים. זו ההזדמנות האחרונה לפתוח הכול - האם גל זכתה בצדק? וכיצד היא הפכה לזוכה כל כך שנויה במחלוקת? | \"האח הגדול\", לצפייה ישירה"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Episode"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1490693711
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4646367311
+     }
+    },
+    "name": "האח הגדול, עונה 8: חוזרים הביתה",
+    "relatedEntities": {},
+    "startDate": 1490693711,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     },
+     "Quality": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "HD"
+       }
+      ]
+     },
+     "SeasonName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "עונה 8"
+       }
+      ]
+     }
+    },
+    "type": 1268,
+    "updateDate": 1783196007,
+    "entryId": "1_f9hhlezq",
+    "geoBlockRuleId": 400,
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Episode"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1782598353,
+    "description": "אלירן, גל, נעם, עומר, ורפאלה - חמשת הדיירים האחרונים שהגיעו לרגע הגדול בחייהם! ורק אתם תחליטו את מה שכל המדינה מחכה לגלות: מי יהיה הדייר האחרון? מי יהיה המנצח הגדול? | \"האח הגדול\", לצפייה ישירה",
+    "endDate": 4646367311,
+    "externalId": "entertainment-the-big-brother-season-08-episodes-65-full",
+    "id": 4471744,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "cad198d5ad00401dbf5e43ad7a00fa6b",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/cad198d5ad00401dbf5e43ad7a00fa6b/version/8",
+      "version": 8
+     }
+    ],
+    "mediaFiles": [
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 4471744,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 5552,
+      "dynamicData": {},
+      "externalId": "1_3g4b8w3i_1_eth9i5xb,1_3g4b8w3i_1_06lyfuid,1_3g4b8w3i_1_efgeyaaq,1_3g4b8w3i_1_62ctagwm,1_3g4b8w3i_1_vfcwhu8p,1_3g4b8w3i_1_zfp914sz",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 4586901,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1782598354,
+      "status": true,
+      "type": "Dash_playready",
+      "typeId": 2908,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_3g4b8w3i/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 4471744,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 5552,
+      "dynamicData": {},
+      "externalId": "1_3g4b8w3i_1_eth9i5xb,1_3g4b8w3i_1_06lyfuid,1_3g4b8w3i_1_efgeyaaq,1_3g4b8w3i_1_62ctagwm,1_3g4b8w3i_1_vfcwhu8p,1_3g4b8w3i_1_zfp914sz",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 4586902,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1782598354,
+      "status": true,
+      "type": "Hls_fairplay",
+      "typeId": 2909,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_3g4b8w3i/format/applehttp/tags/mbr/f/a.m3u8"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 4471744,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 5552,
+      "dynamicData": {},
+      "externalId": "1_3g4b8w3i_1_eth9i5xb,1_3g4b8w3i_1_06lyfuid,1_3g4b8w3i_1_efgeyaaq,1_3g4b8w3i_1_62ctagwm,1_3g4b8w3i_1_vfcwhu8p,1_3g4b8w3i_1_zfp914sz",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 4586904,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1782598354,
+      "status": true,
+      "type": "dash_widevine",
+      "typeId": 2910,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_3g4b8w3i/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 4471744,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 5552,
+      "dynamicData": {},
+      "externalId": "1_3g4b8w3i_1_eth9i5xb,1_3g4b8w3i_1_06lyfuid,1_3g4b8w3i_1_efgeyaaq,1_3g4b8w3i_1_62ctagwm,1_3g4b8w3i_1_vfcwhu8p,1_3g4b8w3i_1_zfp914sz",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 4586903,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1782598354,
+      "status": true,
+      "type": "Hss_playready",
+      "typeId": 2913,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_3g4b8w3i/format/sl/tags/mbr/f/a.ism"
+     }
+    ],
+    "metas": {
+     "RunTime": {
+      "objectType": "KalturaStringValue",
+      "value": "00:00"
+     },
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 1
+     },
+     "Adult": {
+      "objectType": "KalturaBooleanValue",
+      "value": false
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "האח הגדול, עונה 8, פרק 65: הגמר הגדול"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "GeoBlockRule": {
+      "objectType": "KalturaStringValue",
+      "value": "Israel Only"
+     },
+     "EpisodeNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 2
+     },
+     "LongSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "אלירן, גל, נעם, עומר, ורפאלה - חמשת הדיירים האחרונים שהגיעו לרגע הגדול בחייהם! ורק אתם תחליטו את מה שכל המדינה מחכה לגלות: מי יהיה הדייר האחרון? מי יהיה המנצח הגדול? | \"האח הגדול\", לצפייה ישירה"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Episode"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1490693711
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4646367311
+     }
+    },
+    "name": "האח הגדול, עונה 8, פרק 65: הגמר הגדול",
+    "relatedEntities": {},
+    "startDate": 1490693711,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     },
+     "Quality": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "HD"
+       }
+      ]
+     },
+     "SeasonName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "עונה 8"
+       }
+      ]
+     }
+    },
+    "type": 1268,
+    "updateDate": 1783196003,
+    "entryId": "1_3g4b8w3i",
+    "geoBlockRuleId": 400,
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Episode"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1694721154,
+    "description": "\"אני זאת שעשיתי את העונה\": הדיירים חוזרים לבית לסגור חשבונות ולפתוח סודות. איך יובל מעתוק הגיבה כשסתיו קצין פתחה את הכל?",
+    "endDate": 4602821820,
+    "externalId": "entertainment-the-big-brother-season-05-episodes-60-full",
+    "id": 2361602,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "7043e198e9784c98be706bba90ae189c",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/7043e198e9784c98be706bba90ae189c/version/405",
+      "version": 405
+     }
+    ],
+    "mediaFiles": [
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2361602,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3822,
+      "dynamicData": {},
+      "externalId": "1_iilurenz_1_n19dj8kk,1_iilurenz_1_xhtscb8r,1_iilurenz_1_10brb6bd,1_iilurenz_1_01uaw4j4,1_iilurenz_1_1jrjlwso,1_iilurenz_1_f7v7mg0f",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3191856,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1694721155,
+      "status": true,
+      "type": "Dash_playready",
+      "typeId": 2908,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_iilurenz/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2361602,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3822,
+      "dynamicData": {},
+      "externalId": "1_iilurenz_1_n19dj8kk,1_iilurenz_1_xhtscb8r,1_iilurenz_1_10brb6bd,1_iilurenz_1_01uaw4j4,1_iilurenz_1_1jrjlwso,1_iilurenz_1_f7v7mg0f",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3191857,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1694721155,
+      "status": true,
+      "type": "Hls_fairplay",
+      "typeId": 2909,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_iilurenz/format/applehttp/tags/mbr/f/a.m3u8"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2361602,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3822,
+      "dynamicData": {},
+      "externalId": "1_iilurenz_1_n19dj8kk,1_iilurenz_1_xhtscb8r,1_iilurenz_1_10brb6bd,1_iilurenz_1_01uaw4j4,1_iilurenz_1_1jrjlwso,1_iilurenz_1_f7v7mg0f",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3191859,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1694721155,
+      "status": true,
+      "type": "dash_widevine",
+      "typeId": 2910,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_iilurenz/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2361602,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3822,
+      "dynamicData": {},
+      "externalId": "1_iilurenz_1_n19dj8kk,1_iilurenz_1_xhtscb8r,1_iilurenz_1_10brb6bd,1_iilurenz_1_01uaw4j4,1_iilurenz_1_1jrjlwso,1_iilurenz_1_f7v7mg0f",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3191858,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1694721155,
+      "status": true,
+      "type": "Hss_playready",
+      "typeId": 2913,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_iilurenz/format/sl/tags/mbr/f/a.ism"
+     }
+    ],
+    "metas": {
+     "RunTime": {
+      "objectType": "KalturaStringValue",
+      "value": "00:00"
+     },
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 4
+     },
+     "Adult": {
+      "objectType": "KalturaBooleanValue",
+      "value": false
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "האח הגדול, עונה 5, פרק 59: חוזרים הביתה"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "GeoBlockRule": {
+      "objectType": "KalturaStringValue",
+      "value": "Israel Only"
+     },
+     "EpisodeNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 1
+     },
+     "LongSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "\"אני זאת שעשיתי את העונה\": הדיירים חוזרים לבית לסגור חשבונות ולפתוח סודות. איך יובל מעתוק הגיבה כשסתיו קצין פתחה את הכל?"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Episode"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1447148220
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4602821820
+     }
+    },
+    "name": "האח הגדול, עונה 5, פרק 59: חוזרים הביתה",
+    "relatedEntities": {},
+    "startDate": 1447148220,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     },
+     "Quality": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "HD"
+       }
+      ]
+     },
+     "SeasonName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "עונה 5"
+       }
+      ]
+     }
+    },
+    "type": 1268,
+    "updateDate": 1782820178,
+    "entryId": "1_iilurenz",
+    "geoBlockRuleId": 400,
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Episode"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1694415993,
+    "endDate": 4602821820,
+    "externalId": "entertainment-the-big-brother-season-05-episodes-full-M211158 ",
+    "id": 2353654,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "3cafb95e1c5b48679330b64fa74009b7",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/3cafb95e1c5b48679330b64fa74009b7/version/407",
+      "version": 407
+     }
+    ],
+    "mediaFiles": [
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2353654,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 1227,
+      "dynamicData": {},
+      "externalId": "1_mq7yrl2x_1_ap01gcnj,1_mq7yrl2x_1_w0jibl4r,1_mq7yrl2x_1_58iwl8r4,1_mq7yrl2x_1_ecotphtu,1_mq7yrl2x_1_bncv5115,1_mq7yrl2x_1_q5akjztr",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3188101,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1694415994,
+      "status": true,
+      "type": "Dash_playready",
+      "typeId": 2908,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_mq7yrl2x/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2353654,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 1227,
+      "dynamicData": {},
+      "externalId": "1_mq7yrl2x_1_ap01gcnj,1_mq7yrl2x_1_w0jibl4r,1_mq7yrl2x_1_58iwl8r4,1_mq7yrl2x_1_ecotphtu,1_mq7yrl2x_1_bncv5115,1_mq7yrl2x_1_q5akjztr",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3188102,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1694415994,
+      "status": true,
+      "type": "Hls_fairplay",
+      "typeId": 2909,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_mq7yrl2x/format/applehttp/tags/mbr/f/a.m3u8"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2353654,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 1227,
+      "dynamicData": {},
+      "externalId": "1_mq7yrl2x_1_ap01gcnj,1_mq7yrl2x_1_w0jibl4r,1_mq7yrl2x_1_58iwl8r4,1_mq7yrl2x_1_ecotphtu,1_mq7yrl2x_1_bncv5115,1_mq7yrl2x_1_q5akjztr",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3188104,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1694415995,
+      "status": true,
+      "type": "dash_widevine",
+      "typeId": 2910,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_mq7yrl2x/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2353654,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 1227,
+      "dynamicData": {},
+      "externalId": "1_mq7yrl2x_1_ap01gcnj,1_mq7yrl2x_1_w0jibl4r,1_mq7yrl2x_1_58iwl8r4,1_mq7yrl2x_1_ecotphtu,1_mq7yrl2x_1_bncv5115,1_mq7yrl2x_1_q5akjztr",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3188103,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1694415994,
+      "status": true,
+      "type": "Hss_playready",
+      "typeId": 2913,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_mq7yrl2x/format/sl/tags/mbr/f/a.ism"
+     }
+    ],
+    "metas": {
+     "RunTime": {
+      "objectType": "KalturaStringValue",
+      "value": "00:00"
+     },
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 4
+     },
+     "Adult": {
+      "objectType": "KalturaBooleanValue",
+      "value": false
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "האח הגדול - עונה 5 - ראיון עם הזוכה"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "GeoBlockRule": {
+      "objectType": "KalturaStringValue",
+      "value": "Israel Only"
+     },
+     "EpisodeNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 2
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Episode"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1447148220
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4602821820
+     }
+    },
+    "name": "האח הגדול - עונה 5 - ראיון עם הזוכה",
+    "relatedEntities": {},
+    "startDate": 1447148220,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     },
+     "Quality": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "HD"
+       }
+      ]
+     },
+     "SeasonName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "עונה 5"
+       }
+      ]
+     }
+    },
+    "type": 1268,
+    "updateDate": 1782820175,
+    "entryId": "1_mq7yrl2x",
+    "geoBlockRuleId": 400,
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Episode"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1680546326,
+    "description": "המפגש של אור ועומר עם הילדים שהם, הוויכוח הסוער אודות הזוגות החד מיניים וההדחה המפתיעה, צפו בפרק המלא",
+    "endDate": 4602759300,
+    "externalId": "entertainment-the-big-brother-summer-2021-episodes-26-full",
+    "id": 2027074,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "c0a8d5db6824405198f02004222e8071",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/c0a8d5db6824405198f02004222e8071/version/508",
+      "version": 508
+     }
+    ],
+    "mediaFiles": [
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2027074,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3482,
+      "dynamicData": {},
+      "externalId": "1_0uvwpp2z_1_lj9tq217,1_0uvwpp2z_1_r0zwyq4x,1_0uvwpp2z_1_on80nyix,1_0uvwpp2z_1_1ueohx8r,1_0uvwpp2z_1_e3wxznb2",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3012300,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1680546328,
+      "status": true,
+      "type": "Dash_playready",
+      "typeId": 2908,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_0uvwpp2z/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2027074,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3482,
+      "dynamicData": {},
+      "externalId": "1_0uvwpp2z_1_lj9tq217,1_0uvwpp2z_1_r0zwyq4x,1_0uvwpp2z_1_on80nyix,1_0uvwpp2z_1_1ueohx8r,1_0uvwpp2z_1_e3wxznb2",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3012301,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1680546328,
+      "status": true,
+      "type": "Hls_fairplay",
+      "typeId": 2909,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_0uvwpp2z/format/applehttp/tags/mbr/f/a.m3u8"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2027074,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3482,
+      "dynamicData": {},
+      "externalId": "1_0uvwpp2z_1_lj9tq217,1_0uvwpp2z_1_r0zwyq4x,1_0uvwpp2z_1_on80nyix,1_0uvwpp2z_1_1ueohx8r,1_0uvwpp2z_1_e3wxznb2",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3012303,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1680546328,
+      "status": true,
+      "type": "dash_widevine",
+      "typeId": 2910,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_0uvwpp2z/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2027074,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 3482,
+      "dynamicData": {},
+      "externalId": "1_0uvwpp2z_1_lj9tq217,1_0uvwpp2z_1_r0zwyq4x,1_0uvwpp2z_1_on80nyix,1_0uvwpp2z_1_1ueohx8r,1_0uvwpp2z_1_e3wxznb2",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3012302,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1680546328,
+      "status": true,
+      "type": "Hss_playready",
+      "typeId": 2913,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_0uvwpp2z/format/sl/tags/mbr/f/a.ism"
+     }
+    ],
+    "metas": {
+     "RunTime": {
+      "objectType": "KalturaStringValue",
+      "value": "58:02"
+     },
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 6
+     },
+     "Adult": {
+      "objectType": "KalturaBooleanValue",
+      "value": false
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "האח הגדול העונה החמה, פרק 26: ימים אחרונים בבית"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "GeoBlockRule": {
+      "objectType": "KalturaStringValue",
+      "value": "Israel Only"
+     },
+     "EpisodeNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 25
+     },
+     "LongSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "המפגש של אור ועומר עם הילדים שהם, הוויכוח הסוער אודות הזוגות החד מיניים וההדחה המפתיעה, צפו בפרק המלא"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Episode"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1447085700
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4602759300
+     }
+    },
+    "name": "האח הגדול העונה החמה, פרק 26: ימים אחרונים בבית",
+    "relatedEntities": {},
+    "startDate": 1447085700,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     },
+     "Quality": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "HD"
+       }
+      ]
+     },
+     "SeasonName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "העונה החמה • קיץ 2021"
+       }
+      ]
+     }
+    },
+    "type": 1268,
+    "updateDate": 1782819734,
+    "entryId": "1_0uvwpp2z",
+    "geoBlockRuleId": 400,
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Episode"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1722772526,
+    "description": "יעל בר זוהר נכנסת לבית הכי מדובר והכי מושקע במדינה, וחושפת את סודות העיצוב של הבית המפואר מבפנים. צפו בסרט המלא ",
+    "endDate": 4646367287,
+    "externalId": "entertainment-the-big-brother-season-01-episodes-special-the-house-desigh-full_DsfNt1ih",
+    "id": 3177483,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "b8c93f188ef648dda639f2b380760562",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/b8c93f188ef648dda639f2b380760562/version/308",
+      "version": 308
+     }
+    ],
+    "mediaFiles": [
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 3177483,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 1738,
+      "dynamicData": {},
+      "externalId": "1_4r02045p_1_00xtqc8f,1_4r02045p_1_w916jp4j,1_4r02045p_1_9woy5kil,1_4r02045p_1_utg5kl2a",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3635971,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1722772527,
+      "status": true,
+      "type": "Dash_playready",
+      "typeId": 2908,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_4r02045p/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 3177483,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 1738,
+      "dynamicData": {},
+      "externalId": "1_4r02045p_1_00xtqc8f,1_4r02045p_1_w916jp4j,1_4r02045p_1_9woy5kil,1_4r02045p_1_utg5kl2a",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3635972,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1722772527,
+      "status": true,
+      "type": "Hls_fairplay",
+      "typeId": 2909,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_4r02045p/format/applehttp/tags/mbr/f/a.m3u8"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 3177483,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 1738,
+      "dynamicData": {},
+      "externalId": "1_4r02045p_1_00xtqc8f,1_4r02045p_1_w916jp4j,1_4r02045p_1_9woy5kil,1_4r02045p_1_utg5kl2a",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3635974,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1722772527,
+      "status": true,
+      "type": "dash_widevine",
+      "typeId": 2910,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_4r02045p/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 3177483,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 1738,
+      "dynamicData": {},
+      "externalId": "1_4r02045p_1_00xtqc8f,1_4r02045p_1_w916jp4j,1_4r02045p_1_9woy5kil,1_4r02045p_1_utg5kl2a",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3635973,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1722772527,
+      "status": true,
+      "type": "Hss_playready",
+      "typeId": 2913,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_4r02045p/format/sl/tags/mbr/f/a.ism"
+     }
+    ],
+    "metas": {
+     "RunTime": {
+      "objectType": "KalturaStringValue",
+      "value": "28:58"
+     },
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 10
+     },
+     "Adult": {
+      "objectType": "KalturaBooleanValue",
+      "value": false
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "האח הגדול - הבית נחשף: הסרט מלא"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "GeoBlockRule": {
+      "objectType": "KalturaStringValue",
+      "value": "Israel Only"
+     },
+     "EpisodeNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 53
+     },
+     "LongSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "יעל בר זוהר נכנסת לבית הכי מדובר והכי מושקע במדינה, וחושפת את סודות העיצוב של הבית המפואר מבפנים. צפו בסרט המלא "
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Episode"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1490693687
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4646367287
+     }
+    },
+    "name": "האח הגדול - הבית נחשף: הסרט מלא",
+    "relatedEntities": {},
+    "startDate": 1490693687,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     },
+     "Quality": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "HD"
+       }
+      ]
+     },
+     "SeasonName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "עונה 1"
+       }
+      ]
+     }
+    },
+    "type": 1268,
+    "updateDate": 1782819144,
+    "entryId": "1_4r02045p",
+    "geoBlockRuleId": 400,
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Episode"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1717369374,
+    "description": "העונה החדשה של ה\"אח הגדול\" יצאה לדרך. 12 דיירים חדשים נכנסו לבית, ביניהם נכנסה לראשונה בתולדות התוכנית דיירת AI במסגרת המשימה הסודית",
+    "endDate": 4646367299,
+    "externalId": "entertainment-the-big-brother-season-06-episodes-01-full",
+    "id": 3043844,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "64d6c191b01a4f1a843b852f85270054",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/64d6c191b01a4f1a843b852f85270054/version/487",
+      "version": 487
+     }
+    ],
+    "mediaFiles": [
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 3043844,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 6019,
+      "dynamicData": {},
+      "externalId": "1_gpkjwrfr_1_5ec2g0lx,1_gpkjwrfr_1_cpf0rvtf,1_gpkjwrfr_1_5b5hiycq,1_gpkjwrfr_1_pbf3qzai,1_gpkjwrfr_1_zy92j0af,1_gpkjwrfr_1_40z593bs",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3583359,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1717369375,
+      "status": true,
+      "type": "Dash_playready",
+      "typeId": 2908,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_gpkjwrfr/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 3043844,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 6019,
+      "dynamicData": {},
+      "externalId": "1_gpkjwrfr_1_5ec2g0lx,1_gpkjwrfr_1_cpf0rvtf,1_gpkjwrfr_1_5b5hiycq,1_gpkjwrfr_1_pbf3qzai,1_gpkjwrfr_1_zy92j0af,1_gpkjwrfr_1_40z593bs",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3583360,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1717369375,
+      "status": true,
+      "type": "Hls_fairplay",
+      "typeId": 2909,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_gpkjwrfr/format/applehttp/tags/mbr/f/a.m3u8"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 3043844,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 6019,
+      "dynamicData": {},
+      "externalId": "1_gpkjwrfr_1_5ec2g0lx,1_gpkjwrfr_1_cpf0rvtf,1_gpkjwrfr_1_5b5hiycq,1_gpkjwrfr_1_pbf3qzai,1_gpkjwrfr_1_zy92j0af,1_gpkjwrfr_1_40z593bs",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3583362,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1717369375,
+      "status": true,
+      "type": "dash_widevine",
+      "typeId": 2910,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_gpkjwrfr/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 3043844,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 6019,
+      "dynamicData": {},
+      "externalId": "1_gpkjwrfr_1_5ec2g0lx,1_gpkjwrfr_1_cpf0rvtf,1_gpkjwrfr_1_5b5hiycq,1_gpkjwrfr_1_pbf3qzai,1_gpkjwrfr_1_zy92j0af,1_gpkjwrfr_1_40z593bs",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3583361,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1717369375,
+      "status": true,
+      "type": "Hss_playready",
+      "typeId": 2913,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/1_gpkjwrfr/format/sl/tags/mbr/f/a.ism"
+     }
+    ],
+    "metas": {
+     "RunTime": {
+      "objectType": "KalturaStringValue",
+      "value": "00:00"
+     },
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 3
+     },
+     "Adult": {
+      "objectType": "KalturaBooleanValue",
+      "value": false
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "האח הגדול, עונה 6, פרק 1: אירוע הכניסה החלק ראשון"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "GeoBlockRule": {
+      "objectType": "KalturaStringValue",
+      "value": "Israel Only"
+     },
+     "EpisodeNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 67
+     },
+     "LongSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "העונה החדשה של ה\"אח הגדול\" יצאה לדרך. 12 דיירים חדשים נכנסו לבית, ביניהם נכנסה לראשונה בתולדות התוכנית דיירת AI במסגרת המשימה הסודית"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Episode"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1490693699
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 4646367299
+     }
+    },
+    "name": "האח הגדול, עונה 6, פרק 1: אירוע הכניסה החלק ראשון",
+    "relatedEntities": {},
+    "startDate": 1490693699,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     },
+     "Quality": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "HD"
+       }
+      ]
+     },
+     "SeasonName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "עונה 6"
+       }
+      ]
+     }
+    },
+    "type": 1268,
+    "updateDate": 1782820177,
+    "entryId": "1_gpkjwrfr",
+    "geoBlockRuleId": 400,
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Episode"
+   },
+   {
+    "objectType": "KalturaMediaAsset",
+    "createDate": 1685350744,
+    "description": "משימת המתנות נמשכת. רונן, אמלי ויוסי תוקפים את יעל לאחר שקראה לגואל רצון \"סלב\", וטענו שבכך היא מאדירה אותו - ואף אמרו שיש לה חלק במה שקרה לה. בעקבות הדברים, ליאור תקף אותם והגן על יעל, שבחדר האח הגדול אמר שזה קשה לה: \"זה לא סיפור, אלה החיים האמיתיים\". במקביל, תקוה רבה בנפרד עם מישל ועם ירדן, ורות מכריזה מי ייצא מרשימת ההדחה - ומי ייכנס אליה. האח הגדול לצפייה ישירה",
+    "endDate": 4102704000,
+    "externalId": "0_mm4fjvfo",
+    "id": 2164350,
+    "images": [
+     {
+      "objectType": "KalturaMediaImage",
+      "id": "531ce759c8664ba2ba3feee46f4baaa3",
+      "imageTypeId": 148,
+      "imageTypeName": "16x9",
+      "isDefault": false,
+      "ratio": "16x9",
+      "url": "https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/5031/entry_id/531ce759c8664ba2ba3feee46f4baaa3/version/0",
+      "version": 0
+     }
+    ],
+    "mediaFiles": [
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2164350,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 4040,
+      "dynamicData": {},
+      "externalId": "0_mm4fjvfo_0_5zgrx0cm,0_mm4fjvfo_0_4r4sl1ap,0_mm4fjvfo_0_nvzhge3q,0_mm4fjvfo_0_8uf5hqki,0_mm4fjvfo_0_3vjsm19w",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3096239,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1685350744,
+      "status": true,
+      "type": "Dash_playready",
+      "typeId": 2908,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/0_mm4fjvfo/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2164350,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 4040,
+      "dynamicData": {},
+      "externalId": "0_mm4fjvfo_0_5zgrx0cm,0_mm4fjvfo_0_4r4sl1ap,0_mm4fjvfo_0_nvzhge3q,0_mm4fjvfo_0_8uf5hqki,0_mm4fjvfo_0_3vjsm19w",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3096240,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1685350744,
+      "status": true,
+      "type": "Hls_fairplay",
+      "typeId": 2909,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/0_mm4fjvfo/format/applehttp/tags/mbr/f/a.m3u8"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2164350,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 4040,
+      "dynamicData": {},
+      "externalId": "0_mm4fjvfo_0_5zgrx0cm,0_mm4fjvfo_0_4r4sl1ap,0_mm4fjvfo_0_nvzhge3q,0_mm4fjvfo_0_8uf5hqki,0_mm4fjvfo_0_3vjsm19w",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3096242,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1685350744,
+      "status": true,
+      "type": "dash_widevine",
+      "typeId": 2910,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/0_mm4fjvfo/format/mpegdash/tags/mbr/f/a.mpd"
+     },
+     {
+      "objectType": "KalturaMediaFile",
+      "additionalData": "",
+      "alternativeCdnAdapaterProfileId": 0,
+      "altExternalId": "",
+      "altStreamingCode": "",
+      "assetId": 2164350,
+      "catalogEndDate": 4070908800,
+      "cdnAdapaterProfileId": 618,
+      "duration": 4040,
+      "dynamicData": {},
+      "externalId": "0_mm4fjvfo_0_5zgrx0cm,0_mm4fjvfo_0_4r4sl1ap,0_mm4fjvfo_0_nvzhge3q,0_mm4fjvfo_0_8uf5hqki,0_mm4fjvfo_0_3vjsm19w",
+      "externalStoreId": "",
+      "fileSize": 0,
+      "id": 3096241,
+      "isDefaultLanguage": false,
+      "labels": "",
+      "language": "",
+      "opl": "",
+      "orderNum": 0,
+      "startDate": 1685350744,
+      "status": true,
+      "type": "Hss_playready",
+      "typeId": 2913,
+      "url": "https://reshet.g-mana.live/media/ed019b46-c4ef-45f9-a2f6-a3f1b17b3180/entryId/0_mm4fjvfo/format/sl/tags/mbr/f/a.ism"
+     }
+    ],
+    "metas": {
+     "RunTime": {
+      "objectType": "KalturaStringValue",
+      "value": "09:27"
+     },
+     "SeasonNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 3
+     },
+     "Adult": {
+      "objectType": "KalturaBooleanValue",
+      "value": false
+     },
+     "ShortSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "האח הגדול, עונה 2, פרק 7: פרשת גואל רצון מתפוצצת בבית"
+     },
+     "SeriesID": {
+      "objectType": "KalturaStringValue",
+      "value": "57"
+     },
+     "GeoBlockRule": {
+      "objectType": "KalturaStringValue",
+      "value": "Israel Only"
+     },
+     "EpisodeNumber": {
+      "objectType": "KalturaDoubleValue",
+      "value": 8
+     },
+     "LongSummary": {
+      "objectType": "KalturaMultilingualStringValue",
+      "value": "משימת המתנות נמשכת. רונן, אמלי ויוסי תוקפים את יעל לאחר שקראה לגואל רצון \"סלב\", וטענו שבכך היא מאדירה אותו - ואף אמרו שיש לה חלק במה שקרה לה. בעקבות הדברים, ליאור תקף אותם והגן על יעל, שבחדר האח הגדול אמר שזה קשה לה: \"זה לא סיפור, אלה החיים האמיתיים\". במקביל, תקוה רבה בנפרד עם מישל ועם ירדן, ורות מכריזה מי ייצא מרשימת ההדחה - ומי ייכנס אליה. האח הגדול לצפייה ישירה"
+     },
+     "MediaType": {
+      "objectType": "KalturaStringValue",
+      "value": "Episode"
+     },
+     "CatalogStartDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1685059200
+     },
+     "PlaybackEndDateTime": {
+      "objectType": "KalturaLongValue",
+      "value": 1685145600
+     }
+    },
+    "name": "האח הגדול, עונה 2, פרק 7: פרשת גואל רצון מתפוצצת בבית",
+    "relatedEntities": {},
+    "startDate": 1685059200,
+    "tags": {
+     "ParentalRating": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "P13"
+       }
+      ]
+     },
+     "Genre": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "ריאליטי"
+       }
+      ]
+     },
+     "CountryOfOrigin": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Israel"
+       }
+      ]
+     },
+     "Provider": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "Reshet13"
+       }
+      ]
+     },
+     "SeriesName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "האח הגדול"
+       }
+      ]
+     },
+     "Quality": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "HD"
+       }
+      ]
+     },
+     "SeasonName": {
+      "objectType": "KalturaMultilingualStringValueArray",
+      "objects": [
+       {
+        "objectType": "KalturaMultilingualStringValue",
+        "value": "עונה 2"
+       }
+      ]
+     }
+    },
+    "type": 1268,
+    "updateDate": 1716387681,
+    "entryId": "0_mm4fjvfo",
+    "geoBlockRuleId": 400,
+    "inheritancePolicy": "Enable",
+    "status": true,
+    "typeDescription": "Episode"
+   }
+  ],
+  "totalCount": 9
+ }
+}
