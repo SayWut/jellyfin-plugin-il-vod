@@ -4,7 +4,8 @@ A Jellyfin Channel plugin that shows Israeli VOD providers inside Jellyfin as **
 "IL-VOD": every enabled provider's shows on one tile, under one shared set of categories. It
 fetches only what a user opens or plays — nothing is downloaded, synced or crawled.
 
-Providers today: **mako 12+**. Adding another one is a matter of one folder under
+Providers today: **mako 12+** and **רשת 13** (whose streams play from an Israeli IP only, like
+mako's). Adding another one is a matter of one folder under
 `src/Jellyfin.Plugin.IlVod/Providers/` — see `docs/adding-a-provider.md`.
 
 History: this began as the mako-only plugin "Mako" (moved out of oneplus-media-server on
@@ -75,12 +76,22 @@ Dashboard → Plugins → IL-VOD:
 - **Categories**: one row per category a provider names by default, showing the shared
   category it is listed under. Type a different shared name to override that row, or leave it
   empty to keep the default. "Add a category" maps a provider category that the defaults
-  don't name. A category that no row names is shown exactly as the provider spells it.
+  don't name. The channel's categories are one closed set for every provider — ריאליטי,
+  דוקומנטרי, דרמה, קומדיה, בישול, בידור, אירוח, אקטואליה, לייפסטייל — plus **אחר**: a show whose
+  categories no row names, or that has none (most of mako's shows outside its genre lists), is
+  listed under אחר. Jellyfin copies a show's categories only when it first creates the show, so
+  a changed row reaches only shows that appear after the change.
 - **mako**:
   - **Catalogue cache (hours)**: how long the genre menu and lists are kept before mako is
-    asked again. The default is 24 hours; a cold open costs six paced requests.
+    asked again. The default is 24 hours; a cold open costs eight paced requests (the full show
+    list, the genre menu, five genre lists and the news list).
   - **App version**: the app version reported to mako, matching what mako's own Android app
     sends.
+
+- **רשת 13**:
+  - **Catalogue cache (hours)**: how long the series list is kept before Reshet 13 is asked
+    again. The default is 24 hours; a cold open costs one request (plus a login about once a
+    week). A show's episode list is kept for 6 hours (config-file-only: `Reshet13.ShowCacheHours`).
 
 Changes apply on the next request; no restart is needed. mako's other cache lifetimes (show
 page, past season, current season) and the stream-link lifetime are config-file-only.
@@ -91,6 +102,7 @@ page, past season, current season) and the stream-link lifetime are config-file-
 |---|---|---|
 | `mako-cache.json` | mako's page text and config files (genre lists 24 h, show 12 h, seasons 6 h / 7 d) | force mako to be refetched |
 | `mako-device.id` | the device id mako's entitlement service sees | get a new device id |
+| `reshet13-cache.json` | Reshet 13's series list and each opened show's episode list, parsed (24 h / 6 h) | force Reshet 13 to be refetched |
 | `show-snapshots.json` | each provider's last good show list, used only when a provider fails | forget the fallbacks |
 
 A resolved stream link is never written to any of these, or anywhere else on disk (N3). It

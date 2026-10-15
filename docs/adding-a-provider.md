@@ -40,10 +40,18 @@ read by `Source/` and converted by `Transform/`.
      happens later, in `Aggregation/CategoryMapper`.
    - `StreamLink.Description.Format`: the stream's codecs (`StreamFormat`), so Jellyfin can copy
      instead of transcoding. Leave it `null` if they are unknown; Jellyfin then probes.
+   - For an HLS stream, describe the master playlist with `Hls/MasterPlaylist` (and measure its
+     length with `Hls/MediaPlaylist` if the provider states none) rather than parsing it again.
    - Ids must be stable across restarts. A changed id makes Jellyfin recreate the item and lose
      its watched state.
-4. **Categories.** Create `Providers/<Name>/<Name>Categories.cs` mapping the provider's category
-   names onto `Core/SharedCategories`. Add a shared category there only if no existing one fits.
+4. **Categories.** Create `Providers/<Name>/<Name>Categories.cs` mapping **every** category name
+   the provider uses onto `Core/SharedCategories`. The shared categories are one closed set: a
+   name the mapping leaves out, and a show with no category, land in `SharedCategories.Fallback`
+   ("אחר") rather than becoming a category of their own. Add a shared category only when no
+   existing one fits and the category is a real genre other providers will have too; map a
+   provider's brand names (e.g. `דיגיטל 13`) to what their shows are. `<Name>CategoriesTests`
+   should check every value is in `SharedCategories.All`. Reshet 13 (`Providers/Reshet13/`) is
+   the second worked example, over a JSON API rather than mako's pages.
 5. **Provider.** Create `Providers/<Name>/<Name>Provider.cs` implementing `IContentProvider`, with
    a static `ProviderInfo`:
    - `Id`: lower-case `[a-z0-9]+`, **never changed afterwards** (it prefixes every item id).
@@ -72,6 +80,8 @@ read by `Source/` and converted by `Transform/`.
 ## What you get for free
 
 - One tile: the provider's shows appear in the IL-VOD channel next to every other provider's.
+- One set of categories: its shows sit under the same shared categories as every other
+  provider's, with "אחר" for whatever its mapping does not cover.
 - Failure isolation: if the provider is down, the channel serves its last good show list
   (`show-snapshots.json`) or leaves it out. The other providers are unaffected.
 - A toggle and a category table on the settings page.
