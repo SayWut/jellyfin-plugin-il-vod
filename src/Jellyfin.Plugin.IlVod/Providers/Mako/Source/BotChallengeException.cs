@@ -1,4 +1,5 @@
 using Jellyfin.Plugin.IlVod.Core;
+using Jellyfin.Plugin.IlVod.Net;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
@@ -7,13 +8,13 @@ namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 /// <see cref="MakoUrls.BotChallengeHost"/>, or the request was refused outright because
 /// <see cref="RequestPacer.IsBackingOff"/> was already true. Callers back off
 /// <see cref="MakoUrls.BrowseHost"/> traffic for a while rather than retrying (N4). Per N3 the
-/// message never carries a query string — <see cref="MakoUrls.RedactedUrl"/> is the one place
+/// message never carries a query string — <see cref="SafeUrl.Redacted"/> is the one place
 /// that guarantees it.
 /// </summary>
 public sealed class BotChallengeException : ProviderUnavailableException
 {
     public BotChallengeException(string url)
-        : base($"mako: bot challenge while requesting {MakoUrls.RedactedUrl(url)}")
+        : base($"mako: bot challenge while requesting {SafeUrl.Redacted(url)}")
     {
     }
 }

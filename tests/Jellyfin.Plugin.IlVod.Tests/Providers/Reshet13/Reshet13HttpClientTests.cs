@@ -88,12 +88,6 @@ public class Reshet13HttpClientTests
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => client.PostJsonAsync(ListUrl, "{}", cancelled.Token));
     }
 
-    [Fact]
-    public void RequestLogLinesNameOnlyTheHostAndPath()
-    {
-        Assert.Equal("cfvod.kaltura.com/a/index.m3u8", Reshet13Urls.RedactedUrl(SignedUrl));
-    }
-
     private static Reshet13HttpClient CreateClient(StubHttpHandler handler) =>
         new(new HttpClient(handler), new RecordingLogger<Reshet13HttpClient>());
 

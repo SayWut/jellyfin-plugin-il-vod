@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Jellyfin.Plugin.IlVod.Net;
 using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 namespace Jellyfin.Plugin.IlVod.Tests.Support;
@@ -129,7 +130,7 @@ public sealed class FakeMakoHttp : IMakoHttp
 
         if (_failingUrls.Contains(url))
         {
-            throw new MakoRequestException($"HTTP 500 for {MakoUrls.RedactedUrl(url)}");
+            throw new MakoRequestException($"HTTP 500 for {SafeUrl.Redacted(url)}");
         }
 
         return _responses.TryGetValue(url, out string? body)

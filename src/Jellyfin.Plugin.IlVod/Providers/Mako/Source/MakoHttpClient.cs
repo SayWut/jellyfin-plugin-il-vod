@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net;
 using System.Text;
+using Jellyfin.Plugin.IlVod.Net;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
@@ -105,7 +106,7 @@ public sealed class MakoHttpClient : IMakoHttp
             currentUrl = ResolveRedirectOrThrow(response, currentUrl);
         }
 
-        throw new MakoRequestException($"too many redirects for {MakoUrls.RedactedUrl(currentUrl)}");
+        throw new MakoRequestException($"too many redirects for {SafeUrl.Redacted(currentUrl)}");
     }
 
     private async Task<HttpResponseMessage> SendOnceAsync(Func<string, HttpRequestMessage> requestFactory, string url, CancellationToken cancellationToken)
@@ -120,11 +121,11 @@ public sealed class MakoHttpClient : IMakoHttp
         }
         catch (HttpRequestException exception)
         {
-            throw new MakoRequestException($"request failed for {MakoUrls.RedactedUrl(url)}", RedactIfItNamesTheUrl(exception, url));
+            throw new MakoRequestException($"request failed for {SafeUrl.Redacted(url)}", RedactIfItNamesTheUrl(exception, url));
         }
         catch (TaskCanceledException exception) when (!cancellationToken.IsCancellationRequested)
         {
-            throw new MakoRequestException($"request timed out for {MakoUrls.RedactedUrl(url)}", RedactIfItNamesTheUrl(exception, url));
+            throw new MakoRequestException($"request timed out for {SafeUrl.Redacted(url)}", RedactIfItNamesTheUrl(exception, url));
         }
     }
 
@@ -136,7 +137,7 @@ public sealed class MakoHttpClient : IMakoHttp
     /// </summary>
     private static Exception RedactIfItNamesTheUrl(Exception exception, string url) =>
         exception.Message.Contains(url, StringComparison.Ordinal)
-            ? new MakoRequestException(exception.Message.Replace(url, MakoUrls.RedactedUrl(url), StringComparison.Ordinal))
+            ? new MakoRequestException(exception.Message.Replace(url, SafeUrl.Redacted(url), StringComparison.Ordinal))
             : exception;
 
     private static void AddAppHeaders(HttpRequestMessage request)
@@ -150,7 +151,7 @@ public sealed class MakoHttpClient : IMakoHttp
     {
         if (!response.IsSuccessStatusCode)
         {
-            throw new MakoRequestException($"HTTP {(int)response.StatusCode} for {MakoUrls.RedactedUrl(url)}");
+            throw new MakoRequestException($"HTTP {(int)response.StatusCode} for {SafeUrl.Redacted(url)}");
         }
 
         return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -161,7 +162,7 @@ public sealed class MakoHttpClient : IMakoHttp
         Uri? location = response.Headers.Location;
         if (location is null)
         {
-            throw new MakoRequestException($"redirect without a Location header for {MakoUrls.RedactedUrl(currentUrl)}");
+            throw new MakoRequestException($"redirect without a Location header for {SafeUrl.Redacted(currentUrl)}");
         }
 
         Uri resolved = location.IsAbsoluteUri ? location : new Uri(new Uri(currentUrl), location);
@@ -176,7 +177,7 @@ public sealed class MakoHttpClient : IMakoHttp
     }
 
     private void LogRequest(HttpMethod method, string url) =>
-        _logger.LogInformation("mako: request {Method} {HostAndPath}", method, MakoUrls.RedactedUrl(url));
+        _logger.LogInformation("mako: request {Method} {HostAndPath}", method, SafeUrl.Redacted(url));
 
     private static bool IsBrowseHost(string url) => new Uri(url).Host == MakoUrls.BrowseHost;
 

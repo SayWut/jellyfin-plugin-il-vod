@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using Jellyfin.Plugin.IlVod.Cache;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Hls;
+using Jellyfin.Plugin.IlVod.Net;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Reshet13.Source;
@@ -232,7 +233,7 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
         {
             _logger.LogWarning(
                 "reshet13: could not describe the master playlist at {HostAndPath} ({Reason}); using the default stream description",
-                Reshet13Urls.RedactedUrl(manifestUrl),
+                SafeUrl.Redacted(manifestUrl),
                 exception.GetType().Name);
             return null;
         }
@@ -260,7 +261,7 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
         {
             _logger.LogWarning(
                 "reshet13: could not measure the length from {HostAndPath} ({Reason}); Jellyfin will treat the stream as live",
-                Reshet13Urls.RedactedUrl(variantUrl.AbsoluteUri),
+                SafeUrl.Redacted(variantUrl.AbsoluteUri),
                 exception.GetType().Name);
             return null;
         }
