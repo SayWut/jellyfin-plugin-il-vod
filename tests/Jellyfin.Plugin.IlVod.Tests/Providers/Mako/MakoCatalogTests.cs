@@ -2,6 +2,7 @@ using Jellyfin.Plugin.IlVod.Browsing;
 using Jellyfin.Plugin.IlVod.Cache;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 using Jellyfin.Plugin.IlVod.Tests.Support;
 using MediaBrowser.Controller.Channels;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -68,7 +69,7 @@ public class MakoCatalogTests
     public async Task TheChannelListsEveryShowOfEveryRealGenreOnceWithItsGenres()
     {
         FakeMakoHttp http = SeededHttp();
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         IReadOnlyList<Show> shows = await catalog.GetShowsAsync(CancellationToken.None);
 
@@ -127,7 +128,7 @@ public class MakoCatalogTests
         FakeMakoHttp http = SeededHttp();
         Genre realityGenre = MakoIndex.ParseGenres(MenuJson).Single(genre => genre.Name == genreName);
         http.Respond(MakoUrls.Page(BaseUrlTemplate, realityGenre.PagePath), listWithADuplicateEntry);
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         IReadOnlyList<Show> shows = await catalog.GetShowsAsync(CancellationToken.None);
 
@@ -139,7 +140,7 @@ public class MakoCatalogTests
     public async Task OpeningTheChannelCostsTheMenuAndOneRequestPerRealGenreAndThenNothing()
     {
         FakeMakoHttp http = SeededHttp();
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         await catalog.GetShowsAsync(CancellationToken.None);
         Assert.Equal(6, http.Requests.Count(url => url.Contains(MakoUrls.BrowseHost, StringComparison.Ordinal)));
@@ -154,7 +155,7 @@ public class MakoCatalogTests
     {
         FakeMakoHttp http = SeededHttp();
         http.Challenge(MakoUrls.Page(BaseUrlTemplate, MakoIndex.ParseGenres(MenuJson)[2].PagePath)); // דרמה
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         await Assert.ThrowsAsync<BotChallengeException>(() => catalog.GetShowsAsync(CancellationToken.None));
     }
@@ -169,7 +170,7 @@ public class MakoCatalogTests
         FakeMakoHttp http = SeededHttp();
         string realityListUrl = MakoUrls.Page(BaseUrlTemplate, MakoIndex.ParseGenres(MenuJson)[0].PagePath); // ריאליטי
         http.Respond(realityListUrl, EmptyListJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
         await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
@@ -184,7 +185,7 @@ public class MakoCatalogTests
         FakeMakoHttp http = SeededHttp();
         string dramaListUrl = MakoUrls.Page(BaseUrlTemplate, MakoIndex.ParseGenres(MenuJson)[2].PagePath); // דרמה
         http.Respond(dramaListUrl, HtmlErrorPage);
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
         await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
@@ -196,7 +197,7 @@ public class MakoCatalogTests
     {
         FakeClock clock = new();
         FakeMakoHttp http = SeededHttp();
-        MakoCatalog catalog = await CreateCatalogAsync(http, clock); // builds both TimedCaches over the given FakeClock
+        ICatalog catalog = await CreateCatalogAsync(http, clock); // builds both TimedCaches over the given FakeClock
         IReadOnlyList<Show> first = await catalog.GetShowsAsync(CancellationToken.None);
 
         clock.Advance(CatalogueLifetimes.Default.Catalogue + TimeSpan.FromMinutes(1));
@@ -213,7 +214,7 @@ public class MakoCatalogTests
     {
         FakeMakoHttp http = SeededHttp();
         http.Respond(MakoUrls.Page(BaseUrlTemplate, MakoIndexPaths.GenreMenu), HtmlErrorPage);
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
         await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
@@ -229,7 +230,7 @@ public class MakoCatalogTests
     {
         FakeMakoHttp http = SeededHttp();
         http.Respond(MakoUrls.Page(BaseUrlTemplate, MakoIndexPaths.GenreMenu), """{"menuItems":[]}""");
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
         await Assert.ThrowsAsync<FormatException>(() => catalog.GetShowsAsync(CancellationToken.None));
@@ -240,7 +241,7 @@ public class MakoCatalogTests
     public async Task EpisodesAreNamedAfterTheirShowFromTheCachedListsWithoutARequest()
     {
         FakeMakoHttp http = SeededHttp();
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
         await catalog.GetShowsAsync(CancellationToken.None);
         int requestsBefore = http.Requests.Count;
 
@@ -254,7 +255,7 @@ public class MakoCatalogTests
     public async Task AnUnknownShowStillListsItsEpisodesWithNoSeriesName()
     {
         FakeMakoHttp http = SeededHttp();
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         IReadOnlyList<Episode> episodes = await catalog.GetEpisodesAsync("/mako-vod-keshet/never-listed", SeasonOnePagePath, CancellationToken.None);
 
@@ -267,7 +268,7 @@ public class MakoCatalogTests
     public async Task AnyShowsSeasonsCanBeOpenedNotJustAPinnedOne()
     {
         FakeMakoHttp http = SeededHttp();
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         Assert.NotEmpty(await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None));
     }
@@ -287,7 +288,7 @@ public class MakoCatalogTests
         string showJson = InlineShowPageJson(showPath, seasonCount: 3, displayedSeasonNumber: 3, episodeTitle: "S3 Episode");
         FakeMakoHttp http = new();
         http.Respond(MakoUrls.Page(BaseUrlTemplate, showPath), showJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
         int requestsAfterSeasons = http.Requests.Count;
@@ -315,7 +316,7 @@ public class MakoCatalogTests
         FakeMakoHttp http = new();
         http.Respond(MakoUrls.Page(BaseUrlTemplate, showPath), showJson);
         http.Respond(MakoUrls.Page(BaseUrlTemplate, latestSeasonPath), latestSeasonJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
         int requestsAfterSeasons = http.Requests.Count;
@@ -335,7 +336,7 @@ public class MakoCatalogTests
         FakeClock clock = new();
         FakeMakoHttp http = new();
         http.Respond(SeasonOneUrl, SeasonOnePageJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
+        ICatalog catalog = await CreateCatalogAsync(http, clock);
 
         await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
         int requestsAfterFirst = http.Requests.Count;
@@ -364,7 +365,7 @@ public class MakoCatalogTests
         FakeClock clock = new();
         FakeMakoHttp http = new();
         http.Respond(DisplayedSeasonUrl, ShowPageJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
+        ICatalog catalog = await CreateCatalogAsync(http, clock);
 
         await catalog.GetSeasonsAsync(DisplayedSeasonPath, CancellationToken.None);
         int requestsAfterFirst = http.Requests.Count;
@@ -382,7 +383,7 @@ public class MakoCatalogTests
         FakeClock clock = new();
         FakeMakoHttp http = new();
         http.Respond(DisplayedSeasonUrl, ShowPageJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
+        ICatalog catalog = await CreateCatalogAsync(http, clock);
 
         // Opened directly through GetEpisodesAsync, never through GetSeasonsAsync, so this is a
         // fresh cache entry governed purely by the "is this the latest season" 6h lifetime.
@@ -403,7 +404,7 @@ public class MakoCatalogTests
         FakeClock clock = new();
         FakeMakoHttp http = new();
         http.Respond(MakoUrls.Page(BaseUrlTemplate, showPath), showJson);
-        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
+        ICatalog catalog = await CreateCatalogAsync(http, clock);
 
         await catalog.GetSeasonsAsync(showPath, CancellationToken.None);
         int requestsAfterFirst = http.Requests.Count;
@@ -426,7 +427,7 @@ public class MakoCatalogTests
         FakeMakoHttp http = new();
         http.Respond(PlaylistUrl, EncryptedPlaylist(isProtected: false));
         http.Respond(MediaUrl, MasterPlaylistText);
-        MakoCatalog catalog = await CreateCatalogAsync(http, clock);
+        ICatalog catalog = await CreateCatalogAsync(http, clock);
 
         StreamLink first = await catalog.GetStreamLinkAsync(Episode.ToString(), CancellationToken.None);
         int requestsAfterFirstResolve = http.Requests.Count;
@@ -464,7 +465,7 @@ public class MakoCatalogTests
             http.Respond(PlaylistUrl, EncryptedPlaylist(isProtected: true));
             http.Respond(TokenUrl, EncryptedTokenResponse());
             http.Respond(FinalMediaUrl, MasterPlaylistText);
-            MakoCatalog catalog = await CreateCatalogAsync(http, pageCachePersistencePath: persistencePath);
+            ICatalog catalog = await CreateCatalogAsync(http, pageCachePersistencePath: persistencePath);
 
             await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None);
             await catalog.GetStreamLinkAsync(Episode.ToString(), CancellationToken.None);
@@ -522,7 +523,7 @@ public class MakoCatalogTests
     public async Task AMalformedEpisodeIdFailsAsAnUnavailableStreamNotARawFormatException()
     {
         FakeMakoHttp http = new();
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         StreamUnavailableException exception = await Assert.ThrowsAsync<StreamUnavailableException>(
             () => catalog.GetStreamLinkAsync("not-a-valid-episode-id", CancellationToken.None));
@@ -643,13 +644,13 @@ public class MakoCatalogTests
     private static Task<ChannelItemResult> OpenFolder(MakoChannel channel, FolderId folder) =>
         channel.GetChannelItems(new InternalChannelItemQuery { FolderId = folder.ToString(), UserId = Guid.NewGuid() }, CancellationToken.None);
 
-    private static Task<MakoCatalog> CreateCatalogAsync(FakeMakoHttp http, string? pageCachePersistencePath = null) =>
+    private static Task<ICatalog> CreateCatalogAsync(FakeMakoHttp http, string? pageCachePersistencePath = null) =>
         CreateCatalogAsync(http, new FakeClock(), pageCachePersistencePath);
 
     /// <summary>Builds a catalog whose two <see cref="TimedCache"/>s (page cache and stream-link
     /// cache) both run over <paramref name="clock"/>, so a test can advance one clock and see both
     /// caches age together — needed by <see cref="AStaleCatalogueIsServedWhenMakoRefusesTheRefetch"/>.</summary>
-    private static async Task<MakoCatalog> CreateCatalogAsync(FakeMakoHttp http, IClock clock, string? pageCachePersistencePath = null)
+    private static async Task<ICatalog> CreateCatalogAsync(FakeMakoHttp http, IClock clock, string? pageCachePersistencePath = null)
     {
         TimedCache pageCache = new(clock, pageCachePersistencePath);
         TimedCache streamLinkCache = new(clock);
@@ -657,7 +658,7 @@ public class MakoCatalogTests
         MakoPageSource pages = new(http, config, pageCache, new RecordingLogger<MakoPageSource>());
         StreamResolver resolver = new(http, config, CreateDevice(), () => AppVersion, new RecordingLogger<StreamResolver>());
 
-        return new MakoCatalog(pages, resolver, streamLinkCache, () => CatalogueLifetimes.Default, NullLogger<MakoCatalog>.Instance);
+        return MakoTestCatalog.Over(pages, resolver, streamLinkCache);
     }
 
     /// <summary>

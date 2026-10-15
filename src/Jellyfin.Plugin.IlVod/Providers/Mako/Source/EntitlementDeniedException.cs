@@ -1,4 +1,4 @@
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// mako's entitlement service refused to issue a playback ticket for a protected episode: the

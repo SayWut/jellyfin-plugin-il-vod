@@ -1,4 +1,4 @@
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// A <see cref="RequestPacer"/> refused to grant a turn because it was already backing off — a

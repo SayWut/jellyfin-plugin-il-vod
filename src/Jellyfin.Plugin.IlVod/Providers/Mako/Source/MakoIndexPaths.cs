@@ -1,4 +1,4 @@
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>The page paths of mako's show index (spec §6.0): the genre menu, and the rule that
 /// tells a real genre's list from the provider, A–B and playlist entries the menu also carries.</summary>

@@ -1,6 +1,7 @@
 using Jellyfin.Plugin.IlVod.Cache;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 using Jellyfin.Plugin.IlVod.Tests.Support;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -9,7 +10,7 @@ namespace Jellyfin.Plugin.IlVod.Tests.Providers.Mako;
 /// <summary>
 /// N1's definition of done (spec §2): one <see cref="FakeMakoHttp"/> wired through the real
 /// <see cref="MakoConfigLoader"/>, <see cref="MakoPageSource"/>, <see cref="StreamResolver"/> and
-/// <see cref="MakoCatalog"/>, counting requests after every step of a user session — browsing a
+/// <see cref="MakoSource"/> (through <see cref="MakoTestCatalog"/>), counting requests after every step of a user session — browsing a
 /// show, its current season, a past season, and pressing play — to prove that only what each
 /// action actually needs is ever asked of mako, nothing ahead of it and nothing repeated inside a
 /// cache's lifetime.
@@ -21,7 +22,7 @@ public class OnDemandRequestBudgetTests
     // The show's own landing path, which is NOT the same as whichever season page it happens to
     // display (that is DisplayedSeasonPath below). Serving the show-page fixture's JSON at this
     // distinct url is what makes the "current season" row of the table below a genuine test of
-    // MakoCatalog.Remember-ing under a different cache key, rather than a same-key overwrite that
+    // MakoSource.Remember-ing under a different cache key, rather than a same-key overwrite that
     // would pass even if nothing were remembered at all.
     private const string ShemeshPagePath = "/mako-vod-keshet/shemesh";
     private const string DisplayedSeasonPath = "/mako-vod-keshet/shemesh-s6";
@@ -71,7 +72,7 @@ public class OnDemandRequestBudgetTests
     public async Task TheRequestBudgetMatchesEveryStepOfTheOnDemandTable()
     {
         FakeMakoHttp http = SeededHttp();
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         // | Open the channel (cold catalogue) | 6 (menu + 5 genre lists) |
         await catalog.GetShowsAsync(CancellationToken.None);
@@ -126,7 +127,7 @@ public class OnDemandRequestBudgetTests
     public async Task NothingIsEverRequestedForSeasonsNobodyOpened()
     {
         FakeMakoHttp http = SeededHttp();
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None);
         await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
@@ -146,7 +147,7 @@ public class OnDemandRequestBudgetTests
     public async Task NothingIsEverRequestedForShowsNobodyOpened()
     {
         FakeMakoHttp http = SeededHttp();
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         await catalog.GetShowsAsync(CancellationToken.None);
 
@@ -162,7 +163,7 @@ public class OnDemandRequestBudgetTests
     public async Task ASeasonOpenNeverTurnsIntoAnIndexBurst()
     {
         FakeMakoHttp http = SeededHttp();
-        MakoCatalog catalog = await CreateCatalogAsync(http);
+        ICatalog catalog = await CreateCatalogAsync(http);
 
         await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
 
@@ -231,7 +232,7 @@ public class OnDemandRequestBudgetTests
     private static string EncryptedTokenResponse() =>
         PayloadCipher.Encrypt(TokenKey, $$"""{ "caseId": 1, "tickets": [ { "ticket": "{{Uri.EscapeDataString(DecodedTicket)}}" } ] }""");
 
-    private static async Task<MakoCatalog> CreateCatalogAsync(FakeMakoHttp http)
+    private static async Task<ICatalog> CreateCatalogAsync(FakeMakoHttp http)
     {
         FakeClock clock = new();
         TimedCache pageCache = new(clock);
@@ -240,7 +241,7 @@ public class OnDemandRequestBudgetTests
         MakoPageSource pages = new(http, config, pageCache, new RecordingLogger<MakoPageSource>());
         StreamResolver resolver = new(http, config, CreateDevice(), () => AppVersion, new RecordingLogger<StreamResolver>());
 
-        return new MakoCatalog(pages, resolver, streamLinkCache, () => CatalogueLifetimes.Default, NullLogger<MakoCatalog>.Instance);
+        return MakoTestCatalog.Over(pages, resolver, streamLinkCache);
     }
 
     /// <summary>

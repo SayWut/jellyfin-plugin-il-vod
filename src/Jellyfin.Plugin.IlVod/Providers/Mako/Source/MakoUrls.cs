@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// Builds the URLs mako's own Android app builds: filling placeholders into templates the app

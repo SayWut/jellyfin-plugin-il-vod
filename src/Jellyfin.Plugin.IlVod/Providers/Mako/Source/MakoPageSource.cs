@@ -3,13 +3,13 @@ using System.Diagnostics.CodeAnalysis;
 using Jellyfin.Plugin.IlVod.Cache;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// Fetches a mako show/season page through the cache lifetimes spec §2 assigns them (N2), serving
 /// a stale copy rather than failing outright when mako refuses (spec §5.4). Parsing the page's
 /// JSON belongs to <see cref="MakoPages"/>; deciding what to do with the parsed result — which
-/// page to fetch next, how long it may live — belongs to <c>MakoCatalog</c> (task B9).
+/// page to fetch next, how long it may live — belongs to <c>MakoSource</c>.
 /// </summary>
 public sealed class MakoPageSource
 {
@@ -69,7 +69,7 @@ public sealed class MakoPageSource
 
         // lifetimeOf is likewise taken from whichever caller happens to start the fetch: every
         // caller asking for the same page path always passes an equivalent function in this
-        // codebase (MakoCatalog decides it from the page path alone), so that is acceptable.
+        // codebase (MakoSource decides it from the page path alone), so that is acceptable.
         Task<string> fetch = _inFlightFetches.GetOrAdd(pagePath, _ => StartFetch(pagePath, cacheKey, lifetimeOf));
 
         try
@@ -105,8 +105,8 @@ public sealed class MakoPageSource
 
     /// <summary>
     /// Peeks at whatever copy of <paramref name="pagePath"/> is cached, fresh or stale, without
-    /// ever making a request. <c>MakoCatalog.GetShowsAsync</c> (task B9) is built on this so
-    /// opening the channel can never cost mako anything (N1).
+    /// ever making a request. <c>MakoSource.ShowNameOf</c> is built on this so naming a
+    /// season's episodes after their show never costs an index request (N1).
     /// </summary>
     public bool TryGetCached(string pagePath, [NotNullWhen(true)] out string? json)
     {

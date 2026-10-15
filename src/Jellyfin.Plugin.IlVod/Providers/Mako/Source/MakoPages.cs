@@ -1,14 +1,14 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Jellyfin.Plugin.IlVod.Core;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// Parses the JSON mako serves for a show or season page (both have the same shape, spec §5.2):
-/// the show's seasons and overview, one season's episodes, and whether a page is the current
-/// season. Parsing only - fetching and caching the page text belongs to <c>MakoPageSource</c>.
+/// the show's seasons and overview, one season's episode entries, and whether a page is the current
+/// season. Parsing only, into mako's own records - fetching and caching the page text belongs to
+/// <c>MakoPageSource</c>, turning the records into the shared model to <c>MakoTransformer</c>.
 /// </summary>
 public static class MakoPages
 {
@@ -16,14 +16,7 @@ public static class MakoPages
     private const string AdComponentLayout = "ad";
     private const string DefaultSeasonName = "עונה 1";
 
-    // The two-digit year in extraInfo's air date: 70-99 means 19xx, anything else 20xx.
-    private const int TwoDigitYearCenturyPivot = 70;
-    private const int NineteenHundred = 1900;
-    private const int TwoThousand = 2000;
-
     private static readonly Regex SeasonNumberPattern = new(@"\d+", RegexOptions.Compiled);
-    private static readonly Regex EpisodeNumberPattern = new(@"פרק\s*(\d+)", RegexOptions.Compiled);
-    private static readonly Regex AirDatePattern = new(@"@(\d{2})\.(\d{2})\.(\d{2})", RegexOptions.Compiled);
 
     public static ShowPage ParseShowPage(string pageJson)
     {
@@ -37,7 +30,7 @@ public static class MakoPages
             DisplayedSeasonId: DisplayedSeasonIdOf(root));
     }
 
-    public static IReadOnlyList<Episode> ParseEpisodes(string pageJson, string showName, int seasonNumber)
+    public static IReadOnlyList<MakoEpisodeEntry> ParseEpisodes(string pageJson)
     {
         using JsonDocument document = ParseDocument(pageJson);
         JsonElement root = RequireObjectRoot(document.RootElement);
@@ -47,7 +40,7 @@ public static class MakoPages
             return [];
         }
 
-        List<Episode> episodes = [];
+        List<MakoEpisodeEntry> episodes = [];
         foreach (JsonElement entry in episodeEntries.Value.EnumerateArray())
         {
             if (IsAdEntry(entry) || TryReadEpisodeKey(entry) is not EpisodeKey key)
@@ -55,7 +48,11 @@ public static class MakoPages
                 continue;
             }
 
-            episodes.Add(ToEpisode(entry, key, showName, seasonNumber, position: episodes.Count + 1));
+            episodes.Add(new MakoEpisodeEntry(
+                key,
+                Title: TryGetString(entry, "title") ?? string.Empty,
+                ExtraInfo: TryGetString(entry, "extraInfo"),
+                ThumbnailUrl: FirstStringIn(entry, "pics", "picUrl")));
         }
 
         return episodes;
@@ -79,8 +76,8 @@ public static class MakoPages
             return true;
         }
 
-        Season? latestSeason = ParseSeasons(root).MaxBy(season => season.Number);
-        return latestSeason?.Id == seasonPagePath;
+        MakoSeason? latestSeason = ParseSeasons(root).MaxBy(season => season.Number);
+        return latestSeason?.PageUrl == seasonPagePath;
     }
 
     private static JsonDocument ParseDocument(string pageJson)
@@ -106,14 +103,14 @@ public static class MakoPages
         return root;
     }
 
-    private static IReadOnlyList<Season> ParseSeasons(JsonElement root)
+    private static IReadOnlyList<MakoSeason> ParseSeasons(JsonElement root)
     {
         if (!TryGetArray(root, "seasons", out JsonElement seasonEntries))
         {
-            return [new Season(PageUrlOf(root) ?? string.Empty, 1, DefaultSeasonName)];
+            return [new MakoSeason(PageUrlOf(root) ?? string.Empty, 1, DefaultSeasonName)];
         }
 
-        List<Season> seasons = [];
+        List<MakoSeason> seasons = [];
         foreach (JsonElement entry in seasonEntries.EnumerateArray())
         {
             // mako interleaves non-season placeholders elsewhere on its pages; tolerate the
@@ -126,7 +123,7 @@ public static class MakoPages
             string? title = TryGetString(entry, "seasonTitle");
             string id = TryGetString(entry, "pageUrl") ?? string.Empty;
             int number = SeasonNumberFrom(title, position: seasons.Count + 1);
-            seasons.Add(new Season(id, number, title ?? string.Empty));
+            seasons.Add(new MakoSeason(id, number, title ?? string.Empty));
         }
 
         return seasons;
@@ -192,49 +189,6 @@ public static class MakoPages
         return string.IsNullOrEmpty(vcmId) || string.IsNullOrEmpty(channelId) || string.IsNullOrEmpty(galleryChannelId)
             ? null
             : new EpisodeKey(vcmId, channelId, galleryChannelId);
-    }
-
-    private static Episode ToEpisode(JsonElement entry, EpisodeKey key, string showName, int seasonNumber, int position)
-    {
-        string? extraInfo = TryGetString(entry, "extraInfo");
-        return new Episode(
-            Id: key.ToString(),
-            ShowName: showName,
-            SeasonNumber: seasonNumber,
-            Number: EpisodeNumberFrom(extraInfo, position),
-            Name: TryGetString(entry, "title") ?? string.Empty,
-            AirDate: AirDateFrom(extraInfo),
-            Duration: null,
-            ThumbnailUrl: FirstStringIn(entry, "pics", "picUrl"));
-    }
-
-    private static int EpisodeNumberFrom(string? extraInfo, int position)
-    {
-        Match match = extraInfo is null ? Match.Empty : EpisodeNumberPattern.Match(extraInfo);
-        return match.Success ? int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture) : position;
-    }
-
-    private static DateTime? AirDateFrom(string? extraInfo)
-    {
-        Match match = extraInfo is null ? Match.Empty : AirDatePattern.Match(extraInfo);
-        if (!match.Success)
-        {
-            return null;
-        }
-
-        int day = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
-        int month = int.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
-        int twoDigitYear = int.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture);
-        int year = (twoDigitYear >= TwoDigitYearCenturyPivot ? NineteenHundred : TwoThousand) + twoDigitYear;
-
-        try
-        {
-            return new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc);
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            return null;
-        }
     }
 
     private static string? PosterUrlOf(JsonElement root) =>

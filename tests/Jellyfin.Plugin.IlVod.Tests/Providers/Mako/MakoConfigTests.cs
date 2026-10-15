@@ -1,4 +1,4 @@
-using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 using Jellyfin.Plugin.IlVod.Tests.Support;
 
 namespace Jellyfin.Plugin.IlVod.Tests.Providers.Mako;

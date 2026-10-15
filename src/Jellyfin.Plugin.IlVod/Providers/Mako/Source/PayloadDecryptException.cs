@@ -1,4 +1,4 @@
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// A mako payload — a playlist or a token response — could not be decrypted: the ciphertext

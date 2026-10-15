@@ -2,6 +2,8 @@ using Jellyfin.Plugin.IlVod.Cache;
 using Jellyfin.Plugin.IlVod.Configuration;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Transform;
 using Jellyfin.Plugin.IlVod.Transcoding;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Plugins;
@@ -84,12 +86,18 @@ internal static class MakoServiceCollectionExtensions
             provider.GetRequiredService<BrowseCache>().Value,
             provider.GetRequiredService<ILogger<MakoPageSource>>()));
 
-        services.AddSingleton<ICatalog>(provider => new MakoCatalog(
+        services.AddSingleton(provider => new MakoSource(
             provider.GetRequiredService<MakoPageSource>(),
             provider.GetRequiredService<StreamResolver>(),
-            provider.GetRequiredService<StreamLinkCache>().Value,
             () => CatalogueLifetimesFrom(configuration()),
-            provider.GetRequiredService<ILogger<MakoCatalog>>()));
+            provider.GetRequiredService<ILogger<MakoSource>>()));
+
+        // The only place mako's fetching half and its converting half meet.
+        services.AddSingleton<ICatalog>(provider => new SourceCatalog<MakoShowIndex, ShowPage, MakoSeasonPage, MakoResolvedStream>(
+            provider.GetRequiredService<MakoSource>(),
+            new MakoTransformer(),
+            provider.GetRequiredService<StreamLinkCache>().Value,
+            () => CatalogueLifetimesFrom(configuration()).StreamLink));
 
         // Lazy, not ICatalog: Jellyfin constructs every IChannel before any plugin instance
         // exists (see MakoChannel's own remarks), and building the catalogue reads the data

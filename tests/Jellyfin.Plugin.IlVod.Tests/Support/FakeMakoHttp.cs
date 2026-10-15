@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 namespace Jellyfin.Plugin.IlVod.Tests.Support;
 

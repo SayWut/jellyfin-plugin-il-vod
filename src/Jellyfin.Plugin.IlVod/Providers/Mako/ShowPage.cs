@@ -1,5 +1,3 @@
-using Jellyfin.Plugin.IlVod.Core;
-
 namespace Jellyfin.Plugin.IlVod.Providers.Mako;
 
 /// <summary>
@@ -12,4 +10,4 @@ namespace Jellyfin.Plugin.IlVod.Providers.Mako;
 /// necessarily the season currently airing (see <see cref="MakoPages.IsLatestSeason"/>): a page
 /// for a past season marks that same past season as its own "current" (displayed) one.
 /// </param>
-public sealed record ShowPage(string? Overview, string? PosterUrl, IReadOnlyList<Season> Seasons, string? DisplayedSeasonId);
+public sealed record ShowPage(string? Overview, string? PosterUrl, IReadOnlyList<MakoSeason> Seasons, string? DisplayedSeasonId);

@@ -1,21 +1,19 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
 using System.Text.Json;
-using Jellyfin.Plugin.IlVod.Core;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// Resolves a playable stream at the moment play is pressed (spec §5.2): fetch and decrypt the
 /// episode's playlist, mint an entitlement token when the item is protected, and describe the
-/// stream from its HLS master playlist. Nothing here is cached — task B8's <c>MakoPageSource</c>
-/// is where the 5-minute stream-link cache (N2) lives, since a signed URL must never sit on disk
-/// (N3) and this class has no disk of its own to sit on.
+/// stream from its HLS master playlist. Nothing here is cached — <c>SourceCatalog</c> is where the
+/// 5-minute stream-link cache (N2) lives, in memory only, since a signed URL must never sit on
+/// disk (N3) and this class has no disk of its own to sit on.
 /// </summary>
 public sealed class StreamResolver
 {
-    private const string HlsContainer = "hls";
     private const string TokenContentType = "application/json; charset=utf-8";
     private const string EntitlementType = "ngt";
 
@@ -62,7 +60,7 @@ public sealed class StreamResolver
         _logger = logger;
     }
 
-    public async Task<StreamLink> ResolveAsync(EpisodeKey episode, CancellationToken cancellationToken)
+    public async Task<MakoResolvedStream> ResolveAsync(EpisodeKey episode, CancellationToken cancellationToken)
     {
         MakoConfig config = await LoadConfigAsync(cancellationToken).ConfigureAwait(false);
         (config, string playlistJson) = await FetchPlaylistAsync(config, episode, cancellationToken).ConfigureAwait(false);
@@ -73,7 +71,7 @@ public sealed class StreamResolver
             ? await AuthorizeAsync(config, episode, media, cancellationToken).ConfigureAwait(false)
             : media.Url;
 
-        StreamDescription description = await DescribeMasterPlaylistAsync(finalUrl, cancellationToken).ConfigureAwait(false);
+        (MakoStreamVariant? variant, TimeSpan? duration) = await DescribeMasterPlaylistAsync(finalUrl, cancellationToken).ConfigureAwait(false);
 
         _logger.LogInformation(
             "mako: resolved stream for {VcmId} (protected: {Protected}, cdn: {Cdn})",
@@ -81,7 +79,7 @@ public sealed class StreamResolver
             media.Protected,
             media.Cdn);
 
-        return new StreamLink(finalUrl, HlsContainer, description);
+        return new MakoResolvedStream(finalUrl, variant, duration);
     }
 
     /// <summary>
@@ -279,17 +277,17 @@ public sealed class StreamResolver
 
     /// <summary>
     /// Best-effort only (spec §5.2): any failure describing the master playlist — a request error,
-    /// a bot challenge, or text that parses to nothing usable — falls back to
-    /// <see cref="MakoStreams.DefaultDescription"/> rather than failing playback. Never logs
+    /// a bot challenge — leaves the stream undescribed (no variant, no duration) rather than failing
+    /// playback; <c>MakoTransformer</c> then describes it as mako's default. Never logs
     /// <paramref name="finalUrl"/> itself, only its redacted host and path (N3).
     /// </summary>
-    private async Task<StreamDescription> DescribeMasterPlaylistAsync(string finalUrl, CancellationToken cancellationToken)
+    private async Task<(MakoStreamVariant? Variant, TimeSpan? Duration)> DescribeMasterPlaylistAsync(string finalUrl, CancellationToken cancellationToken)
     {
         try
         {
             string masterPlaylistText = await _http.GetTextAsync(finalUrl, cancellationToken).ConfigureAwait(false);
             TimeSpan? duration = await MeasureDurationAsync(finalUrl, masterPlaylistText, cancellationToken).ConfigureAwait(false);
-            return MasterPlaylist.Describe(masterPlaylistText) with { Duration = duration };
+            return (MasterPlaylist.Describe(masterPlaylistText), duration);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
@@ -297,7 +295,7 @@ public sealed class StreamResolver
                 exception,
                 "mako: could not describe the master playlist at {HostAndPath}; using the default stream description",
                 MakoUrls.RedactedUrl(finalUrl));
-            return MakoStreams.DefaultDescription;
+            return (null, null);
         }
     }
 

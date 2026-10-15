@@ -1,5 +1,7 @@
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Transform;
 using Jellyfin.Plugin.IlVod.Tests.Support;
 
 namespace Jellyfin.Plugin.IlVod.Tests.Providers.Mako;
@@ -18,7 +20,7 @@ public class MakoPagesTests
         Assert.Equal(Enumerable.Range(1, 6), page.Seasons.Select(season => season.Number));
         Assert.Equal(
             ["עונה 1", "עונה 2", "עונה 3", "עונה 4", "עונה 5", "עונה 6"],
-            page.Seasons.Select(season => season.Name));
+            page.Seasons.Select(season => season.Title));
         Assert.Equal(
             [
                 "/mako-vod-keshet/shemesh-s1",
@@ -28,7 +30,7 @@ public class MakoPagesTests
                 "/mako-vod-keshet/shemesh-s5",
                 "/mako-vod-keshet/shemesh-s6",
             ],
-            page.Seasons.Select(season => season.Id));
+            page.Seasons.Select(season => season.PageUrl));
     }
 
     [Fact]
@@ -81,17 +83,17 @@ public class MakoPagesTests
 
         ShowPage page = MakoPages.ParseShowPage(pageJson);
 
-        Season season = Assert.Single(page.Seasons);
-        Assert.Equal("/show/only", season.Id);
+        MakoSeason season = Assert.Single(page.Seasons);
+        Assert.Equal("/show/only", season.PageUrl);
         Assert.Equal(1, season.Number);
-        Assert.Equal("עונה 1", season.Name);
+        Assert.Equal("עונה 1", season.Title);
         Assert.Equal("/show/only", page.DisplayedSeasonId);
     }
 
     [Fact]
     public void ParsesTheFourRealEpisodesOfTheSeasonPageSkippingTheAdSlot()
     {
-        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(SeasonOnePageJson, ShowName, 1);
+        IReadOnlyList<Episode> episodes = EpisodesOf(SeasonOnePageJson);
 
         Assert.Equal(4, episodes.Count);
     }
@@ -99,7 +101,7 @@ public class MakoPagesTests
     [Fact]
     public void TheFirstEpisodeCarriesEveryFieldParsedFromTheFixture()
     {
-        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(SeasonOnePageJson, ShowName, 1);
+        IReadOnlyList<Episode> episodes = EpisodesOf(SeasonOnePageJson);
 
         Episode first = episodes[0];
         Assert.Equal("שמש בעל הנס", first.Name);
@@ -150,7 +152,7 @@ public class MakoPagesTests
             }
             """;
 
-        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(pageJson, ShowName, 1);
+        IReadOnlyList<Episode> episodes = EpisodesOf(pageJson);
 
         Assert.Equal(1, episodes[0].Number);
         Assert.Equal(5, episodes[1].Number);
@@ -165,7 +167,7 @@ public class MakoPagesTests
     {
         string pageJson = SingleEpisodePageJson(extraInfo);
 
-        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(pageJson, ShowName, 1);
+        IReadOnlyList<Episode> episodes = EpisodesOf(pageJson);
 
         Assert.Equal(expectedYear, episodes[0].AirDate!.Value.Year);
     }
@@ -175,7 +177,7 @@ public class MakoPagesTests
     {
         string pageJson = SingleEpisodePageJson("אין תאריך כאן");
 
-        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(pageJson, ShowName, 1);
+        IReadOnlyList<Episode> episodes = EpisodesOf(pageJson);
 
         Assert.Null(episodes[0].AirDate);
     }
@@ -210,7 +212,7 @@ public class MakoPagesTests
             }
             """;
 
-        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(pageJson, ShowName, 1);
+        IReadOnlyList<Episode> episodes = EpisodesOf(pageJson);
 
         Episode kept = Assert.Single(episodes);
         Assert.Equal("תקין", kept.Name);
@@ -240,7 +242,7 @@ public class MakoPagesTests
             }
             """;
 
-        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(pageJson, ShowName, 1);
+        IReadOnlyList<Episode> episodes = EpisodesOf(pageJson);
 
         Episode kept = Assert.Single(episodes);
         Assert.Equal("פרק יחיד", kept.Name);
@@ -296,7 +298,7 @@ public class MakoPagesTests
     public void ParseEpisodesFailsWithAFormatExceptionOnMalformedJson()
     {
         FormatException exception = Assert.Throws<FormatException>(
-            () => MakoPages.ParseEpisodes("not json", ShowName, 1));
+            () => MakoPages.ParseEpisodes("not json"));
 
         Assert.Equal("mako page is not valid JSON", exception.Message);
     }
@@ -326,7 +328,7 @@ public class MakoPagesTests
     public void ParseEpisodesFailsWithAFormatExceptionWhenTheRootIsNotAJsonObject(string nonObjectJson)
     {
         FormatException exception = Assert.Throws<FormatException>(
-            () => MakoPages.ParseEpisodes(nonObjectJson, ShowName, 1));
+            () => MakoPages.ParseEpisodes(nonObjectJson));
 
         Assert.Equal("mako page is not a JSON object", exception.Message);
     }
@@ -354,10 +356,10 @@ public class MakoPagesTests
 
         ShowPage page = MakoPages.ParseShowPage(pageJson);
 
-        Season season = Assert.Single(page.Seasons);
-        Assert.Equal("/show/s1", season.Id);
+        MakoSeason season = Assert.Single(page.Seasons);
+        Assert.Equal("/show/s1", season.PageUrl);
         Assert.Equal(1, season.Number);
-        Assert.Equal("עונה 1", season.Name);
+        Assert.Equal("עונה 1", season.Title);
         Assert.Equal("/show/s1", page.DisplayedSeasonId);
     }
 
@@ -387,7 +389,7 @@ public class MakoPagesTests
             }
             """;
 
-        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(pageJson, ShowName, 1);
+        IReadOnlyList<Episode> episodes = EpisodesOf(pageJson);
 
         Episode kept = Assert.Single(episodes);
         Assert.Equal("תקין", kept.Name);
@@ -436,7 +438,7 @@ public class MakoPagesTests
             }
             """;
 
-        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(pageJson, ShowName, 1);
+        IReadOnlyList<Episode> episodes = EpisodesOf(pageJson);
 
         Assert.Null(episodes[0].ThumbnailUrl);
     }
@@ -464,7 +466,7 @@ public class MakoPagesTests
             }
             """;
 
-        IReadOnlyList<Episode> episodes = MakoPages.ParseEpisodes(pageJson, ShowName, 1);
+        IReadOnlyList<Episode> episodes = EpisodesOf(pageJson);
 
         Assert.Equal(1, episodes[0].Number);
         Assert.Null(episodes[0].AirDate);
@@ -505,4 +507,10 @@ public class MakoPagesTests
             ]
         }
         """;
+
+    /// <summary>A season page's episodes as the channel gets them: parsed by
+    /// <see cref="MakoPages.ParseEpisodes"/>, then converted by <see cref="MakoTransformer"/> — the
+    /// episode number and air date are read off mako's <c>extraInfo</c> in that second step.</summary>
+    private static IReadOnlyList<Episode> EpisodesOf(string pageJson) =>
+        new MakoTransformer().ToEpisodes(new MakoSeasonPage(ShowName, 1, MakoPages.ParseEpisodes(pageJson)));
 }

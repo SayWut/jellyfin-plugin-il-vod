@@ -1,5 +1,5 @@
 using System.Net;
-using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 using Jellyfin.Plugin.IlVod.Tests.Support;
 using Microsoft.Extensions.Logging.Abstractions;
 

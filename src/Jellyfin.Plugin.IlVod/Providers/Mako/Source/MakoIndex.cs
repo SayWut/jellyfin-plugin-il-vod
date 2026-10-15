@@ -1,10 +1,6 @@
 using System.Text.Json;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
-
-public sealed record Genre(string Name, string PagePath);
-
-public sealed record IndexEntry(string PagePath, string Name, string? PosterUrl);
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// Parsing only, for mako's show index: the genre menu (<c>menuItems[]</c>) and a genre's list

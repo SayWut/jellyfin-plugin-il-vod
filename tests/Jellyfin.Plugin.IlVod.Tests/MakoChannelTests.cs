@@ -1,6 +1,7 @@
 using Jellyfin.Plugin.IlVod.Browsing;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 using Jellyfin.Plugin.IlVod.Tests.Support;
 using Jellyfin.Plugin.IlVod.Tests.Transcoding;
 using Jellyfin.Plugin.IlVod.Transcoding;

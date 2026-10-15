@@ -3,7 +3,7 @@ using System.Net;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// The only class that speaks HTTP to mako: adds the app's headers to every request, paces and

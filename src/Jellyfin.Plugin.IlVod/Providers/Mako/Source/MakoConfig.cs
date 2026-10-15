@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// The URL templates, app identity and decryption keys mako serves from its own three-stage

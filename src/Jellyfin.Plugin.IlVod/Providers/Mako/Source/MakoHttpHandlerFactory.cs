@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// Builds the <see cref="SocketsHttpHandler"/> the production <c>HttpClient</c> is built over

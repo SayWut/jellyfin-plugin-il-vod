@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Jellyfin.Plugin.IlVod.Cache;
-using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 using Jellyfin.Plugin.IlVod.Tests.Support;
 
 namespace Jellyfin.Plugin.IlVod.Tests.Providers.Mako;
@@ -54,7 +54,7 @@ public class StreamResolverTests
         http.Respond(PlaylistUrl, EncryptedPlaylist(MediaUrl, isProtected: false));
         http.Respond(MediaUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(MediaUrl, link.Url);
         Assert.Null(http.LastPostBody);
@@ -69,7 +69,7 @@ public class StreamResolverTests
         http.Respond(TokenUrl, EncryptedTokenResponse(DecodedTicket));
         http.Respond(finalUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(finalUrl, link.Url);
     }
@@ -84,7 +84,7 @@ public class StreamResolverTests
         http.Respond(TokenUrl, EncryptedTokenResponse(DecodedTicket));
         http.Respond(finalUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(finalUrl, link.Url);
     }
@@ -133,7 +133,7 @@ public class StreamResolverTests
         http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
         http.Respond(highWeightUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(highWeightUrl, link.Url);
     }
@@ -145,7 +145,7 @@ public class StreamResolverTests
         http.Respond(PlaylistUrl, PayloadCipher.Encrypt(OldPlaylistKey, PlaylistJson(MediaUrl, isProtected: false)));
         http.Respond(MediaUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(MediaUrl, link.Url);
     }
@@ -172,7 +172,7 @@ public class StreamResolverTests
         http.Enqueue(PlaylistUrl, EncryptedPlaylist(MediaUrl, isProtected: false));
         http.Enqueue(MediaUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(MediaUrl, link.Url);
         Assert.Equal(1, http.RequestCountFor(PlaylistUrl));
@@ -203,9 +203,9 @@ public class StreamResolverTests
         http.Fail(MediaUrl);
         RecordingLogger<StreamResolver> logger = new();
 
-        StreamLink link = await CreateResolver(http, logger: logger).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http, logger: logger).ResolveAsync(Episode, CancellationToken.None);
 
-        Assert.Equal(MakoStreams.DefaultDescription, link.Description);
+        Assert.Null(link.Variant);
         Assert.Single(logger.Warnings);
     }
 
@@ -216,9 +216,9 @@ public class StreamResolverTests
         http.Respond(PlaylistUrl, EncryptedPlaylist(MediaUrl, isProtected: false));
         http.Respond(MediaUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
-        Assert.Equal(MasterPlaylist.Describe(MasterPlaylistText), link.Description);
+        Assert.Equal(MasterPlaylist.Describe(MasterPlaylistText), link.Variant);
     }
 
     /// <summary>mako states an episode's length nowhere; the CDN's own variant playlist is the
@@ -231,10 +231,10 @@ public class StreamResolverTests
         http.Respond(MediaUrl, MasterPlaylistText);
         http.Respond(BestVariantUrl, "#EXTM3U\n#EXTINF:6.0,\n00.ts\n#EXTINF:4.5,\n01.ts\n#EXT-X-ENDLIST\n");
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
-        Assert.Equal(TimeSpan.FromSeconds(10.5), link.Description.Duration);
-        Assert.Equal(MasterPlaylist.Describe(MasterPlaylistText), link.Description with { Duration = null });
+        Assert.Equal(TimeSpan.FromSeconds(10.5), link.Duration);
+        Assert.Equal(MasterPlaylist.Describe(MasterPlaylistText), link.Variant);
     }
 
     [Fact]
@@ -245,9 +245,10 @@ public class StreamResolverTests
         http.Respond(MediaUrl, MasterPlaylistText);
         http.Fail(BestVariantUrl);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
-        Assert.Equal(MasterPlaylist.Describe(MasterPlaylistText), link.Description);
+        Assert.Equal(MasterPlaylist.Describe(MasterPlaylistText), link.Variant);
+        Assert.Null(link.Duration);
     }
 
     [Fact]
@@ -280,7 +281,7 @@ public class StreamResolverTests
         http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
         http.Respond(MediaUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(MediaUrl, link.Url);
     }
@@ -340,7 +341,7 @@ public class StreamResolverTests
         http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
         http.Respond(firstUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(firstUrl, link.Url);
     }
@@ -364,7 +365,7 @@ public class StreamResolverTests
         http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
         http.Respond(realWeightUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(realWeightUrl, link.Url);
     }
@@ -390,7 +391,7 @@ public class StreamResolverTests
         http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
         http.Respond(highWeightUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(highWeightUrl, link.Url);
     }
@@ -415,7 +416,7 @@ public class StreamResolverTests
         http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
         http.Respond(numericWeightUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(numericWeightUrl, link.Url);
     }
@@ -427,7 +428,7 @@ public class StreamResolverTests
         http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, $$"""{ "media": [ { "url": "{{MediaUrl}}", "cdn": "cdn1", "cdnLB": "50" } ] }"""));
         http.Respond(MediaUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(MediaUrl, link.Url);
         Assert.Null(http.LastPostBody);
@@ -447,7 +448,7 @@ public class StreamResolverTests
         http.Respond(PlaylistUrl, PayloadCipher.Encrypt(NewPlaylistKey, playlistJson));
         http.Respond(MediaUrl, MasterPlaylistText);
 
-        StreamLink link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
+        MakoResolvedStream link = await CreateResolver(http).ResolveAsync(Episode, CancellationToken.None);
 
         Assert.Equal(MediaUrl, link.Url);
         Assert.Null(http.LastPostBody);

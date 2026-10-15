@@ -5,7 +5,8 @@ namespace Jellyfin.Plugin.IlVod.Providers.Mako;
 /// <summary>What every mako stream is, whatever its resolution: H.264 video and AAC-LC audio.</summary>
 public static class MakoStreams
 {
-    private const string UnmeasuredProfile = "Main";
+    /// <summary>The H.264 profile assumed when a master playlist names no <c>CODECS</c>.</summary>
+    public const string UnmeasuredProfile = "Main";
 
     /// <summary>
     /// mako serves planar 8-bit H.264 in an MP4-style (length-prefixed, not Annex B) bitstream,

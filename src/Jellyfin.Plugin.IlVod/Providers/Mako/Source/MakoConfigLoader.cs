@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Jellyfin.Plugin.IlVod.Cache;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// Loads mako's three-stage config chain (main -&gt; core -&gt; notes) through the 24-hour cache

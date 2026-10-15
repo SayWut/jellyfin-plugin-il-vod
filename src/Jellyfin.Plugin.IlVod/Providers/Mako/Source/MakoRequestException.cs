@@ -1,6 +1,6 @@
 using Jellyfin.Plugin.IlVod.Core;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// A request to mako failed at the HTTP boundary: a non-success status, a transport failure or a

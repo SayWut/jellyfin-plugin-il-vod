@@ -1,6 +1,7 @@
 using Jellyfin.Plugin.IlVod.Configuration;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 using MediaBrowser.Controller.Channels;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,7 +22,7 @@ public sealed class PluginServiceRegistratorTests
         using TemporaryDirectory dataFolder = new();
         using ServiceProvider provider = BuildProvider(dataFolder.Path);
 
-        Assert.IsType<MakoCatalog>(provider.GetRequiredService<ICatalog>());
+        Assert.IsType<SourceCatalog<MakoShowIndex, ShowPage, MakoSeasonPage, MakoResolvedStream>>(provider.GetRequiredService<ICatalog>());
         Assert.IsType<MakoChannel>(provider.GetRequiredService<IChannel>());
     }
 
@@ -119,7 +120,7 @@ public sealed class PluginServiceRegistratorTests
     /// The other half of the same rule: deferring construction must not mean never constructing.
     /// Resolving the catalogue is the first user action that builds the whole graph — and only
     /// then is the data folder read. Resolution-only (no <c>GetChannelItems</c> call): the live
-    /// <c>MakoCatalog</c> now reaches mako on every browse, so exercising it here would send a
+    /// mako's catalogue now reaches mako on every browse, so exercising it here would send a
     /// real HTTP request. Resolving <see cref="ICatalog"/> itself is "the first user action" for
     /// this test's purpose — it is exactly what <see cref="MakoChannel"/>'s own
     /// <c>Lazy&lt;ICatalog&gt;</c> forces open on a real first action, and it alone is enough to
@@ -143,7 +144,7 @@ public sealed class PluginServiceRegistratorTests
         IChannel channel = provider.GetServices<IChannel>().OfType<MakoChannel>().Single();
         Assert.Equal(0, dataFolderReads);
 
-        Assert.IsType<MakoCatalog>(provider.GetRequiredService<ICatalog>());
+        Assert.IsType<SourceCatalog<MakoShowIndex, ShowPage, MakoSeasonPage, MakoResolvedStream>>(provider.GetRequiredService<ICatalog>());
 
         Assert.True(dataFolderReads > 0);
     }

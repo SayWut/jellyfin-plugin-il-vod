@@ -1,6 +1,6 @@
 using Jellyfin.Plugin.IlVod.Cache;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// Keeps at most one request to <see cref="MakoUrls.BrowseHost"/> in flight and spaces consecutive

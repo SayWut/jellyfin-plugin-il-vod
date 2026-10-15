@@ -1,19 +1,17 @@
-using System.Text.Json;
-using Jellyfin.Plugin.IlVod.Cache;
 using Jellyfin.Plugin.IlVod.Core;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
-/// The live catalogue (spec §6.2): every show mako files under one of its real genres, fetched
-/// only because a user opened the channel, a show, or pressed play — nothing here ever fetches
-/// ahead of that action (N1); <c>OnDemandRequestBudgetTests</c> is the test that proves it.
-/// <paramref name="readLifetimes"/> is a delegate, not a value, so a change on the settings
-/// page (task B10) takes effect on the next call with no restart, the same pattern
-/// <c>StaticCatalog</c> already used for its test stream URL.
+/// mako's fetching half (spec §6.2): every page it reads, fetched only because a user opened the
+/// channel, a show, or pressed play — nothing here ever fetches ahead of that action (N1);
+/// <c>OnDemandRequestBudgetTests</c> is the test that proves it. Answers in mako's own records;
+/// <c>MakoTransformer</c> turns them into the shared model. <paramref name="readLifetimes"/> is a
+/// delegate, not a value, so a change on the settings page takes effect on the next call with no
+/// restart.
 /// </summary>
-public sealed class MakoCatalog : ICatalog
+public sealed class MakoSource : IContentSource<MakoShowIndex, ShowPage, MakoSeasonPage, MakoResolvedStream>
 {
     private const int FallbackSeasonNumber = 1;
     private const string UnknownShowName = "";
@@ -32,62 +30,43 @@ public sealed class MakoCatalog : ICatalog
 
     private readonly MakoPageSource _pages;
     private readonly StreamResolver _resolver;
-    private readonly TimedCache _streamLinks;
     private readonly Func<CatalogueLifetimes> _readLifetimes;
-    private readonly ILogger<MakoCatalog> _logger;
+    private readonly ILogger<MakoSource> _logger;
 
-    public MakoCatalog(
+    public MakoSource(
         MakoPageSource pages,
         StreamResolver resolver,
-        TimedCache streamLinks,
         Func<CatalogueLifetimes> readLifetimes,
-        ILogger<MakoCatalog> logger)
+        ILogger<MakoSource> logger)
     {
         _pages = pages;
         _resolver = resolver;
-        _streamLinks = streamLinks;
         _readLifetimes = readLifetimes;
         _logger = logger;
     }
 
     /// <summary>
-    /// Every show mako files under a real genre (spec §6.2): the genre menu, then each genre's
-    /// list, merged by page path. The lists are pages like any other, so <see cref="MakoPageSource"/>
-    /// caches, coalesces and stale-serves them; a list that fails with no stale copy fails the
-    /// whole answer, because a shorter answer would make Jellyfin delete the missing shows.
+    /// The genre menu, then each real genre's list (spec §6.2). The lists are pages like any other,
+    /// so <see cref="MakoPageSource"/> caches, coalesces and stale-serves them; a list that fails
+    /// with no stale copy fails the whole answer, because a shorter answer would make Jellyfin
+    /// delete the missing shows.
     /// </summary>
-    public async Task<IReadOnlyList<Show>> GetShowsAsync(CancellationToken cancellationToken)
+    public async Task<MakoShowIndex> FetchIndexAsync(CancellationToken cancellationToken)
     {
         TimeSpan lifetime = _readLifetimes().Catalogue;
         string menuJson = await _pages.GetAsync(MakoIndexPaths.GenreMenu, MenuLifetimeOf(lifetime), cancellationToken).ConfigureAwait(false);
-        IReadOnlyList<Genre> genres = MakoIndex.ParseGenres(menuJson);
 
-        Dictionary<string, Show> showsByPath = new(StringComparer.Ordinal);
-        List<string> order = [];
-        foreach (Genre genre in genres)
+        List<MakoGenreList> genres = [];
+        foreach (Genre genre in MakoIndex.ParseGenres(menuJson))
         {
             string listJson = await _pages.GetAsync(genre.PagePath, ListLifetimeOf(lifetime), cancellationToken).ConfigureAwait(false);
-            foreach (IndexEntry entry in MakoIndex.ParseEntries(listJson))
-            {
-                if (showsByPath.TryGetValue(entry.PagePath, out Show? known))
-                {
-                    if (!known.Genres.Contains(genre.Name, StringComparer.Ordinal))
-                    {
-                        showsByPath[entry.PagePath] = known with { Genres = [.. known.Genres, genre.Name] };
-                    }
-
-                    continue;
-                }
-
-                showsByPath[entry.PagePath] = new Show(entry.PagePath, entry.Name, entry.PosterUrl, Overview: null, Genres: [genre.Name]);
-                order.Add(entry.PagePath);
-            }
+            genres.Add(new MakoGenreList(genre.Name, MakoIndex.ParseEntries(listJson)));
         }
 
-        return order.Select(path => showsByPath[path]).ToList();
+        return new MakoShowIndex(genres);
     }
 
-    public async Task<IReadOnlyList<Season>> GetSeasonsAsync(string showId, CancellationToken cancellationToken)
+    public async Task<ShowPage> FetchShowAsync(string showId, CancellationToken cancellationToken)
     {
         CatalogueLifetimes lifetimes = _readLifetimes();
         string showJson = await _pages.GetAsync(showId, ShowPageLifetimeOf(lifetimes), cancellationToken).ConfigureAwait(false);
@@ -95,15 +74,14 @@ public sealed class MakoCatalog : ICatalog
 
         RememberDisplayedSeason(showPage, showJson, showId, lifetimes);
 
-        return showPage.Seasons;
+        return showPage;
     }
 
     /// <summary>
-    /// The episodes' <see cref="Episode.ShowName"/> comes from the cached genre lists
-    /// (<see cref="ShowNameOf"/>), not from a fetch — a season open must never turn into an index
-    /// burst (N1).
+    /// The show's name comes from the cached genre lists (<see cref="ShowNameOf"/>), not from a
+    /// fetch — a season open must never turn into an index burst (N1).
     /// </summary>
-    public async Task<IReadOnlyList<Episode>> GetEpisodesAsync(string showId, string seasonId, CancellationToken cancellationToken)
+    public async Task<MakoSeasonPage> FetchSeasonAsync(string showId, string seasonId, CancellationToken cancellationToken)
     {
         CatalogueLifetimes lifetimes = _readLifetimes();
 
@@ -111,22 +89,11 @@ public sealed class MakoCatalog : ICatalog
             .GetAsync(seasonId, pageJson => LifetimeOf(pageJson, seasonId, lifetimes), cancellationToken)
             .ConfigureAwait(false);
 
-        return MakoPages.ParseEpisodes(seasonJson, ShowNameOf(showId), SeasonNumberOf(seasonJson, seasonId));
+        return new MakoSeasonPage(ShowNameOf(showId), SeasonNumberOf(seasonJson, seasonId), MakoPages.ParseEpisodes(seasonJson));
     }
 
-    public async Task<StreamLink> GetStreamLinkAsync(string episodeId, CancellationToken cancellationToken)
-    {
-        CacheRead cached = _streamLinks.Read(episodeId);
-        if (cached.IsFresh)
-        {
-            return DeserializeStreamLink(cached.Value!);
-        }
-
-        EpisodeKey episode = ParseEpisodeIdOrThrow(episodeId);
-        StreamLink link = await _resolver.ResolveAsync(episode, cancellationToken).ConfigureAwait(false);
-        _streamLinks.Write(episodeId, SerializeStreamLink(link), _readLifetimes().StreamLink);
-        return link;
-    }
+    public Task<MakoResolvedStream> FetchStreamAsync(string episodeId, CancellationToken cancellationToken) =>
+        _resolver.ResolveAsync(ParseEpisodeIdOrThrow(episodeId), cancellationToken);
 
     /// <summary>
     /// The page just fetched under <paramref name="fetchedPagePath"/> also carries the episodes of
@@ -202,7 +169,7 @@ public sealed class MakoCatalog : ICatalog
     /// no such entry.</summary>
     private static int SeasonNumberOf(string seasonPageJson, string seasonId)
     {
-        Season? season = MakoPages.ParseShowPage(seasonPageJson).Seasons.FirstOrDefault(candidate => candidate.Id == seasonId);
+        MakoSeason? season = MakoPages.ParseShowPage(seasonPageJson).Seasons.FirstOrDefault(candidate => candidate.PageUrl == seasonId);
         return season?.Number ?? FallbackSeasonNumber;
     }
 
@@ -256,10 +223,4 @@ public sealed class MakoCatalog : ICatalog
             throw new StreamUnavailableException($"mako episode id '{episodeId}' is not playable", exception);
         }
     }
-
-    private static string SerializeStreamLink(StreamLink link) => JsonSerializer.Serialize(link);
-
-    private static StreamLink DeserializeStreamLink(string json) =>
-        JsonSerializer.Deserialize<StreamLink>(json)
-            ?? throw new JsonException("cached stream link deserialized to null");
 }

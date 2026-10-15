@@ -1,4 +1,4 @@
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// The one seam through which the plugin talks to mako: fetch a page or config file, or post an

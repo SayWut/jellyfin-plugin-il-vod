@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// An HLS media (variant) playlist — the one that lists segments. mako states an episode's

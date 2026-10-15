@@ -1,6 +1,6 @@
 using Jellyfin.Plugin.IlVod.Core;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Mako;
+namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
 /// mako's Radware bot protection intercepted a request: a redirect landed on
