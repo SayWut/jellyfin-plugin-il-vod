@@ -1,5 +1,4 @@
-using Jellyfin.Plugin.IlVod.Catalog;
-using Jellyfin.Plugin.IlVod.Model;
+using Jellyfin.Plugin.IlVod.Core;
 
 namespace Jellyfin.Plugin.IlVod.Tests.Support;
 

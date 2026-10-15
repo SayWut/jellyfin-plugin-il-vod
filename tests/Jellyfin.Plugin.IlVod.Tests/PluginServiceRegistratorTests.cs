@@ -1,6 +1,6 @@
-using Jellyfin.Plugin.IlVod.Catalog;
 using Jellyfin.Plugin.IlVod.Configuration;
-using Jellyfin.Plugin.IlVod.MakoApi;
+using Jellyfin.Plugin.IlVod.Core;
+using Jellyfin.Plugin.IlVod.Providers.Mako;
 using MediaBrowser.Controller.Channels;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,5 +1,5 @@
 using Jellyfin.Plugin.IlVod.Browsing;
-using Jellyfin.Plugin.IlVod.Model;
+using Jellyfin.Plugin.IlVod.Core;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Model.Channels;
 using MediaBrowser.Model.Dto;

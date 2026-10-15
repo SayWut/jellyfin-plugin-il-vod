@@ -1,7 +1,7 @@
 using MediaBrowser.Controller.MediaEncoding;
 using MediaBrowser.Controller.Streaming;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.IlVod.Tests.Transcoding;
 

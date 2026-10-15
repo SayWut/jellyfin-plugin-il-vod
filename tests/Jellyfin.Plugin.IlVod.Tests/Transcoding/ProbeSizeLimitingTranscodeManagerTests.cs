@@ -1,5 +1,6 @@
 using Jellyfin.Plugin.IlVod.Browsing;
-using Jellyfin.Plugin.IlVod.Model;
+using Jellyfin.Plugin.IlVod.Core;
+using Jellyfin.Plugin.IlVod.Providers.Mako;
 using Jellyfin.Plugin.IlVod.Transcoding;
 using MediaBrowser.Controller.MediaEncoding;
 using MediaBrowser.Controller.Streaming;
@@ -19,7 +20,7 @@ public class ProbeSizeLimitingTranscodeManagerTests
         var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
         var sut = new ProbeSizeLimitingTranscodeManager(fake, NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
         StreamState state = StreamStateFor(
-            MediaSourceFactory.Create(new StreamLink("https://cdn.test/master.m3u8", "hls", StreamDescription.MakoDefault)));
+            MediaSourceFactory.Create(new StreamLink("https://cdn.test/master.m3u8", "hls", MakoStreams.DefaultDescription)));
 
         await sut.StartFfMpeg(state, "out.ts", OriginalArguments, Guid.NewGuid(), TranscodingJobType.Hls, new CancellationTokenSource());
 

@@ -1,5 +1,6 @@
 using Jellyfin.Plugin.IlVod.Browsing;
-using Jellyfin.Plugin.IlVod.Model;
+using Jellyfin.Plugin.IlVod.Core;
+using Jellyfin.Plugin.IlVod.Providers.Mako;
 using MediaBrowser.Model.Dto;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.MediaInfo;
@@ -11,7 +12,7 @@ public class MediaSourceFactoryTests
     [Fact]
     public void DescribesARemoteHttpStreamThatCanBePlayedDirectly()
     {
-        var link = new StreamLink("https://cdn.test/master.m3u8?hdnea=t", "hls", StreamDescription.MakoDefault);
+        var link = new StreamLink("https://cdn.test/master.m3u8?hdnea=t", "hls", MakoStreams.DefaultDescription);
 
         MediaSourceInfo source = MediaSourceFactory.Create(link);
 
@@ -33,7 +34,7 @@ public class MediaSourceFactoryTests
     [Fact]
     public void TheMeasuredDurationBecomesTheRunTimeSoJellyfinDoesNotTreatTheStreamAsLive()
     {
-        StreamDescription measured = StreamDescription.MakoDefault with { Duration = TimeSpan.FromSeconds(1320.08) };
+        StreamDescription measured = MakoStreams.DefaultDescription with { Duration = TimeSpan.FromSeconds(1320.08) };
         var link = new StreamLink("https://cdn.test/master.m3u8", "hls", measured);
 
         Assert.Equal(TimeSpan.FromSeconds(1320.08).Ticks, MediaSourceFactory.Create(link).RunTimeTicks);
@@ -42,7 +43,7 @@ public class MediaSourceFactoryTests
     [Fact]
     public void AnUnmeasuredDurationLeavesTheRunTimeUnset()
     {
-        var link = new StreamLink("https://cdn.test/master.m3u8", "hls", StreamDescription.MakoDefault);
+        var link = new StreamLink("https://cdn.test/master.m3u8", "hls", MakoStreams.DefaultDescription);
 
         Assert.Null(MediaSourceFactory.Create(link).RunTimeTicks);
     }
@@ -50,7 +51,7 @@ public class MediaSourceFactoryTests
     [Fact]
     public void AnEmptyContainerBecomesNullSoJellyfinDecides()
     {
-        var link = new StreamLink("https://cdn.test/master.m3u8?hdnea=t", string.Empty, StreamDescription.MakoDefault);
+        var link = new StreamLink("https://cdn.test/master.m3u8?hdnea=t", string.Empty, MakoStreams.DefaultDescription);
 
         MediaSourceInfo source = MediaSourceFactory.Create(link);
 
@@ -60,7 +61,7 @@ public class MediaSourceFactoryTests
     [Fact]
     public void LeavesTheIdEmptySoJellyfinAssignsTheItemsGuid()
     {
-        var link = new StreamLink("https://cdn.test/master.m3u8", string.Empty, StreamDescription.MakoDefault);
+        var link = new StreamLink("https://cdn.test/master.m3u8", string.Empty, MakoStreams.DefaultDescription);
 
         MediaSourceInfo source = MediaSourceFactory.Create(link);
 
@@ -71,7 +72,7 @@ public class MediaSourceFactoryTests
     public void DescribesTheVideoAndAudioSoJellyfinCanCopyThemInsteadOfGuessing()
     {
         MediaSourceInfo source = MediaSourceFactory.Create(
-            new StreamLink("https://cdn.test/master.m3u8", string.Empty, StreamDescription.MakoDefault));
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, MakoStreams.DefaultDescription));
 
         MediaStream video = Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Video);
         MediaStream audio = Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Audio);
@@ -83,7 +84,7 @@ public class MediaSourceFactoryTests
     [Fact]
     public void TheVideoStreamCarriesTheStreamDescription()
     {
-        var description = new StreamDescription(1920, 1080, 5_000_000, "High", 4.0);
+        var description = new StreamDescription(1920, 1080, 5_000_000, "High", 4.0) { Format = MakoStreams.Format };
         MediaSourceInfo source = MediaSourceFactory.Create(
             new StreamLink("https://cdn.test/master.m3u8", string.Empty, description));
 
@@ -99,7 +100,7 @@ public class MediaSourceFactoryTests
     public void ANullDescriptionLeavesTheVideoStreamsResolutionAndBitrateUnset()
     {
         MediaSourceInfo source = MediaSourceFactory.Create(
-            new StreamLink("https://cdn.test/master.m3u8", string.Empty, StreamDescription.MakoDefault));
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, MakoStreams.DefaultDescription));
 
         MediaStream video = Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Video);
         Assert.Null(video.Width);
@@ -112,7 +113,7 @@ public class MediaSourceFactoryTests
     public void TheVideoStreamCarriesTheFlagsThatLetJellyfinCopyH264()
     {
         MediaSourceInfo source = MediaSourceFactory.Create(
-            new StreamLink("https://cdn.test/master.m3u8", string.Empty, StreamDescription.MakoDefault));
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, MakoStreams.DefaultDescription));
 
         MediaStream video = Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Video);
         Assert.False(video.IsInterlaced);
@@ -126,7 +127,7 @@ public class MediaSourceFactoryTests
     public void TheAudioStreamCarriesTheSampleRateAndProfile()
     {
         MediaSourceInfo source = MediaSourceFactory.Create(
-            new StreamLink("https://cdn.test/master.m3u8", string.Empty, StreamDescription.MakoDefault));
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, MakoStreams.DefaultDescription));
 
         MediaStream audio = Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Audio);
         Assert.Equal(48000, audio.SampleRate);
@@ -134,10 +135,19 @@ public class MediaSourceFactoryTests
     }
 
     [Fact]
+    public void ADescriptionWithNoFormatDescribesNoStreams()
+    {
+        MediaSourceInfo source = MediaSourceFactory.Create(
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, new StreamDescription(null, null, null, "Main", null)));
+
+        Assert.Empty(source.MediaStreams);
+    }
+
+    [Fact]
     public void LimitsHowLongFfmpegAnalysesTheStreamBeforePlaying()
     {
         MediaSourceInfo source = MediaSourceFactory.Create(
-            new StreamLink("https://cdn.test/master.m3u8", string.Empty, StreamDescription.MakoDefault));
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, MakoStreams.DefaultDescription));
 
         Assert.Equal(3000, source.AnalyzeDurationMs);
     }
@@ -146,7 +156,7 @@ public class MediaSourceFactoryTests
     public void IsMakoSourceIsTrueForASourceThePluginCreated()
     {
         MediaSourceInfo source = MediaSourceFactory.Create(
-            new StreamLink("https://cdn.test/master.m3u8", string.Empty, StreamDescription.MakoDefault));
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, MakoStreams.DefaultDescription));
 
         Assert.True(MediaSourceFactory.IsMakoSource(source));
     }

@@ -1,4 +1,4 @@
-using Jellyfin.Plugin.IlVod.Model;
+using Jellyfin.Plugin.IlVod.Core;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Model.Channels;
 

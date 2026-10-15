@@ -1,14 +1,13 @@
 using Jellyfin.Plugin.IlVod.Browsing;
-using Jellyfin.Plugin.IlVod.Catalog;
-using Jellyfin.Plugin.IlVod.MakoApi;
-using Jellyfin.Plugin.IlVod.Model;
+using Jellyfin.Plugin.IlVod.Core;
+using Jellyfin.Plugin.IlVod.Providers.Mako;
 using Jellyfin.Plugin.IlVod.Tests.Support;
 using Jellyfin.Plugin.IlVod.Tests.Transcoding;
 using Jellyfin.Plugin.IlVod.Transcoding;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Model.Dto;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.IlVod.Tests;
 
@@ -18,7 +17,7 @@ public class MakoChannelTests
     private const string ResolvedUrl = "https://example.test/master.m3u8";
     private const string ResolvedContainer = "hls";
 
-    private static readonly StreamLink ResolvedLink = new(ResolvedUrl, ResolvedContainer, StreamDescription.MakoDefault);
+    private static readonly StreamLink ResolvedLink = new(ResolvedUrl, ResolvedContainer, MakoStreams.DefaultDescription);
 
     private static MakoChannel ChannelOver(FakeCatalog catalog) => ChannelOver(catalog, NullLogger<MakoChannel>.Instance);
 

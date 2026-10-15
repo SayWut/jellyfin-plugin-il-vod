@@ -1,7 +1,5 @@
 using Jellyfin.Plugin.IlVod.Browsing;
-using Jellyfin.Plugin.IlVod.Catalog;
-using Jellyfin.Plugin.IlVod.MakoApi;
-using Jellyfin.Plugin.IlVod.Model;
+using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Transcoding;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Providers;
@@ -86,7 +84,7 @@ public sealed class MakoChannel : IChannel, IRequiresMediaInfoCallback
             List<ChannelItemInfo> items = await ItemsInside(folder, cancellationToken).ConfigureAwait(false);
             return new ChannelItemResult { Items = items, TotalRecordCount = items.Count };
         }
-        catch (Exception exception) when (exception is BotChallengeException or MakoRequestException or FormatException)
+        catch (Exception exception) when (exception is ProviderUnavailableException or FormatException)
         {
             // mako failed (FormatException is mako answering something that is not a mako page —
             // an HTML error page with status 200). Rethrown, never answered with an empty list:
