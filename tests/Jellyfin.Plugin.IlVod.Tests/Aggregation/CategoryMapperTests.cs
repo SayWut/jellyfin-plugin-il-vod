@@ -46,6 +46,14 @@ public class CategoryMapperTests
     }
 
     [Fact]
+    public void ANameMappedToTheFallbackOnPurposeIsStillDroppedNextToARealCategory()
+    {
+        CategoryMapper mapper = new(() => [new CategoryOverride { ProviderId = "alpha", SourceName = "טלנובלות", SharedName = SharedCategories.Fallback }]);
+
+        Assert.Equal([SharedCategories.Documentary], mapper.Map(Provider, ["טלנובלות", "דוקו"]));
+    }
+
+    [Fact]
     public void AnOverrideToANameOutsideTheSharedOnesIsKeptAsTheUserTypedIt()
     {
         CategoryMapper mapper = new(() => [new CategoryOverride { ProviderId = "alpha", SourceName = "טלנובלות", SharedName = "אופרות סבון" }]);

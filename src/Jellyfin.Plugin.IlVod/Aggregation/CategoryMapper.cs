@@ -27,6 +27,7 @@ public sealed class CategoryMapper
         List<string> named = categories
             .Select(category => overrides.GetValueOrDefault(category) ?? provider.DefaultCategories.GetValueOrDefault(category))
             .OfType<string>()
+            .Where(shared => shared != SharedCategories.Fallback)
             .Distinct(StringComparer.Ordinal)
             .ToList();
 

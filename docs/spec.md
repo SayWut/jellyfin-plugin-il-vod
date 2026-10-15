@@ -34,7 +34,7 @@ otherwise.
 | User action | Requests to mako |
 |---|---|
 | Nothing: server idle, Jellyfin scheduled tasks, library scans | 0 |
-| Open the channel | 0 while the catalogue cache is fresh; else 6 (genre menu + 5 genre lists), paced — step C, §6.2 |
+| Open the channel | 0 while the catalogue cache is fresh; else 8 (full show list + genre menu + 5 genre lists + the news list), paced — step C, §6.2; the full list since 2026-10-16 |
 | Open a show | 1 (the show page: season list + current season's episodes) |
 | Open a season | 1, or 0 if it arrived with the show page |
 | Press play | 1 playlist request, plus 1 token request if the item is protected (and 2 to the CDN: the master playlist and its best variant, which is the only place an episode's length can be measured — without a length Jellyfin treats the stream as live) |
