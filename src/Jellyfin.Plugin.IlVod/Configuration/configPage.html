@@ -61,6 +61,18 @@
                     </div>
                 </div>
 
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">רשת 13</h2>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="Reshet13CatalogueCacheHours">Catalogue cache (hours)</label>
+                        <input id="Reshet13CatalogueCacheHours" name="Reshet13CatalogueCacheHours" type="number" min="1" is="emby-input" />
+                        <div class="fieldDescription">
+                            How long the series list is kept before Reshet 13 is asked again. Opening the channel with a
+                            cold cache costs one request.
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <button is="emby-button" type="submit" class="raised button-submit block emby-button">
                         <span>Save</span>
@@ -193,6 +205,8 @@
                     var mako = config.Mako || {};
                     page.querySelector('#CatalogueCacheHours').value = mako.CatalogueCacheHours;
                     page.querySelector('#AppVersion').value = mako.AppVersion || '';
+                    var reshet13 = config.Reshet13 || {};
+                    page.querySelector('#Reshet13CatalogueCacheHours').value = reshet13.CatalogueCacheHours;
                     Dashboard.hideLoadingMsg();
                 }).catch(showFailure);
             });
@@ -215,6 +229,8 @@
                     config.Mako = config.Mako || {};
                     config.Mako.CatalogueCacheHours = parseInt(page.querySelector('#CatalogueCacheHours').value, 10);
                     config.Mako.AppVersion = page.querySelector('#AppVersion').value.trim();
+                    config.Reshet13 = config.Reshet13 || {};
+                    config.Reshet13.CatalogueCacheHours = parseInt(page.querySelector('#Reshet13CatalogueCacheHours').value, 10);
                     return ApiClient.updatePluginConfiguration(IlVodConfig.pluginUniqueId, config).then(function (result) {
                         Dashboard.processPluginConfigurationUpdateResult(result);
                     });

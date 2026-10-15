@@ -34,6 +34,15 @@ public class PluginPagesTests
     }
 
     [Fact]
+    public void SettingsPageHasReshet13sCatalogueCacheSetting()
+    {
+        string html = EmbeddedSettingsPageHtml();
+
+        Assert.Contains("Reshet13CatalogueCacheHours", html, StringComparison.Ordinal);
+        Assert.Contains("config.Reshet13", html, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void SettingsPageListsProvidersAndCategoriesFromThePluginsOwnApi()
     {
         string html = EmbeddedSettingsPageHtml();
