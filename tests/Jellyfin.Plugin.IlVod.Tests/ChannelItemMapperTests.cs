@@ -86,11 +86,11 @@ public class ChannelItemMapperTests
     }
 
     [Fact]
-    public void PlaceholderIsNeverMistakenForAMakoStream()
+    public void PlaceholderIsNeverMistakenForAProvidersStream()
     {
-        MediaSourceInfo placeholder = MediaSourceFactory.CreatePlaceholder("shemesh-s1-e1");
+        MediaSourceInfo placeholder = MediaSourceFactory.CreatePlaceholder("mako:shemesh-s1-e1");
 
-        Assert.False(MediaSourceFactory.IsMakoSource(placeholder));
+        Assert.Null(MediaSourceFactory.ProviderIdOf(placeholder));
     }
 
     [Fact]

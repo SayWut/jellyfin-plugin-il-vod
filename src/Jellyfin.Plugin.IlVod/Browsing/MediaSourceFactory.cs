@@ -12,11 +12,11 @@ namespace Jellyfin.Plugin.IlVod.Browsing;
 public static class MediaSourceFactory
 {
     /// <summary>
-    /// The <see cref="MediaSourceInfo.Name"/> every mako media source carries. This is the one
-    /// place that owns how the plugin recognises its own streams; nothing else should compare
-    /// against the literal "mako".
+    /// What every media source this plugin creates is named, followed by its provider's id
+    /// (<c>il-vod/mako</c>). This is the one place that owns how the plugin recognises its own
+    /// streams and which provider each came from; nothing else should parse the name.
     /// </summary>
-    public const string SourceName = "mako";
+    private const string SourceNamePrefix = "il-vod/";
 
     private const int VideoStreamIndex = 0;
     private const int AudioStreamIndex = 1;
@@ -32,9 +32,9 @@ public static class MediaSourceFactory
 
     // Id is left unset on purpose: Jellyfin assigns the item's own GUID, and its HLS
     // endpoint parses the media source id as a GUID. Any other value breaks playback.
-    public static MediaSourceInfo Create(StreamLink link) => new()
+    public static MediaSourceInfo Create(StreamLink link, string providerId) => new()
     {
-        Name = SourceName,
+        Name = SourceNamePrefix + providerId,
         Path = link.Url,
         Protocol = MediaProtocol.Http,
         Container = string.IsNullOrEmpty(link.Container) ? null : link.Container,
@@ -66,16 +66,20 @@ public static class MediaSourceFactory
     };
 
     /// <summary>
-    /// True when <paramref name="source"/> is a media source this plugin created. Checks more
-    /// than the name: Jellyfin names a local library file's media source after its file name, so
-    /// a file on disk that happens to be called "mako" must not match — only a remote HTTP
-    /// source, which is all this plugin ever produces, can be ours.
+    /// The id of the provider whose stream <paramref name="source"/> is, when this plugin created
+    /// it; <c>null</c> for every other source. Checks more than the name: Jellyfin names a local
+    /// library file's media source after its file name, so a file on disk that happens to be
+    /// called "il-vod/mako" must not match — only a remote HTTP source, which is all this plugin
+    /// ever produces, can be ours.
     /// </summary>
-    public static bool IsMakoSource(MediaSourceInfo? source) =>
+    public static string? ProviderIdOf(MediaSourceInfo? source) =>
         source is not null
-        && string.Equals(source.Name, SourceName, StringComparison.Ordinal)
+        && source.Name is { } name
+        && name.StartsWith(SourceNamePrefix, StringComparison.Ordinal)
         && source.Protocol == MediaProtocol.Http
-        && source.IsRemote;
+        && source.IsRemote
+            ? name[SourceNamePrefix.Length..]
+            : null;
 
     // Telling Jellyfin the codecs up front lets it copy the streams instead of analysing,
     // guessing and re-encoding them. A provider that cannot name them gets none described.

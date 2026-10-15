@@ -1,3 +1,4 @@
+using Jellyfin.Plugin.IlVod.Aggregation;
 using Jellyfin.Plugin.IlVod.Browsing;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Transcoding;
@@ -115,7 +116,7 @@ public sealed class IlVodChannel : IChannel, IRequiresMediaInfoCallback
         WarnIfProbeSizeLimiterIsNotInstalled();
 
         StreamLink link = await _catalog.Value.GetStreamLinkAsync(id, cancellationToken).ConfigureAwait(false);
-        return [MediaSourceFactory.Create(link)];
+        return [MediaSourceFactory.Create(link, ProviderIdOf(id))];
     }
 
     // Jellyfin 12.1 walks folders by itself: every new Season item is queued for a metadata
@@ -132,8 +133,8 @@ public sealed class IlVodChannel : IChannel, IRequiresMediaInfoCallback
         }
     }
 
-    // Jellyfin's global -probesize buffers mako's unidentifiable data track in RAM until the
-    // phone aborts playback (docs/spec.md §4.3); the plugin fixes this by wrapping
+    // Jellyfin's global -probesize buffers some providers' unidentifiable data tracks (mako's) in
+    // RAM until the phone aborts playback (docs/spec.md §4.3); the plugin fixes this by wrapping
     // ITranscodeManager at startup, but that wrapping can silently fail to install if a future
     // Jellyfin update changes the seam it relies on. Checked here, on every play, so that
     // failure is loud instead of surfacing only as mysterious playback crashes.
@@ -146,6 +147,11 @@ public sealed class IlVodChannel : IChannel, IRequiresMediaInfoCallback
     }
 
     private static ChannelItemResult EmptyResult() => new() { Items = [], TotalRecordCount = 0 };
+
+    // The catalogue has already routed the id to its provider by now, so it is scoped; an id that
+    // is not (only ever a test's) names no provider, and no provider's play-time handling applies.
+    private static string ProviderIdOf(string episodeId) =>
+        ProviderScopedId.TryParse(episodeId, out ProviderScopedId? scoped) ? scoped.Value.ProviderId : string.Empty;
 
     private FolderId? TryParseFolderId(string? rawFolderId)
     {

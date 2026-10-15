@@ -94,10 +94,11 @@ public class IlVodChannelTests
     {
         FakeCatalog catalog = new() { StreamLink = ResolvedLink };
 
-        IEnumerable<MediaSourceInfo> sources = await ChannelOver(catalog).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
+        IEnumerable<MediaSourceInfo> sources = await ChannelOver(catalog).GetChannelItemMediaInfo("mako:shemesh-s1-e1", CancellationToken.None);
 
         MediaSourceInfo source = Assert.Single(sources);
         Assert.Equal(ResolvedUrl, source.Path);
+        Assert.Equal("mako", MediaSourceFactory.ProviderIdOf(source));
     }
 
     [Fact]
@@ -118,7 +119,7 @@ public class IlVodChannelTests
         FakeCatalog catalog = new() { StreamLinkFailure = new StreamUnavailableException("no stream available") };
 
         await Assert.ThrowsAsync<StreamUnavailableException>(
-            () => ChannelOver(catalog).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None));
+            () => ChannelOver(catalog).GetChannelItemMediaInfo("mako:shemesh-s1-e1", CancellationToken.None));
     }
 
     [Fact]
@@ -199,7 +200,7 @@ public class IlVodChannelTests
             var logger = new RecordingLogger<IlVodChannel>();
             FakeCatalog catalog = new() { StreamLink = ResolvedLink };
 
-            await ChannelOver(catalog, logger).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
+            await ChannelOver(catalog, logger).GetChannelItemMediaInfo("mako:shemesh-s1-e1", CancellationToken.None);
 
             Assert.Contains(logger.Warnings, message => message.Contains("NOT installed", StringComparison.Ordinal));
         }
@@ -219,7 +220,7 @@ public class IlVodChannelTests
             var logger = new RecordingLogger<IlVodChannel>();
             FakeCatalog catalog = new() { StreamLink = ResolvedLink };
 
-            await ChannelOver(catalog, logger).GetChannelItemMediaInfo("shemesh-s1-e1", CancellationToken.None);
+            await ChannelOver(catalog, logger).GetChannelItemMediaInfo("mako:shemesh-s1-e1", CancellationToken.None);
 
             Assert.Empty(logger.Warnings);
         }

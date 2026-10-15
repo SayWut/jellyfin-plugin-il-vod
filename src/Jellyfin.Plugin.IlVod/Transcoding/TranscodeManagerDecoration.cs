@@ -1,3 +1,4 @@
+using Jellyfin.Plugin.IlVod.Core;
 using MediaBrowser.Controller.MediaEncoding;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,7 @@ namespace Jellyfin.Plugin.IlVod.Transcoding;
 /// <summary>
 /// Replaces Jellyfin's registered <see cref="ITranscodeManager"/> with one wrapped in
 /// <see cref="ProbeSizeLimitingTranscodeManager"/>, so ffmpeg's probe size can be limited for
-/// mako's own streams. Every check here fails safe: if Core has no such registration at all,
+/// the streams of providers that need it. Every check here fails safe: if Core has no such registration at all,
 /// the container is left exactly as it was and the server runs as before.
 /// </summary>
 public static class TranscodeManagerDecoration
@@ -69,6 +70,7 @@ public static class TranscodeManagerDecoration
     private static ProbeSizeLimitingTranscodeManager CreateDecorator(IServiceProvider provider, Func<IServiceProvider, ITranscodeManager> buildInner, bool ownsInner) =>
         new(
             buildInner(provider),
+            provider.GetServices<ProviderInfo>(),
             provider.GetRequiredService<ILogger<ProbeSizeLimitingTranscodeManager>>(),
             ownsInner);
 }

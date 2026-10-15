@@ -18,9 +18,9 @@ public class ProbeSizeLimitingTranscodeManagerTests
     {
         var recorder = new CallRecorder();
         var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
-        var sut = new ProbeSizeLimitingTranscodeManager(fake, NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
+        var sut = new ProbeSizeLimitingTranscodeManager(fake, [MakoProvider.Description], NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
         StreamState state = StreamStateFor(
-            MediaSourceFactory.Create(new StreamLink("https://cdn.test/master.m3u8", "hls", MakoStreams.DefaultDescription)));
+            MediaSourceFactory.Create(new StreamLink("https://cdn.test/master.m3u8", "hls", MakoStreams.DefaultDescription), "mako"));
 
         await sut.StartFfMpeg(state, "out.ts", OriginalArguments, Guid.NewGuid(), TranscodingJobType.Hls, new CancellationTokenSource());
 
@@ -28,11 +28,26 @@ public class ProbeSizeLimitingTranscodeManagerTests
     }
 
     [Fact]
+    public async Task PassesTheOriginalArgumentsUnchangedForAProviderThatNamesNoProbeSize()
+    {
+        var recorder = new CallRecorder();
+        var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
+        ProviderInfo noLimit = new("other", "Other", "https://other.test", ProbeSize: null, DefaultCategories: new Dictionary<string, string>());
+        var sut = new ProbeSizeLimitingTranscodeManager(fake, [MakoProvider.Description, noLimit], NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
+        StreamState state = StreamStateFor(
+            MediaSourceFactory.Create(new StreamLink("https://cdn.test/master.m3u8", "hls", MakoStreams.DefaultDescription), "other"));
+
+        await sut.StartFfMpeg(state, "out.ts", OriginalArguments, Guid.NewGuid(), TranscodingJobType.Hls, new CancellationTokenSource());
+
+        Assert.Same(OriginalArguments, recorder.LastCommandLineArguments);
+    }
+
+    [Fact]
     public async Task PassesTheOriginalArgumentsUnchangedForAnyOtherStream()
     {
         var recorder = new CallRecorder();
         var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
-        var sut = new ProbeSizeLimitingTranscodeManager(fake, NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
+        var sut = new ProbeSizeLimitingTranscodeManager(fake, [MakoProvider.Description], NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
         StreamState state = StreamStateFor(new MediaSourceInfo { Name = "some-other-plugin" });
 
         await sut.StartFfMpeg(state, "out.ts", OriginalArguments, Guid.NewGuid(), TranscodingJobType.Hls, new CancellationTokenSource());
@@ -45,7 +60,7 @@ public class ProbeSizeLimitingTranscodeManagerTests
     {
         var recorder = new CallRecorder();
         var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
-        var sut = new ProbeSizeLimitingTranscodeManager(fake, NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
+        var sut = new ProbeSizeLimitingTranscodeManager(fake, [MakoProvider.Description], NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
 
         sut.PingTranscodingJob("session-1", true);
 
@@ -57,7 +72,7 @@ public class ProbeSizeLimitingTranscodeManagerTests
     {
         var recorder = new CallRecorder();
         var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
-        var sut = new ProbeSizeLimitingTranscodeManager(fake, NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
+        var sut = new ProbeSizeLimitingTranscodeManager(fake, [MakoProvider.Description], NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
 
         sut.GetTranscodingJob("session-2");
 
@@ -69,7 +84,7 @@ public class ProbeSizeLimitingTranscodeManagerTests
     {
         var recorder = new CallRecorder();
         var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
-        var sut = new ProbeSizeLimitingTranscodeManager(fake, NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
+        var sut = new ProbeSizeLimitingTranscodeManager(fake, [MakoProvider.Description], NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
 
         // A null StreamState is not a real Jellyfin call, but it is the simplest honest way to
         // make recognising the stream throw without weakening ArgumentsForThisStream's own
@@ -86,7 +101,7 @@ public class ProbeSizeLimitingTranscodeManagerTests
     {
         var recorder = new CallRecorder();
         var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
-        var sut = new ProbeSizeLimitingTranscodeManager(fake, NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
+        var sut = new ProbeSizeLimitingTranscodeManager(fake, [MakoProvider.Description], NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
 
         sut.Dispose();
 
@@ -98,7 +113,7 @@ public class ProbeSizeLimitingTranscodeManagerTests
     {
         var recorder = new CallRecorder();
         var fake = new FakeTranscodeManager(NullLoggerFactory.Instance, recorder);
-        var sut = new ProbeSizeLimitingTranscodeManager(fake, NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
+        var sut = new ProbeSizeLimitingTranscodeManager(fake, [MakoProvider.Description], NullLogger<ProbeSizeLimitingTranscodeManager>.Instance);
 
         sut.Dispose();
         sut.Dispose();

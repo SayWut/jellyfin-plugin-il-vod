@@ -1,4 +1,5 @@
 using Jellyfin.Plugin.IlVod.Browsing;
+using Jellyfin.Plugin.IlVod.Core;
 using MediaBrowser.Controller.MediaEncoding;
 using MediaBrowser.Controller.Streaming;
 using Microsoft.Extensions.Logging;
@@ -7,9 +8,10 @@ namespace Jellyfin.Plugin.IlVod.Transcoding;
 
 /// <summary>
 /// Wraps Jellyfin's real <see cref="ITranscodeManager"/> so ffmpeg's probe size can be limited
-/// for mako's own streams without touching the server-wide setting every other stream relies
-/// on. Every member delegates to <paramref name="inner"/> unchanged except
-/// <see cref="StartFfMpeg"/>, and every stream but mako's passes through that unchanged too.
+/// for the streams of providers that need it (<see cref="ProviderInfo.ProbeSize"/>) without
+/// touching the server-wide setting every other stream relies on. Every member delegates to
+/// <paramref name="inner"/> unchanged except <see cref="StartFfMpeg"/>, and every other stream
+/// passes through that unchanged too.
 /// </summary>
 /// <remarks>
 /// This class sits in front of every stream the server plays, so it must never be the reason
@@ -20,11 +22,14 @@ namespace Jellyfin.Plugin.IlVod.Transcoding;
 public sealed class ProbeSizeLimitingTranscodeManager : ITranscodeManager, IDisposable
 {
     private readonly ITranscodeManager _inner;
+    private readonly IReadOnlyDictionary<string, string> _probeSizeByProviderId;
     private readonly ILogger<ProbeSizeLimitingTranscodeManager> _logger;
     private readonly bool _ownsInner;
     private bool _disposed;
 
     /// <param name="inner">The manager this one wraps.</param>
+    /// <param name="providers">Every provider the plugin has; only those naming a probe size have
+    /// their streams' command lines rewritten.</param>
     /// <param name="logger">Where this decorator logs.</param>
     /// <param name="ownsInner">
     /// Whether <see cref="Dispose"/> may dispose <paramref name="inner"/>. The caller — the
@@ -35,12 +40,19 @@ public sealed class ProbeSizeLimitingTranscodeManager : ITranscodeManager, IDisp
     /// reference to. Defaults to <c>true</c>, matching every other registration shape, where the
     /// inner is built for and owned by this decorator.
     /// </param>
-    public ProbeSizeLimitingTranscodeManager(ITranscodeManager inner, ILogger<ProbeSizeLimitingTranscodeManager> logger, bool ownsInner = true)
+    public ProbeSizeLimitingTranscodeManager(
+        ITranscodeManager inner,
+        IEnumerable<ProviderInfo> providers,
+        ILogger<ProbeSizeLimitingTranscodeManager> logger,
+        bool ownsInner = true)
     {
         _inner = inner;
+        _probeSizeByProviderId = providers
+            .Where(provider => provider.ProbeSize is not null)
+            .ToDictionary(provider => provider.Id, provider => provider.ProbeSize!, StringComparer.Ordinal);
         _logger = logger;
         _ownsInner = ownsInner;
-        _logger.LogInformation("mako: ffmpeg probe-size limiter installed");
+        _logger.LogInformation("il-vod: ffmpeg probe-size limiter installed");
     }
 
     public TranscodingJob? GetTranscodingJob(string playSessionId) => _inner.GetTranscodingJob(playSessionId);
@@ -102,20 +114,21 @@ public sealed class ProbeSizeLimitingTranscodeManager : ITranscodeManager, IDisp
     {
         try
         {
-            if (!MediaSourceFactory.IsMakoSource(state.MediaSource))
+            if (MediaSourceFactory.ProviderIdOf(state.MediaSource) is not string providerId
+                || !_probeSizeByProviderId.TryGetValue(providerId, out string? probeSize))
             {
                 return commandLineArguments;
             }
 
-            _logger.LogInformation("mako: limiting ffmpeg probe size to {ProbeSize} for this stream", ProbeSizeLimiter.MakoProbeSize);
-            return ProbeSizeLimiter.Limit(commandLineArguments);
+            _logger.LogInformation("il-vod: limiting ffmpeg probe size to {ProbeSize} for this {Provider} stream", probeSize, providerId);
+            return ProbeSizeLimiter.Limit(commandLineArguments, probeSize);
         }
         catch (Exception ex)
         {
             // Fail open: this class wraps a component every stream on the server depends on, so
-            // no path through it may prevent a non-mako stream from playing. Whatever went
+            // no path through it may prevent any other stream from playing. Whatever went
             // wrong, send ffmpeg exactly what Jellyfin built.
-            _logger.LogWarning(ex, "mako: could not check or limit the ffmpeg probe size; using Jellyfin's original arguments.");
+            _logger.LogWarning(ex, "il-vod: could not check or limit the ffmpeg probe size; using Jellyfin's original arguments.");
             return commandLineArguments;
         }
     }
