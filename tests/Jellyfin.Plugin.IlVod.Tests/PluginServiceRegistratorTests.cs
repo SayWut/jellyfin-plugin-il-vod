@@ -3,6 +3,8 @@ using Jellyfin.Plugin.IlVod.Configuration;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
 using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
+using Jellyfin.Plugin.IlVod.Providers.Reshet13;
+using Jellyfin.Plugin.IlVod.Providers.Reshet13.Source;
 using MediaBrowser.Controller.Channels;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,10 +27,37 @@ public sealed class PluginServiceRegistratorTests
 
         Assert.IsType<AggregateCatalog>(provider.GetRequiredService<ICatalog>());
         Assert.IsType<IlVodChannel>(provider.GetRequiredService<IChannel>());
-        IContentProvider mako = Assert.Single(provider.GetServices<IContentProvider>());
-        Assert.IsType<MakoProvider>(mako);
+        IContentProvider[] providers = provider.GetServices<IContentProvider>().ToArray();
+        IContentProvider mako = Assert.Single(providers.OfType<MakoProvider>());
         Assert.IsType<SourceCatalog<MakoShowIndex, ShowPage, MakoSeasonPage, MakoResolvedStream>>(mako.Catalog);
-        Assert.Equal(mako.Info, Assert.Single(provider.GetServices<ProviderInfo>()));
+        IContentProvider reshet13 = Assert.Single(providers.OfType<Reshet13Provider>());
+        Assert.IsType<SourceCatalog<Reshet13ShowIndex, Reshet13ShowPage, Reshet13SeasonPage, Reshet13Stream>>(reshet13.Catalog);
+        Assert.Equal(2, providers.Length);
+        Assert.Equal(providers.Select(each => each.Info), provider.GetServices<ProviderInfo>());
+    }
+
+    [Fact]
+    public void Reshet13sCacheLifetimesComeFromItsSettingsAndFloorToOneHour()
+    {
+        PluginConfiguration configuration = new() { Reshet13 = new Reshet13Settings { CatalogueCacheHours = 0, ShowCacheHours = 3 } };
+
+        Reshet13Lifetimes lifetimes = Reshet13ServiceCollectionExtensions.LifetimesFrom(configuration);
+
+        Assert.Equal(TimeSpan.FromHours(1), lifetimes.Catalogue);
+        Assert.Equal(TimeSpan.FromHours(3), lifetimes.Show);
+    }
+
+    [Fact]
+    public void Reshet13sStreamLinkCacheWritesNoFileAndItsBrowseCacheIsPersisted()
+    {
+        using TemporaryDirectory dataFolder = new();
+        using ServiceProvider provider = BuildProvider(dataFolder.Path);
+
+        provider.GetRequiredService<Reshet13StreamLinkCache>().Value.Write("4471744", "{\"url\":\"https://cdn.test/x\"}", TimeSpan.FromMinutes(5));
+        Assert.Empty(Directory.GetFiles(dataFolder.Path));
+
+        provider.GetRequiredService<Reshet13BrowseCache>().Value.Write("shows", "[]", TimeSpan.FromHours(24));
+        Assert.True(File.Exists(Path.Combine(dataFolder.Path, "reshet13-cache.json")));
     }
 
     /// <summary>A setting of 0 (or a stray negative value) must not cache the catalogue for no
