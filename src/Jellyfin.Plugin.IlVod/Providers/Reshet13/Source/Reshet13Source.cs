@@ -89,7 +89,7 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
         return new Reshet13SeasonPage(
             ShowNameOf(showId, showPage),
             seasonIndex,
-            SeasonAssetNameOf(showPage, seasonIndex),
+            showPage.SeasonAssetNameOf(seasonIndex),
             [.. showPage.Episodes.Where(episode => episode.SeasonIndex == seasonIndex)]);
     }
 
@@ -174,9 +174,6 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
             _openedEpisodes[episode.AssetId] = episode;
         }
     }
-
-    private static string? SeasonAssetNameOf(Reshet13ShowPage showPage, int? seasonIndex) =>
-        seasonIndex is int index && showPage.SeasonAssetNames.TryGetValue(index, out string? name) ? name : null;
 
     private string ShowNameOf(string showId, Reshet13ShowPage showPage) =>
         showPage.Episodes.Select(episode => episode.SeriesName).FirstOrDefault(name => !string.IsNullOrEmpty(name))

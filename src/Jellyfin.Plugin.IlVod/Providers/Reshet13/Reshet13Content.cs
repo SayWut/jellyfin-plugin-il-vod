@@ -49,7 +49,14 @@ public sealed record Reshet13Episode(
 /// season assets give, by <see cref="Reshet13Episode.SeasonIndex"/>.</summary>
 public sealed record Reshet13ShowPage(
     IReadOnlyDictionary<int, string> SeasonAssetNames,
-    IReadOnlyList<Reshet13Episode> Episodes);
+    IReadOnlyList<Reshet13Episode> Episodes)
+{
+    /// <summary>The name of the season asset for <paramref name="seasonIndex"/>; <c>null</c> when
+    /// the show has none for it, and always for the episodes with no index. Here, beside the record,
+    /// because the source (a season page) and the transformer (the season list) must agree on it.</summary>
+    public string? SeasonAssetNameOf(int? seasonIndex) =>
+        seasonIndex is int index ? SeasonAssetNames.GetValueOrDefault(index) : null;
+}
 
 /// <summary>One season's episodes, with the show's name and the season's asset name (when the show
 /// has a season asset for it) — neither of which every episode carries itself.</summary>
