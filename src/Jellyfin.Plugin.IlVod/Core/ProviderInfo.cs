@@ -18,7 +18,7 @@ namespace Jellyfin.Plugin.IlVod.Core;
 /// </param>
 /// <param name="DefaultCategories">
 /// The provider's category name → the <see cref="SharedCategories"/> name it means. A name missing
-/// here is shown as the provider spells it; the settings page can override any entry.
+/// here falls back to <see cref="SharedCategories.Fallback"/>; the settings page can override any entry.
 /// </param>
 public sealed record ProviderInfo(
     string Id,

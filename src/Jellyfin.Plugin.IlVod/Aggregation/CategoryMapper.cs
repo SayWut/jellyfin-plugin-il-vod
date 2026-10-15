@@ -5,7 +5,8 @@ namespace Jellyfin.Plugin.IlVod.Aggregation;
 
 /// <summary>
 /// Turns a provider's category names into the shared ones: the settings page's override for that
-/// provider and name first, then the provider's own default mapping, else the name unchanged.
+/// provider and name first, then the provider's own default mapping, else
+/// <see cref="SharedCategories.Fallback"/> — so the channel's categories stay one closed set.
 /// Read on every call, so a saved override applies to the next channel open with no restart.
 /// </summary>
 public sealed class CategoryMapper
@@ -18,21 +19,18 @@ public sealed class CategoryMapper
     }
 
     /// <summary>Two provider categories that map to the same shared one are listed once, in the
-    /// order the provider first names them.</summary>
+    /// order the provider first names them. The fallback is listed only when nothing else is: a
+    /// show with a real category is not also "other".</summary>
     public IReadOnlyList<string> Map(ProviderInfo provider, IReadOnlyList<string> categories)
     {
-        if (categories.Count == 0)
-        {
-            return categories;
-        }
-
         Dictionary<string, string> overrides = OverridesFor(provider.Id);
-        return categories
-            .Select(category => overrides.GetValueOrDefault(category)
-                ?? provider.DefaultCategories.GetValueOrDefault(category)
-                ?? category)
+        List<string> named = categories
+            .Select(category => overrides.GetValueOrDefault(category) ?? provider.DefaultCategories.GetValueOrDefault(category))
+            .OfType<string>()
             .Distinct(StringComparer.Ordinal)
             .ToList();
+
+        return named.Count > 0 ? named : [SharedCategories.Fallback];
     }
 
     /// <summary>A row with no shared name is a row still being filled in on the settings page,

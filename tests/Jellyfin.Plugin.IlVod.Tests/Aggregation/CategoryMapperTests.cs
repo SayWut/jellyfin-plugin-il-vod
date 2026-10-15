@@ -14,11 +14,43 @@ public class CategoryMapperTests
         DefaultCategories: new Dictionary<string, string> { ["דוקו"] = SharedCategories.Documentary, ["סרטי תעודה"] = SharedCategories.Documentary });
 
     [Fact]
-    public void ADefaultMappingRenamesAndAnUnmappedNameIsKeptAsIs()
+    public void ADefaultMappingRenamesTheProvidersCategory()
     {
         CategoryMapper mapper = new(() => []);
 
-        Assert.Equal([SharedCategories.Documentary, "אחר"], mapper.Map(Provider, ["דוקו", "אחר"]));
+        Assert.Equal([SharedCategories.Documentary], mapper.Map(Provider, ["דוקו"]));
+    }
+
+    [Fact]
+    public void ANameNoMappingCoversFallsBackSoTheCategoryListStaysClosed()
+    {
+        CategoryMapper mapper = new(() => []);
+
+        Assert.Equal([SharedCategories.Fallback], mapper.Map(Provider, ["טלנובלות"]));
+    }
+
+    [Fact]
+    public void AShowWithNoCategoryIsListedUnderTheFallback()
+    {
+        CategoryMapper mapper = new(() => []);
+
+        Assert.Equal([SharedCategories.Fallback], mapper.Map(Provider, []));
+    }
+
+    [Fact]
+    public void TheFallbackIsDroppedNextToARealCategory()
+    {
+        CategoryMapper mapper = new(() => []);
+
+        Assert.Equal([SharedCategories.Documentary], mapper.Map(Provider, ["טלנובלות", "דוקו"]));
+    }
+
+    [Fact]
+    public void AnOverrideToANameOutsideTheSharedOnesIsKeptAsTheUserTypedIt()
+    {
+        CategoryMapper mapper = new(() => [new CategoryOverride { ProviderId = "alpha", SourceName = "טלנובלות", SharedName = "אופרות סבון" }]);
+
+        Assert.Equal(["אופרות סבון"], mapper.Map(Provider, ["טלנובלות"]));
     }
 
     [Fact]
@@ -30,7 +62,7 @@ public class CategoryMapperTests
             new CategoryOverride { ProviderId = "beta", SourceName = "אחר", SharedName = SharedCategories.Comedy },
         ]);
 
-        Assert.Equal(["תיעודי", "אחר"], mapper.Map(Provider, ["דוקו", "אחר"]));
+        Assert.Equal(["תיעודי"], mapper.Map(Provider, ["דוקו", "אחר"]));
     }
 
     [Fact]
