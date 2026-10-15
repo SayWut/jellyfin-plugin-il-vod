@@ -1,0 +1,28 @@
+{
+  "lastUpdate": "Thu, 15 Oct 2026 12:08:34 +0300",
+  "timestamp": 1792055314836,
+  "pageType": "SubVertical",
+  "vcmid": "ee06c13070733210VgnVCM2000002a0c10acRCRD",
+  "channelVcmId": "05c2e4caebbe3210VgnVCM100000290c10acRCRD",
+  "sch": "05c2e4caebbe3210",
+  "items": [
+    {
+      "itemVcmId": "013dff549291f610VgnVCM200000650a10acRCRD",
+      "title": "המהדורה המרכזית",
+      "pageUrl": "/mako-vod-channel2-news/main-newscast",
+      "pic": "https://img.mako.co.il/2024/03/07/MainNews_01_E.jpg"
+    },
+    {
+      "itemVcmId": "2ed2040a7781f610VgnVCM200000650a10acRCRD",
+      "title": "חדשות סוף השבוע",
+      "pageUrl": "/mako-vod-channel2-news/weekend-news",
+      "pic": "https://img.mako.co.il/2024/05/12/Sofash_1_e.jpg"
+    },
+    {
+      "itemVcmId": "9879907ca9f4c210VgnVCM100000290c10acRCRD",
+      "title": "אולפן שישי",
+      "pageUrl": "/mako-vod-channel2-news/ulpan-shishi",
+      "pic": "https://img.mako.co.il/2021/11/10/Ulpan_Shishi_02_E.jpg"
+    }
+  ]
+}

@@ -47,6 +47,8 @@ public class OnDemandRequestBudgetTests
     private static readonly string MenuJson = FixtureFile.ReadText("genre-menu.json");
     private static readonly string ComedyJson = FixtureFile.ReadText("genre-list-comedy.json");
     private static readonly string DramaJson = FixtureFile.ReadText("genre-list-drama.json");
+    private static readonly string NewsJson = FixtureFile.ReadText("provider-list-news.json");
+    private static readonly string FullIndexJson = FixtureFile.ReadText("mako-index-all.json");
     private static readonly string EmptyListJson = """{"items":[]}""";
 
     private static readonly string MainConfigUrl = MakoUrls.MainConfigUrl(AppVersion);
@@ -74,37 +76,37 @@ public class OnDemandRequestBudgetTests
         FakeMakoHttp http = SeededHttp();
         ICatalog catalog = await CreateCatalogAsync(http);
 
-        // | Open the channel (cold catalogue) | 6 (menu + 5 genre lists) |
+        // | Open the channel (cold catalogue) | 8 (full list + menu + 5 genre lists + החדשות) |
         await catalog.GetShowsAsync(CancellationToken.None);
-        Assert.Equal(6, BrowseHostRequestCount(http));
+        Assert.Equal(8, BrowseHostRequestCount(http));
 
-        // | Open the channel again (fresh catalogue) | 6, unchanged |
+        // | Open the channel again (fresh catalogue) | 8, unchanged |
         await catalog.GetShowsAsync(CancellationToken.None);
-        Assert.Equal(6, BrowseHostRequestCount(http));
+        Assert.Equal(8, BrowseHostRequestCount(http));
 
-        // | Open a show | 7 (the show page) |
+        // | Open a show | 9 (the show page) |
         await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None);
-        Assert.Equal(7, BrowseHostRequestCount(http));
-
-        // | Open the season the show page displayed | 7, unchanged |
-        await catalog.GetEpisodesAsync(ShemeshPagePath, DisplayedSeasonPath, CancellationToken.None);
-        Assert.Equal(7, BrowseHostRequestCount(http));
-
-        // | Open another season | 8 |
-        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
-        Assert.Equal(8, BrowseHostRequestCount(http));
-
-        // | GetEpisodesAsync(season 1) again | 8 |
-        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
-        Assert.Equal(8, BrowseHostRequestCount(http));
-
-        // | GetSeasonsAsync(show) again | 8 |
-        await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None);
-        Assert.Equal(8, BrowseHostRequestCount(http));
-
-        // | Press play (protected) | 9 on www + 1 POST token + 2 CDN GETs |
-        StreamLink link = await catalog.GetStreamLinkAsync(ProtectedEpisode.ToString(), CancellationToken.None);
         Assert.Equal(9, BrowseHostRequestCount(http));
+
+        // | Open the season the show page displayed | 9, unchanged |
+        await catalog.GetEpisodesAsync(ShemeshPagePath, DisplayedSeasonPath, CancellationToken.None);
+        Assert.Equal(9, BrowseHostRequestCount(http));
+
+        // | Open another season | 10 |
+        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
+        Assert.Equal(10, BrowseHostRequestCount(http));
+
+        // | GetEpisodesAsync(season 1) again | 10 |
+        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
+        Assert.Equal(10, BrowseHostRequestCount(http));
+
+        // | GetSeasonsAsync(show) again | 10 |
+        await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None);
+        Assert.Equal(10, BrowseHostRequestCount(http));
+
+        // | Press play (protected) | 11 on www + 1 POST token + 2 CDN GETs |
+        StreamLink link = await catalog.GetStreamLinkAsync(ProtectedEpisode.ToString(), CancellationToken.None);
+        Assert.Equal(11, BrowseHostRequestCount(http));
         Assert.Equal(1, RequestCountTo(http, TokenUrl));
         Assert.Equal(1, RequestCountTo(http, FinalMediaUrl));
         Assert.Equal(1, RequestCountTo(http, BestVariantUrl));
@@ -116,7 +118,7 @@ public class OnDemandRequestBudgetTests
 
         // | same episode again within 5 min | unchanged |
         StreamLink again = await catalog.GetStreamLinkAsync(ProtectedEpisode.ToString(), CancellationToken.None);
-        Assert.Equal(9, BrowseHostRequestCount(http));
+        Assert.Equal(11, BrowseHostRequestCount(http));
         Assert.Equal(1, RequestCountTo(http, TokenUrl));
         Assert.Equal(1, RequestCountTo(http, FinalMediaUrl));
         Assert.Equal(1, RequestCountTo(http, BestVariantUrl));
@@ -175,14 +177,45 @@ public class OnDemandRequestBudgetTests
         Assert.Contains(http.Requests, url => url.Contains("shemesh-s1", StringComparison.Ordinal));
     }
 
-    /// <summary>The genre menu plus its five real genre lists (comedy and drama carry the real
-    /// fixtures; the other three real genres answer one throwaway placeholder show each, never an
-    /// empty list — mako's real genres are never empty, spec §6.2) — same seeding as
-    /// <c>MakoCatalogTests</c> — plus the show/season/playlist/token/CDN fixtures the rest of this
-    /// test's steps need.</summary>
+    /// <summary>The menu entries that are not category lists: none of them is ever asked for, in
+    /// any step of a session — podcast and ערוץ 24 shows are not even in mako's full list.</summary>
+    [Fact]
+    public async Task TheOtherProviderListsTheAbcListAndPlaylistsAreNeverRequested()
+    {
+        FakeMakoHttp http = SeededHttp();
+        ICatalog catalog = await CreateCatalogAsync(http);
+
+        await catalog.GetShowsAsync(CancellationToken.None);
+        await catalog.GetSeasonsAsync(ShemeshPagePath, CancellationToken.None);
+        await catalog.GetEpisodesAsync(ShemeshPagePath, SeasonOnePagePath, CancellationToken.None);
+        await catalog.GetStreamLinkAsync(ProtectedEpisode.ToString(), CancellationToken.None);
+
+        foreach (string excludedPath in new[]
+        {
+            "/mako-vod-index?filter=provider&vcmId=d5aae64655ea0810VgnVCM100000700a10acRCRD", // פודקאסטים
+            "/mako-vod-index?filter=provider&vcmId=3377c13070733210VgnVCM2000002a0c10acRCRD", // ערוץ 24
+            "/mako-vod-index?filter=ABC_Programs_Slider",
+            "/mako-vod-index?filter=playlists",
+        })
+        {
+            Assert.DoesNotContain(MakoUrls.Page(ParsedConfig.BaseUrlTemplate, excludedPath), http.Requests);
+        }
+
+        // Positive control: the allowlisted provider list IS asked for, built the very same way.
+        Assert.Contains(
+            MakoUrls.Page(ParsedConfig.BaseUrlTemplate, "/mako-vod-index?filter=provider&vcmId=ee06c13070733210VgnVCM2000002a0c10acRCRD"),
+            http.Requests);
+    }
+
+    /// <summary>The full show list, the genre menu and its six category lists (comedy, drama and
+    /// החדשות carry the real fixtures; the other three real genres answer one throwaway
+    /// placeholder show each, never an empty list — mako's real genres are never empty, spec
+    /// §6.2) — same seeding as <c>MakoCatalogTests</c> — plus the show/season/playlist/token/CDN
+    /// fixtures the rest of this test's steps need.</summary>
     private static FakeMakoHttp SeededHttp()
     {
         FakeMakoHttp http = new();
+        http.Respond(MakoUrls.Page(ParsedConfig.BaseUrlTemplate, MakoIndexPaths.FullIndex), FullIndexJson);
         http.Respond(MakoUrls.Page(ParsedConfig.BaseUrlTemplate, MakoIndexPaths.GenreMenu), MenuJson);
         foreach (Genre genre in MakoIndex.ParseGenres(MenuJson))
         {
@@ -190,6 +223,7 @@ public class OnDemandRequestBudgetTests
             {
                 "קומדיה" => ComedyJson,
                 "דרמה" => DramaJson,
+                "החדשות" => NewsJson,
                 "ריאליטי" => PlaceholderListJson(genre.Name, "/mako-vod-keshet/placeholder-1"),
                 "דוקומנטרי" => PlaceholderListJson(genre.Name, "/mako-vod-keshet/placeholder-2"),
                 "בישול" => PlaceholderListJson(genre.Name, "/mako-vod-keshet/placeholder-3"),

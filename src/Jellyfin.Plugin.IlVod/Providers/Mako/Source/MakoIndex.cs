@@ -3,8 +3,9 @@ using System.Text.Json;
 namespace Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 
 /// <summary>
-/// Parsing only, for mako's show index: the genre menu (<c>menuItems[]</c>) and a genre's list
-/// (<c>items[]</c>, the same shape as the full index). Tolerant like <c>MakoPages</c>: a missing
+/// Parsing only, for mako's show index: the genre menu (<c>menuItems[]</c>), whose category lists
+/// <see cref="ParseGenres"/> keeps (<see cref="MakoIndexPaths.IsCategoryList"/>), and a show list —
+/// a category's or the full index (<c>items[]</c>, one shape for both). Tolerant like <c>MakoPages</c>: a missing
 /// or wrongly-typed property degrades to a skipped entry or null, never a throw; only text that
 /// is not a JSON object at all is a <see cref="FormatException"/>.
 /// </summary>
@@ -42,7 +43,7 @@ public static class MakoIndex
     {
         string? name = TryGetString(item, TitleProperty);
         string? pagePath = TryGetString(item, UrlProperty);
-        return !string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(pagePath) && MakoIndexPaths.IsGenreList(pagePath)
+        return !string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(pagePath) && MakoIndexPaths.IsCategoryList(name, pagePath)
             ? new Genre(name, pagePath)
             : null;
     }

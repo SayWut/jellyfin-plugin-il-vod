@@ -20,8 +20,9 @@ public sealed class MakoSource : IContentSource<MakoShowIndex, ShowPage, MakoSea
     /// is treated the same as one that is not JSON at all — a failure, never cached.</summary>
     private const string EmptyGenreMenuMessage = "mako's genre menu names no genre";
 
-    /// <summary>Same ruling as <see cref="EmptyGenreMenuMessage"/>, for a genre's own list.</summary>
-    private const string EmptyGenreListMessage = "mako's genre list names no show";
+    /// <summary>Same ruling as <see cref="EmptyGenreMenuMessage"/>, for a show list — a category's
+    /// own, or the full index.</summary>
+    private const string EmptyShowListMessage = "a mako show list names no show";
 
     /// <summary>Logged by <see cref="ParseOrEmpty{T}"/>, which only ever runs against an already
     /// cached page — this is a stale/corrupted cache entry, not a live browse failure.</summary>
@@ -46,24 +47,26 @@ public sealed class MakoSource : IContentSource<MakoShowIndex, ShowPage, MakoSea
     }
 
     /// <summary>
-    /// The genre menu, then each real genre's list (spec §6.2). The lists are pages like any other,
-    /// so <see cref="MakoPageSource"/> caches, coalesces and stale-serves them; a list that fails
-    /// with no stale copy fails the whole answer, because a shorter answer would make Jellyfin
-    /// delete the missing shows.
+    /// mako's full show list, then the genre menu, then each category's list (spec §6.2): the
+    /// categories give shows their genres, the full list adds the shows no category names. The
+    /// lists are pages like any other, so <see cref="MakoPageSource"/> caches, coalesces and
+    /// stale-serves them; a list that fails with no stale copy fails the whole answer, because a
+    /// shorter answer would make Jellyfin delete the missing shows.
     /// </summary>
     public async Task<MakoShowIndex> FetchIndexAsync(CancellationToken cancellationToken)
     {
         TimeSpan lifetime = _readLifetimes().Catalogue;
+        IReadOnlyList<IndexEntry> allShows = await FetchShowListAsync(MakoIndexPaths.FullIndex, lifetime, cancellationToken).ConfigureAwait(false);
         string menuJson = await _pages.GetAsync(MakoIndexPaths.GenreMenu, MenuLifetimeOf(lifetime), cancellationToken).ConfigureAwait(false);
 
         List<MakoGenreList> genres = [];
         foreach (Genre genre in MakoIndex.ParseGenres(menuJson))
         {
-            string listJson = await _pages.GetAsync(genre.PagePath, ListLifetimeOf(lifetime), cancellationToken).ConfigureAwait(false);
-            genres.Add(new MakoGenreList(genre.Name, MakoIndex.ParseEntries(listJson)));
+            IReadOnlyList<IndexEntry> entries = await FetchShowListAsync(genre.PagePath, lifetime, cancellationToken).ConfigureAwait(false);
+            genres.Add(new MakoGenreList(genre.Name, entries));
         }
 
-        return new MakoShowIndex(genres);
+        return new MakoShowIndex(genres, allShows);
     }
 
     public async Task<ShowPage> FetchShowAsync(string showId, CancellationToken cancellationToken)
@@ -78,7 +81,7 @@ public sealed class MakoSource : IContentSource<MakoShowIndex, ShowPage, MakoSea
     }
 
     /// <summary>
-    /// The show's name comes from the cached genre lists (<see cref="ShowNameOf"/>), not from a
+    /// The show's name comes from the cached show lists (<see cref="ShowNameOf"/>), not from a
     /// fetch — a season open must never turn into an index burst (N1).
     /// </summary>
     public async Task<MakoSeasonPage> FetchSeasonAsync(string showId, string seasonId, CancellationToken cancellationToken)
@@ -94,6 +97,14 @@ public sealed class MakoSource : IContentSource<MakoShowIndex, ShowPage, MakoSea
 
     public Task<MakoResolvedStream> FetchStreamAsync(string episodeId, CancellationToken cancellationToken) =>
         _resolver.ResolveAsync(ParseEpisodeIdOrThrow(episodeId), cancellationToken);
+
+    /// <summary>One show list — the full index or a category's — validated before it is cached
+    /// (<see cref="ListLifetimeOf"/>).</summary>
+    private async Task<IReadOnlyList<IndexEntry>> FetchShowListAsync(string listPath, TimeSpan lifetime, CancellationToken cancellationToken)
+    {
+        string listJson = await _pages.GetAsync(listPath, ListLifetimeOf(lifetime), cancellationToken).ConfigureAwait(false);
+        return MakoIndex.ParseEntries(listJson);
+    }
 
     /// <summary>
     /// The page just fetched under <paramref name="fetchedPagePath"/> also carries the episodes of
@@ -147,15 +158,16 @@ public sealed class MakoSource : IContentSource<MakoShowIndex, ShowPage, MakoSea
             return lifetime;
         };
 
-    /// <summary>Same rule as <see cref="MenuLifetimeOf"/>, validating a genre's own list with
-    /// <see cref="MakoIndex.ParseEntries"/> instead: a list that parses but names no show is a
-    /// failure too, since a shorter root answer would make Jellyfin delete the shows it lacks.</summary>
+    /// <summary>Same rule as <see cref="MenuLifetimeOf"/>, validating a show list — a category's
+    /// own, or the full index — with <see cref="MakoIndex.ParseEntries"/> instead: a list that
+    /// parses but names no show is a failure too, since a shorter root answer would make Jellyfin
+    /// delete the shows it lacks.</summary>
     private static Func<string, TimeSpan> ListLifetimeOf(TimeSpan lifetime) =>
         listJson =>
         {
             if (MakoIndex.ParseEntries(listJson).Count == 0)
             {
-                throw new FormatException(EmptyGenreListMessage);
+                throw new FormatException(EmptyShowListMessage);
             }
 
             return lifetime;
@@ -173,26 +185,34 @@ public sealed class MakoSource : IContentSource<MakoShowIndex, ShowPage, MakoSea
         return season?.Number ?? FallbackSeasonNumber;
     }
 
-    /// <summary>Only peeks at the cached menu and lists — a season open must not turn into an index
-    /// burst. A show no list names (a stale folder id) gets episodes with no series name.</summary>
-    private string ShowNameOf(string showId)
+    /// <summary>Only peeks at the cached lists — a season open must not turn into an index burst.
+    /// A show no list names (a stale folder id) gets episodes with no series name.</summary>
+    private string ShowNameOf(string showId) =>
+        CachedShowListPaths()
+            .SelectMany(CachedEntriesOf)
+            .FirstOrDefault(entry => entry.PagePath == showId)
+            ?.Name ?? UnknownShowName;
+
+    /// <summary>The full index first, since it names all but the few shows only a genre lists;
+    /// then the category lists the cached menu names, for those few. Lazy, so the lists after the
+    /// one naming the show are never parsed.</summary>
+    private IEnumerable<string> CachedShowListPaths()
     {
+        yield return MakoIndexPaths.FullIndex;
+
         if (!_pages.TryGetCached(MakoIndexPaths.GenreMenu, out string? menuJson))
         {
-            return UnknownShowName;
+            yield break;
         }
 
         foreach (Genre genre in ParseOrEmpty(() => MakoIndex.ParseGenres(menuJson)))
         {
-            if (_pages.TryGetCached(genre.PagePath, out string? listJson)
-                && ParseOrEmpty(() => MakoIndex.ParseEntries(listJson)).FirstOrDefault(entry => entry.PagePath == showId) is { } entry)
-            {
-                return entry.Name;
-            }
+            yield return genre.PagePath;
         }
-
-        return UnknownShowName;
     }
+
+    private IReadOnlyList<IndexEntry> CachedEntriesOf(string listPath) =>
+        _pages.TryGetCached(listPath, out string? listJson) ? ParseOrEmpty(() => MakoIndex.ParseEntries(listJson)) : [];
 
     private IReadOnlyList<T> ParseOrEmpty<T>(Func<IReadOnlyList<T>> parse)
     {
