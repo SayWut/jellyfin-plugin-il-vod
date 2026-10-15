@@ -32,7 +32,7 @@ public sealed class PluginServiceRegistratorTests
     }
 
     /// <summary>A setting of 0 (or a stray negative value) must not cache the catalogue for no
-    /// time at all — that would turn every channel open into a cold, six-request one.
+    /// time at all — that would turn every channel open into a cold, eight-request one.
     /// <c>CatalogueLifetimesFrom</c> is <c>internal</c> precisely so this can call it directly,
     /// through this test project's <c>InternalsVisibleTo</c> grant, without building the whole
     /// service graph just to read one number back off it.</summary>
