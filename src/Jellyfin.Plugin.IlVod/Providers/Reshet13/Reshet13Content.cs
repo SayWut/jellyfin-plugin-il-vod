@@ -60,5 +60,6 @@ public sealed record Reshet13SeasonPage(
     IReadOnlyList<Reshet13Episode> Episodes);
 
 /// <summary>What pressing play resolved to: the clean (ad-free) master playlist URL, its best variant
-/// when the playlist could be read, and the episode's length when Kaltura states it.</summary>
+/// when the playlist could be read, and the episode's length — Kaltura's, else measured from that
+/// variant; <c>null</c> when neither is known.</summary>
 public sealed record Reshet13Stream(string ManifestUrl, HlsVariant? Variant, TimeSpan? Duration);

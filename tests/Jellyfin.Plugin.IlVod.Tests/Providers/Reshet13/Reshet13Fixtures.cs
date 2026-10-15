@@ -14,6 +14,20 @@ internal static class Reshet13Fixtures
     public const string KnownEntryId = "1_3g4b8w3i";
     public const string AssetGetId = "2361602";
     public const string AssetGetEntryId = "1_iilurenz";
+
+    /// <summary>The fixture's episode whose media file states a length of 0: Kaltura does not know it.</summary>
+    public const string UnstatedLengthAssetId = "2207940";
+    public const string UnstatedLengthEntryId = "1_cizqgast";
+
+    /// <summary>The highest-bandwidth variant <see cref="MasterPlaylist"/> names.</summary>
+    public const string BestVariantUrl =
+        "https://cfvod.kaltura.com/scf/enc/hls/p/2748741/sp/274874100/serveFlavor/entryId/1_f9hhlezq/v/1/ev/7/flavorId/1_b9j3w1m4/name/a.mp4/index.m3u8?Policy=TEST&Signature=TEST&Key-Pair-Id=TEST";
+
+    /// <summary>A variant playlist of two segments: 10 s and 5.5 s.</summary>
+    public const string VariantPlaylist =
+        "#EXTM3U\n#EXT-X-TARGETDURATION:10\n#EXTINF:10.000,\nseg-1.ts\n#EXTINF:5.500,\nseg-2.ts\n#EXT-X-ENDLIST\n";
+
+    public static readonly TimeSpan VariantPlaylistLength = TimeSpan.FromSeconds(15.5);
     public const string Ks = "TEST-KS";
 
     public static readonly string LoginJson = FixtureFile.ReadText("reshet13-login.json");
@@ -31,6 +45,7 @@ internal static class Reshet13Fixtures
 
     public static readonly string KnownManifestUrl = Reshet13Urls.CleanManifest(KnownEntryId);
     public static readonly string AssetGetManifestUrl = Reshet13Urls.CleanManifest(AssetGetEntryId);
+    public static readonly string UnstatedLengthManifestUrl = Reshet13Urls.CleanManifest(UnstatedLengthEntryId);
 
     public static bool Any(string body) => true;
 
@@ -48,7 +63,8 @@ internal static class Reshet13Fixtures
         body => body.Contains($"\"pageIndex\":{pageIndex},", StringComparison.Ordinal);
 
     /// <summary>Every saved answer in place: login, the series list, show 57's episodes and season
-    /// assets, <see cref="AssetGetId"/>'s asset, and the clean manifests of both entry ids.</summary>
+    /// assets, <see cref="AssetGetId"/>'s asset, the clean manifests of three entry ids, and the
+    /// best variant they all name.</summary>
     public static FakeReshet13Http SeededHttp()
     {
         FakeReshet13Http http = new();
@@ -59,6 +75,8 @@ internal static class Reshet13Fixtures
         http.RespondToPost(GetUrl, IsAssetGet, AssetGetJson);
         http.RespondToGet(KnownManifestUrl, MasterPlaylist);
         http.RespondToGet(AssetGetManifestUrl, MasterPlaylist);
+        http.RespondToGet(UnstatedLengthManifestUrl, MasterPlaylist);
+        http.RespondToGet(BestVariantUrl, VariantPlaylist);
         return http;
     }
 }
