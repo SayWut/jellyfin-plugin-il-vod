@@ -1,4 +1,5 @@
 using Jellyfin.Plugin.IlVod.Cache;
+using Jellyfin.Plugin.IlVod.Configuration;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Reshet13;
 using Jellyfin.Plugin.IlVod.Providers.Reshet13.Source;
@@ -94,7 +95,7 @@ public class Reshet13RequestBudgetTests
             new KalturaOttClient(http, new RecordingLogger<KalturaOttClient>()),
             http,
             new TimedCache(clock),
-            () => Reshet13Lifetimes.Default,
+            () => Reshet13ServiceCollectionExtensions.LifetimesFrom(new PluginConfiguration()),
             new RecordingLogger<Reshet13Source>());
 
         return new SourceCatalog<Reshet13ShowIndex, Reshet13ShowPage, Reshet13SeasonPage, Reshet13Stream>(

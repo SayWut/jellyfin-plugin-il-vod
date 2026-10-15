@@ -10,7 +10,7 @@ namespace Jellyfin.Plugin.IlVod.Tests.Providers.Reshet13;
 
 public class Reshet13SourceTests
 {
-    private static readonly Reshet13Lifetimes Lifetimes = Reshet13Lifetimes.Default;
+    private static readonly Reshet13Lifetimes Lifetimes = new(Catalogue: TimeSpan.FromHours(24), Show: TimeSpan.FromHours(6));
     private static readonly TimeSpan PastEveryLifetime = TimeSpan.FromDays(2);
 
     private readonly FakeClock _clock = new();
