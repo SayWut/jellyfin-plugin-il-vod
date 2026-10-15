@@ -19,6 +19,12 @@ tasks.
 
 ## Where things stand
 
+**2026-10-15 — became IL-VOD, a multi-provider channel (branch `claude/il-vod-multi-provider`).**
+The plugin is now "IL-VOD" (new GUID `b8239c51-1963-42d7-82ee-d98ce3e75db4`, assembly
+`Jellyfin.Plugin.IlVod`, folder `IlVod_0.1.0.0`): one channel aggregating every enabled provider,
+with mako as the only provider so far. See the "IL-VOD" section below and `docs/adding-a-provider.md`.
+356/356 tests pass and `scripts/build.sh` builds; **not yet deployed to the phone.**
+
 **2026-09-28 — moved to its own repository.** The plugin moved out of oneplus-media-server
 (`jellyfin-plugin-mako/`, branch `claude/jellyfin-plugin-mako`) to
 `/media/ofek/B1/ProgramingProcjects/jellyfin/jellyfin-plugin-mako`. `git filter-repo
@@ -389,6 +395,27 @@ before C6. `dotnet test`: 304 → 309, all green, 0 warnings.
 - **Original app-check request (§6.7 checks 1, 3):** the "mako test" tile on web, Android TV
   and Fladder — five genre rows; open several shows per genre, including a one-off documentary
   and a cooking show; a season; play. The log is then read for `could not open Show` warnings.
+
+## IL-VOD — multi-provider (2026-10-15)
+
+Decided with the user: one combined channel (one tile; the one-time content reload is
+accepted), a brand-new plugin identity, provider on/off toggles, a category dictionary with
+code defaults plus settings overrides, and a failing provider served from its last good list.
+Scope: the framework plus mako; a second provider is a later plan.
+
+| Step | Title | Status | Notes |
+|---|---|---|---|
+| 1 | Rename to IL-VOD | `done` | New GUID, assembly, folder, scripts, settings page. Behaviour unchanged. |
+| 2 | Core contracts | `done` | `Core/`: `ICatalog`, model, `ProviderInfo`, `IContentProvider`, `ProviderUnavailableException`, `StreamFormat`. `MediaSourceFactory` reads codecs from `StreamDescription.Format` instead of assuming mako's. |
+| 3 | mako as source + transformer | `done` | `IContentSource` / `IContentTransformer` joined only by `SourceCatalog` (which owns the memory-only stream-link cache). Parsers return mako's own records (`MakoContent.cs`); `MakoSource` keeps `MakoCatalog`'s orchestration; `MakoTransformer` merges shows, numbers episodes, describes streams. The existing end-to-end and request-budget tests run unchanged against the composition. |
+| 4 | One aggregated channel | `done` | `AggregateCatalog`, ids `<provider>:<id>`, `ShowListSnapshots` (`show-snapshots.json`); the root fails only when every enabled provider fails with no snapshot. `IlVodChannel`; folder ids `series|…` / `season|…`; `ContentVersion` 6. mako's files: `mako-cache.json`, `mako-device.id`. |
+| 5 | Settings | `done` | `DisabledProviderIds`, `CategoryOverrides`, `Mako` section; `CategoryMapper`; `SharedCategories`; `GET /IlVod/Providers` (admin) feeds the page. The page's script passed `node --check` but has **not been tried in a browser yet**. |
+| 6 | Probe size per provider | `done` | Sources named `il-vod/<provider>`; the limiter applies `ProviderInfo.ProbeSize` (mako `20M`). |
+| 7 | Docs | `done` | README, `docs/adding-a-provider.md`. |
+
+Still to verify on the phone: install (after removing `Mako_0.1.0.0`), one "IL-VOD" tile,
+browse and play mako, the probe-size log line for `il-vod/mako`, the settings page (toggle mako
+off → root empty with no restart; a category override renames a genre on the next root refresh).
 
 ## Deviations log
 
