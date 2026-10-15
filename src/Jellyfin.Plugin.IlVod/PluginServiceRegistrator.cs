@@ -1,14 +1,14 @@
+using Jellyfin.Plugin.IlVod.Aggregation;
 using Jellyfin.Plugin.IlVod.Cache;
 using Jellyfin.Plugin.IlVod.Configuration;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
-using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
-using Jellyfin.Plugin.IlVod.Providers.Mako.Transform;
 using Jellyfin.Plugin.IlVod.Transcoding;
+using MediaBrowser.Controller;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Plugins;
-using MediaBrowser.Controller;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.IlVod;
@@ -18,125 +18,68 @@ public sealed class PluginServiceRegistrator : IPluginServiceRegistrator
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
         // Plugin.Instance does not exist yet at registration time — every read of it below is
-        // deferred into a factory delegate, inside AddMakoServices, never done here.
-        serviceCollection.AddMakoServices(
+        // deferred into a factory delegate, inside AddIlVodServices, never done here.
+        serviceCollection.AddIlVodServices(
             dataFolder: () => Plugin.Instance.DataFolderPath,
             configuration: () => Plugin.Instance.Configuration);
 
-        // Jellyfin's global -probesize setting buffers mako's unidentified data PID in RAM
-        // until the phone aborts playback (see docs/spec.md §4.3). Wrapping the transcode
+        // Jellyfin's global -probesize setting buffers some providers' unidentified data PIDs in
+        // RAM until the phone aborts playback (see docs/spec.md §4.3). Wrapping the transcode
         // manager lets the plugin rewrite the probe size for its own streams only. No logger
         // exists yet at this point in startup, so whether it succeeded is recorded in
-        // ProbeSizeLimiterStatus.IsInstalled for MakoChannel to report on the next play.
+        // ProbeSizeLimiterStatus.IsInstalled for IlVodChannel to report on the next play.
         _ = TranscodeManagerDecoration.Apply(serviceCollection);
     }
 }
 
 /// <summary>
-/// Builds the live mako catalogue's dependency graph (spec §5.1). Kept separate from
-/// <see cref="PluginServiceRegistrator"/> itself so a test can call it directly, over a temporary
-/// data folder and a throwaway configuration, without <see cref="Plugin.Instance"/> ever having to
-/// exist — see <c>PluginServiceRegistratorTests</c>.
+/// Builds the channel's dependency graph: every provider, the catalogue over all of them and the
+/// channel itself. Kept separate from <see cref="PluginServiceRegistrator"/> itself so a test can
+/// call it directly, over a temporary data folder and a throwaway configuration, without
+/// <see cref="Plugin.Instance"/> ever having to exist — see <c>PluginServiceRegistratorTests</c>.
 /// </summary>
-internal static class MakoServiceCollectionExtensions
+internal static class IlVodServiceCollectionExtensions
 {
-    private const string BrowseCacheFileName = "mako-cache.json";
-    private const string DeviceIdentityFileName = "device.id";
+    private const string ShowSnapshotsFileName = "show-snapshots.json";
 
-    /// <summary>A setting of 0 (or less) would cache the catalogue for no time at all, turning
-    /// every channel open into a cold one — floored to the smallest lifetime that still means
-    /// "cached" rather than trusting the settings page's number field unchecked.</summary>
-    private const int MinimumCatalogueCacheHours = 1;
-
-    /// <summary>The 15 s timeout applies from here down: <see cref="MakoConfigLoader"/>, <see cref="MakoPageSource"/>
-    /// and <see cref="StreamResolver"/> all share the one <see cref="IMakoHttp"/> registered below.</summary>
-    internal static void AddMakoServices(this IServiceCollection services, Func<string> dataFolder, Func<PluginConfiguration> configuration)
+    internal static void AddIlVodServices(this IServiceCollection services, Func<string> dataFolder, Func<PluginConfiguration> configuration)
     {
-        services.AddSingleton<IClock, SystemClock>();
-        services.AddSingleton(provider => new RequestPacer(provider.GetRequiredService<IClock>(), Task.Delay));
+        services.TryAddSingleton<IClock, SystemClock>();
 
-        // Two distinct wrapper types, not two registrations of the same TimedCache keyed by a
-        // string, so DI (and this file's readers) can tell "persisted browse cache" and
-        // "memory-only stream-link cache" apart without a magic key (N2 vs. N3).
-        services.AddSingleton(provider => new BrowseCache(new TimedCache(provider.GetRequiredService<IClock>(), BrowseCachePathIn(dataFolder))));
-        services.AddSingleton(provider => new StreamLinkCache(new TimedCache(provider.GetRequiredService<IClock>())));
+        // One line per provider. Each registers its own graph, one IContentProvider and its
+        // ProviderInfo (read by the probe-size limiter without building the provider's graph).
+        services.AddMakoProvider(dataFolder, configuration);
 
-        services.AddSingleton<IMakoHttp>(provider => new MakoHttpClient(
-            CreateHttpClient(),
-            provider.GetRequiredService<RequestPacer>(),
-            provider.GetRequiredService<ILogger<MakoHttpClient>>()));
+        services.AddSingleton(provider => new ShowListSnapshots(
+            new TimedCache(provider.GetRequiredService<IClock>(), PluginDataFolder.PathOf(dataFolder, ShowSnapshotsFileName))));
 
-        services.AddSingleton(provider => new MakoConfigLoader(
-            provider.GetRequiredService<IMakoHttp>(),
-            provider.GetRequiredService<BrowseCache>().Value,
-            () => configuration().AppVersion));
-
-        services.AddSingleton(_ => new DeviceIdentity(DeviceIdentityPathIn(dataFolder)));
-
-        services.AddSingleton(provider => new StreamResolver(
-            provider.GetRequiredService<IMakoHttp>(),
-            provider.GetRequiredService<MakoConfigLoader>(),
-            provider.GetRequiredService<DeviceIdentity>(),
-            () => configuration().AppVersion,
-            provider.GetRequiredService<ILogger<StreamResolver>>()));
-
-        services.AddSingleton(provider => new MakoPageSource(
-            provider.GetRequiredService<IMakoHttp>(),
-            provider.GetRequiredService<MakoConfigLoader>(),
-            provider.GetRequiredService<BrowseCache>().Value,
-            provider.GetRequiredService<ILogger<MakoPageSource>>()));
-
-        services.AddSingleton(provider => new MakoSource(
-            provider.GetRequiredService<MakoPageSource>(),
-            provider.GetRequiredService<StreamResolver>(),
-            () => CatalogueLifetimesFrom(configuration()),
-            provider.GetRequiredService<ILogger<MakoSource>>()));
-
-        // The only place mako's fetching half and its converting half meet.
-        services.AddSingleton<ICatalog>(provider => new SourceCatalog<MakoShowIndex, ShowPage, MakoSeasonPage, MakoResolvedStream>(
-            provider.GetRequiredService<MakoSource>(),
-            new MakoTransformer(),
-            provider.GetRequiredService<StreamLinkCache>().Value,
-            () => CatalogueLifetimesFrom(configuration()).StreamLink));
+        services.AddSingleton<ICatalog>(provider => new AggregateCatalog(
+            provider.GetServices<IContentProvider>(),
+            provider.GetRequiredService<ShowListSnapshots>(),
+            provider.GetRequiredService<ILogger<AggregateCatalog>>()));
 
         // Lazy, not ICatalog: Jellyfin constructs every IChannel before any plugin instance
-        // exists (see MakoChannel's own remarks), and building the catalogue reads the data
+        // exists (see IlVodChannel's own remarks), and building the catalogue reads the data
         // folder and the configuration — both of which throw until Plugin.Instance is set.
-        services.AddSingleton<IChannel>(provider => new MakoChannel(
+        services.AddSingleton<IChannel>(provider => new IlVodChannel(
             new Lazy<ICatalog>(provider.GetRequiredService<ICatalog>),
-            provider.GetRequiredService<ILogger<MakoChannel>>()));
+            provider.GetRequiredService<ILogger<IlVodChannel>>()));
     }
+}
 
-    /// <summary>
-    /// N4/N3: <see cref="System.Net.Http.SocketsHttpHandler.AllowAutoRedirect"/> is off (see
-    /// <see cref="MakoHttpHandlerFactory"/>) and the timeout is <see cref="MakoHttpClient.Timeout"/>
-    /// — the constant that class itself names for exactly this wiring.
-    /// </summary>
-    private static HttpClient CreateHttpClient() => new(MakoHttpHandlerFactory.CreateHandler())
-    {
-        Timeout = MakoHttpClient.Timeout,
-    };
-
-    /// <summary>internal (not private): a test reaches this directly, through the test project's
-    /// <c>InternalsVisibleTo</c> grant, to pin the floor without building a whole service graph.</summary>
-    internal static CatalogueLifetimes CatalogueLifetimesFrom(PluginConfiguration configuration) => new(
-        Catalogue: TimeSpan.FromHours(Math.Max(MinimumCatalogueCacheHours, configuration.CatalogueCacheHours)),
-        ShowPage: TimeSpan.FromHours(configuration.ShowPageCacheHours),
-        PastSeason: TimeSpan.FromDays(configuration.PastSeasonCacheDays),
-        CurrentSeason: TimeSpan.FromHours(configuration.CurrentSeasonCacheHours),
-        StreamLink: TimeSpan.FromMinutes(configuration.StreamLinkCacheMinutes));
-
-    private static string BrowseCachePathIn(Func<string> dataFolder) => Path.Combine(EnsuredDataFolder(dataFolder), BrowseCacheFileName);
-
-    private static string DeviceIdentityPathIn(Func<string> dataFolder) => Path.Combine(EnsuredDataFolder(dataFolder), DeviceIdentityFileName);
+/// <summary>Where the plugin keeps its files: the plugin's data folder, shared by every provider —
+/// each names its own files.</summary>
+internal static class PluginDataFolder
+{
+    internal static string PathOf(Func<string> dataFolder, string fileName) => Path.Combine(Ensured(dataFolder), fileName);
 
     /// <summary>
     /// Creates the plugin's data folder if it does not already exist yet, tolerant of failure —
-    /// exactly like the best-effort persistence <see cref="TimedCache"/> and
-    /// <see cref="DeviceIdentity"/> already fall back to on their own, a folder that cannot be
-    /// created must not stop the plugin from loading.
+    /// exactly like the best-effort persistence <see cref="TimedCache"/> and the providers' own
+    /// files already fall back to, a folder that cannot be created must not stop the plugin from
+    /// loading.
     /// </summary>
-    private static string EnsuredDataFolder(Func<string> dataFolder)
+    private static string Ensured(Func<string> dataFolder)
     {
         string path = dataFolder();
         try
@@ -145,41 +88,10 @@ internal static class MakoServiceCollectionExtensions
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            // Best-effort only: TimedCache.Write and DeviceIdentity.Get already tolerate an
+            // Best-effort only: TimedCache.Write and the providers' own files already tolerate an
             // unwritable location themselves.
         }
 
         return path;
     }
-}
-
-/// <summary>
-/// The persisted browse-page cache (spec §5.3): mako's page text and its config files, written to
-/// <c>mako-cache.json</c> in the plugin's data folder so a Jellyfin restart does not cause a wave
-/// of refetches. A distinct type from <see cref="StreamLinkCache"/> is what lets DI resolve the
-/// right one without a magic string key.
-/// </summary>
-internal sealed class BrowseCache
-{
-    public BrowseCache(TimedCache value)
-    {
-        Value = value;
-    }
-
-    public TimedCache Value { get; }
-}
-
-/// <summary>
-/// The resolved-stream-link cache (spec §5.3). Built over a <see cref="TimedCache"/> with no
-/// persistence path, so a signed URL never reaches disk (N3) — never give this type's registration
-/// a path the way <see cref="BrowseCache"/>'s has one.
-/// </summary>
-internal sealed class StreamLinkCache
-{
-    public StreamLinkCache(TimedCache value)
-    {
-        Value = value;
-    }
-
-    public TimedCache Value { get; }
 }

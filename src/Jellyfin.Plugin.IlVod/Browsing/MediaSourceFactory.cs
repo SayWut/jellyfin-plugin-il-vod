@@ -27,7 +27,7 @@ public static class MediaSourceFactory
 
     // A directory that does not exist: Jellyfin judges "on disk" from the text of a path
     // and never opens it, and nothing must ever be found there.
-    private const string PlaceholderDirectory = "/nonexistent/jellyfin-plugin-mako";
+    private const string PlaceholderDirectory = "/nonexistent/jellyfin-plugin-il-vod";
     private const string PlaceholderExtension = ".mkv";
 
     // Id is left unset on purpose: Jellyfin assigns the item's own GUID, and its HLS

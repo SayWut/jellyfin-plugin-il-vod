@@ -493,7 +493,7 @@ public class MakoCatalogTests
     {
         FakeMakoHttp http = new();
         http.Respond(ShowPageUrl, HtmlErrorPage);
-        MakoChannel channel = ChannelOver(await CreateCatalogAsync(http));
+        IlVodChannel channel = ChannelOver(await CreateCatalogAsync(http));
 
         await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForShow(ShemeshPagePath)));
         Assert.Single(http.Requests);
@@ -507,7 +507,7 @@ public class MakoCatalogTests
     {
         FakeMakoHttp http = new();
         http.Respond(SeasonOneUrl, HtmlErrorPage);
-        MakoChannel channel = ChannelOver(await CreateCatalogAsync(http));
+        IlVodChannel channel = ChannelOver(await CreateCatalogAsync(http));
 
         await Assert.ThrowsAsync<FormatException>(() => OpenFolder(channel, FolderId.ForSeason(ShemeshPagePath, SeasonOnePagePath)));
         Assert.Single(http.Requests);
@@ -636,12 +636,12 @@ public class MakoCatalogTests
     private static string EncryptedTokenResponse() =>
         PayloadCipher.Encrypt(TokenKey, $$"""{ "caseId": 1, "tickets": [ { "ticket": "{{Uri.EscapeDataString(DecodedTicket)}}" } ] }""");
 
-    /// <summary>The real <see cref="MakoChannel"/> over a real catalogue, for the tests whose
+    /// <summary>The real <see cref="IlVodChannel"/> over a real catalogue, for the tests whose
     /// subject is what a user sees when a page cannot be parsed.</summary>
-    private static MakoChannel ChannelOver(ICatalog catalog) =>
-        new(new Lazy<ICatalog>(() => catalog), new RecordingLogger<MakoChannel>());
+    private static IlVodChannel ChannelOver(ICatalog catalog) =>
+        new(new Lazy<ICatalog>(() => catalog), new RecordingLogger<IlVodChannel>());
 
-    private static Task<ChannelItemResult> OpenFolder(MakoChannel channel, FolderId folder) =>
+    private static Task<ChannelItemResult> OpenFolder(IlVodChannel channel, FolderId folder) =>
         channel.GetChannelItems(new InternalChannelItemQuery { FolderId = folder.ToString(), UserId = Guid.NewGuid() }, CancellationToken.None);
 
     private static Task<ICatalog> CreateCatalogAsync(FakeMakoHttp http, string? pageCachePersistencePath = null) =>

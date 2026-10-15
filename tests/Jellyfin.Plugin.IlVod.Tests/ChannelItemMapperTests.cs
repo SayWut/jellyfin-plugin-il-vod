@@ -18,7 +18,7 @@ public class ChannelItemMapperTests
 
         Assert.Equal(ChannelItemType.Folder, item.Type);
         Assert.Equal(ChannelFolderType.Series, item.FolderType);
-        Assert.Equal("mako-series|shemesh", item.Id);
+        Assert.Equal("series|shemesh", item.Id);
         Assert.Equal("שמש", item.Name);
         Assert.Equal("https://img.test/p.jpg", item.ImageUrl);
         Assert.Equal("תיאור", item.Overview);
@@ -34,7 +34,7 @@ public class ChannelItemMapperTests
 
         Assert.Equal(ChannelItemType.Folder, item.Type);
         Assert.Equal(ChannelFolderType.Season, item.FolderType);
-        Assert.Equal("mako-season|/mako-vod-keshet/shemesh|" + season.Id, item.Id);
+        Assert.Equal("season|/mako-vod-keshet/shemesh|" + season.Id, item.Id);
         Assert.Equal("עונה 2", item.Name);
         Assert.Equal(2, item.IndexNumber);
     }

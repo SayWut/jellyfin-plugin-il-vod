@@ -13,12 +13,11 @@ public enum FolderKind
 public sealed record FolderId(FolderKind Kind, string Value)
 {
     private const char Separator = '|';
-    // Jellyfin derives a channel item's identity from this id and stores the item's type with it.
-    // Prefixes changed twice: once when shows became Series items (step A), once in step C when
-    // every show had to be created afresh so Jellyfin would copy its genres — it copies them
-    // only when it first creates an item.
-    private const string ShowPrefix = "mako-series";
-    private const string SeasonPrefix = "mako-season";
+    // Jellyfin derives a channel item's identity from this id and stores the item's type with it,
+    // so changing a prefix makes Jellyfin recreate every folder. Provider-neutral since IL-VOD:
+    // the show id a folder carries is already scoped to its provider (ProviderScopedId).
+    private const string ShowPrefix = "series";
+    private const string SeasonPrefix = "season";
     private const int SeasonValueParts = 2;
 
     public static FolderId Root { get; } = new(FolderKind.Root, string.Empty);
@@ -37,7 +36,7 @@ public sealed record FolderId(FolderKind Kind, string Value)
         int separatorAt = raw.IndexOf(Separator, StringComparison.Ordinal);
         if (separatorAt <= 0)
         {
-            throw new FormatException($"'{raw}' is not a mako folder id.");
+            throw new FormatException($"'{raw}' is not an IL-VOD folder id.");
         }
 
         string prefix = raw[..separatorAt];
@@ -47,7 +46,7 @@ public sealed record FolderId(FolderKind Kind, string Value)
         {
             ShowPrefix => ForShow(value),
             SeasonPrefix => ParseSeason(value, raw),
-            _ => throw new FormatException($"'{raw}' is not a mako folder id."),
+            _ => throw new FormatException($"'{raw}' is not an IL-VOD folder id."),
         };
     }
 
@@ -59,8 +58,8 @@ public sealed record FolderId(FolderKind Kind, string Value)
         _ => throw new InvalidOperationException($"Folder kind '{Kind}' has no id format."),
     };
 
-    /// <summary>The show path and season path a season id carries; mako's season page names no show,
-    /// so the id is the only place the show can come from.</summary>
+    /// <summary>The show id and season id a season folder carries; a provider's season need not name
+    /// its show (mako's season page does not), so the folder id is where the show comes from.</summary>
     public (string ShowId, string SeasonId) SeasonParts()
     {
         if (Kind != FolderKind.Season)
@@ -77,7 +76,7 @@ public sealed record FolderId(FolderKind Kind, string Value)
         string[] parts = value.Split(Separator);
         if (parts.Length != SeasonValueParts || parts.Any(string.IsNullOrEmpty))
         {
-            throw new FormatException($"'{raw}' is not a mako folder id.");
+            throw new FormatException($"'{raw}' is not an IL-VOD folder id.");
         }
 
         return new FolderId(FolderKind.Season, value);

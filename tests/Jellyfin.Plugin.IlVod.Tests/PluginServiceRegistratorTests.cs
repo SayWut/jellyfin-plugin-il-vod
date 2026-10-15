@@ -1,3 +1,4 @@
+using Jellyfin.Plugin.IlVod.Aggregation;
 using Jellyfin.Plugin.IlVod.Configuration;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Jellyfin.Plugin.IlVod.Tests;
 
 /// <summary>
-/// <c>AddMakoServices</c> is extracted out of <see cref="PluginServiceRegistrator"/> precisely so
+/// <c>AddIlVodServices</c> is extracted out of <see cref="PluginServiceRegistrator"/> precisely so
 /// it can be exercised here, over a temporary data folder and a throwaway configuration, without
 /// <c>Plugin.Instance</c> existing — which it does not at real registration time. These tests are
 /// N1/N2/N3's proof at the wiring level: the graph resolves to the real live types, the browse
@@ -22,8 +23,12 @@ public sealed class PluginServiceRegistratorTests
         using TemporaryDirectory dataFolder = new();
         using ServiceProvider provider = BuildProvider(dataFolder.Path);
 
-        Assert.IsType<SourceCatalog<MakoShowIndex, ShowPage, MakoSeasonPage, MakoResolvedStream>>(provider.GetRequiredService<ICatalog>());
-        Assert.IsType<MakoChannel>(provider.GetRequiredService<IChannel>());
+        Assert.IsType<AggregateCatalog>(provider.GetRequiredService<ICatalog>());
+        Assert.IsType<IlVodChannel>(provider.GetRequiredService<IChannel>());
+        IContentProvider mako = Assert.Single(provider.GetServices<IContentProvider>());
+        Assert.IsType<MakoProvider>(mako);
+        Assert.IsType<SourceCatalog<MakoShowIndex, ShowPage, MakoSeasonPage, MakoResolvedStream>>(mako.Catalog);
+        Assert.Equal(mako.Info, Assert.Single(provider.GetServices<ProviderInfo>()));
     }
 
     /// <summary>A setting of 0 (or a stray negative value) must not cache the catalogue for no
@@ -62,7 +67,7 @@ public sealed class PluginServiceRegistratorTests
         using TemporaryDirectory dataFolder = new();
         using ServiceProvider provider = BuildProvider(dataFolder.Path);
 
-        provider.GetRequiredService<StreamLinkCache>().Value.Write("episode-1", "{\"url\":\"https://cdn.test/x\"}", TimeSpan.FromMinutes(5));
+        provider.GetRequiredService<MakoStreamLinkCache>().Value.Write("episode-1", "{\"url\":\"https://cdn.test/x\"}", TimeSpan.FromMinutes(5));
 
         Assert.Empty(Directory.GetFiles(dataFolder.Path));
     }
@@ -73,7 +78,7 @@ public sealed class PluginServiceRegistratorTests
         using TemporaryDirectory dataFolder = new();
         using ServiceProvider provider = BuildProvider(dataFolder.Path);
 
-        provider.GetRequiredService<BrowseCache>().Value.Write("page:/mako-vod-keshet/shemesh", "{}", TimeSpan.FromHours(12));
+        provider.GetRequiredService<MakoBrowseCache>().Value.Write("page:/mako-vod-keshet/shemesh", "{}", TimeSpan.FromHours(12));
 
         Assert.True(File.Exists(Path.Combine(dataFolder.Path, "mako-cache.json")));
     }
@@ -94,7 +99,7 @@ public sealed class PluginServiceRegistratorTests
 
         IChannel[] channels = provider.GetServices<IChannel>().ToArray();
 
-        Assert.Single(channels.OfType<MakoChannel>());
+        Assert.Single(channels.OfType<IlVodChannel>());
     }
 
     /// <summary>
@@ -106,9 +111,9 @@ public sealed class PluginServiceRegistratorTests
     public void TheChannelsOwnDescriptionIsReadableBeforeThePluginInstanceExists()
     {
         using ServiceProvider provider = BuildProviderWithoutAPluginInstance();
-        MakoChannel channel = provider.GetServices<IChannel>().OfType<MakoChannel>().Single();
+        IlVodChannel channel = provider.GetServices<IChannel>().OfType<IlVodChannel>().Single();
 
-        Assert.Equal("mako", channel.Name);
+        Assert.Equal("IL-VOD", channel.Name);
         Assert.NotEmpty(channel.Description);
         Assert.NotEmpty(channel.DataVersion);
         Assert.NotNull(channel.GetChannelFeatures());
@@ -122,7 +127,7 @@ public sealed class PluginServiceRegistratorTests
     /// then is the data folder read. Resolution-only (no <c>GetChannelItems</c> call): the live
     /// mako's catalogue now reaches mako on every browse, so exercising it here would send a
     /// real HTTP request. Resolving <see cref="ICatalog"/> itself is "the first user action" for
-    /// this test's purpose — it is exactly what <see cref="MakoChannel"/>'s own
+    /// this test's purpose — it is exactly what <see cref="IlVodChannel"/>'s own
     /// <c>Lazy&lt;ICatalog&gt;</c> forces open on a real first action, and it alone is enough to
     /// prove the data folder is read lazily.
     /// </summary>
@@ -133,7 +138,7 @@ public sealed class PluginServiceRegistratorTests
         int dataFolderReads = 0;
         ServiceCollection services = new();
         services.AddLogging();
-        services.AddMakoServices(
+        services.AddIlVodServices(
             () =>
             {
                 dataFolderReads++;
@@ -141,10 +146,10 @@ public sealed class PluginServiceRegistratorTests
             },
             () => new PluginConfiguration());
         using ServiceProvider provider = services.BuildServiceProvider();
-        IChannel channel = provider.GetServices<IChannel>().OfType<MakoChannel>().Single();
+        IChannel channel = provider.GetServices<IChannel>().OfType<IlVodChannel>().Single();
         Assert.Equal(0, dataFolderReads);
 
-        Assert.IsType<SourceCatalog<MakoShowIndex, ShowPage, MakoSeasonPage, MakoResolvedStream>>(provider.GetRequiredService<ICatalog>());
+        Assert.IsType<AggregateCatalog>(provider.GetRequiredService<ICatalog>());
 
         Assert.True(dataFolderReads > 0);
     }
@@ -153,7 +158,7 @@ public sealed class PluginServiceRegistratorTests
     {
         ServiceCollection services = new();
         services.AddLogging();
-        services.AddMakoServices(() => dataFolder, () => new PluginConfiguration());
+        services.AddIlVodServices(() => dataFolder, () => new PluginConfiguration());
         return services.BuildServiceProvider();
     }
 
@@ -162,9 +167,9 @@ public sealed class PluginServiceRegistratorTests
     {
         ServiceCollection services = new();
         services.AddLogging();
-        services.AddMakoServices(
-            dataFolder: () => throw new InvalidOperationException("The Mako plugin has not been loaded yet."),
-            configuration: () => throw new InvalidOperationException("The Mako plugin has not been loaded yet."));
+        services.AddIlVodServices(
+            dataFolder: () => throw new InvalidOperationException("The IL-VOD plugin has not been loaded yet."),
+            configuration: () => throw new InvalidOperationException("The IL-VOD plugin has not been loaded yet."));
         return services.BuildServiceProvider();
     }
 

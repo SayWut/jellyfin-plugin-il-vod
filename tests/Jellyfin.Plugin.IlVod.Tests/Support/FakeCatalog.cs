@@ -3,9 +3,9 @@ using Jellyfin.Plugin.IlVod.Core;
 namespace Jellyfin.Plugin.IlVod.Tests.Support;
 
 /// <summary>
-/// A hand-written <see cref="ICatalog"/> fake for <c>MakoChannelTests</c>: a fixed show/season/
+/// A hand-written <see cref="ICatalog"/> fake for <c>IlVodChannelTests</c>: a fixed show/season/
 /// episode shape to map, a settable stream link for play, and two settable failures so a test can
-/// prove <c>MakoChannel</c> translates a catalogue failure into either an empty browse result or a
+/// prove <c>IlVodChannel</c> translates a catalogue failure into either an empty browse result or a
 /// propagated play error, without a real mako call anywhere in the plugin's own test suite.
 /// </summary>
 public sealed class FakeCatalog : ICatalog
