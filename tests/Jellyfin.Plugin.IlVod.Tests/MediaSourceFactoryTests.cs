@@ -83,6 +83,31 @@ public class MediaSourceFactoryTests
     }
 
     [Fact]
+    public void ByDefaultTheVideoIsTheFirstStreamAndTheAudioTheSecond()
+    {
+        MediaSourceInfo source = MediaSourceFactory.Create(
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, MakoStreams.DefaultDescription),
+            "mako");
+
+        Assert.Equal(0, Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Video).Index);
+        Assert.Equal(1, Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Audio).Index);
+    }
+
+    /// <summary>Jellyfin's ffmpeg maps the streams by these indices, so a master whose audio is a
+    /// separate rendition must say where its video and audio are, or ffmpeg maps the wrong ones.</summary>
+    [Fact]
+    public void TheStreamIndicesAreTheOnesTheDescriptionStates()
+    {
+        StreamDescription description = MakoStreams.DefaultDescription with { VideoStreamIndex = 5, AudioStreamIndex = 0 };
+        MediaSourceInfo source = MediaSourceFactory.Create(
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, description),
+            "mako");
+
+        Assert.Equal(5, Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Video).Index);
+        Assert.Equal(0, Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Audio).Index);
+    }
+
+    [Fact]
     public void TheVideoStreamCarriesTheStreamDescription()
     {
         var description = new StreamDescription(1920, 1080, 5_000_000, "High", 4.0) { Format = MakoStreams.Format };

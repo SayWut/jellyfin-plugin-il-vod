@@ -43,6 +43,19 @@ public class SourceCatalogTests
         Assert.Equal(2, source.StreamFetches);
     }
 
+    /// <summary>The cache keeps a link as JSON: the stream indices must come back with it, or a
+    /// replayed episode would map the wrong streams.</summary>
+    [Fact]
+    public async Task ACachedStreamLinkKeepsItsStreamIndices()
+    {
+        SourceCatalog<string, string, string, string> catalog = CatalogOver(new StringSource(), new FakeClock());
+
+        await catalog.GetStreamLinkAsync("ep1", CancellationToken.None);
+        StreamDescription cached = (await catalog.GetStreamLinkAsync("ep1", CancellationToken.None)).Description;
+
+        Assert.Equal((5, 0), (cached.VideoStreamIndex, cached.AudioStreamIndex));
+    }
+
     private static SourceCatalog<string, string, string, string> CatalogOver(StringSource source, IClock clock) =>
         new(source, new StringTransformer(), new TimedCache(clock), () => StreamLinkLifetime);
 
@@ -73,6 +86,7 @@ public class SourceCatalogTests
         public IReadOnlyList<Episode> ToEpisodes(string seasonPage) =>
             [new Episode(seasonPage, string.Empty, 1, 1, seasonPage, AirDate: null, Duration: null, ThumbnailUrl: null)];
 
-        public StreamLink ToStreamLink(string stream) => new(stream, "hls", new StreamDescription(null, null, null, "Main", null));
+        public StreamLink ToStreamLink(string stream) =>
+            new(stream, "hls", new StreamDescription(null, null, null, "Main", null) { VideoStreamIndex = 5, AudioStreamIndex = 0 });
     }
 }
