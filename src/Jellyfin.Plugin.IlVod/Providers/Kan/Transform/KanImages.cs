@@ -4,15 +4,17 @@ namespace Jellyfin.Plugin.IlVod.Providers.Kan.Transform;
 
 /// <summary>
 /// Picks which of a show's images Jellyfin shows, and the sized URL to fetch it from. Kan's image
-/// server (Umbraco ImageSharp) resizes to whatever <c>?width=&amp;height=</c> asks for, so each image
-/// is asked for at a size of its own shape — anything else would come back cropped or stretched.
+/// server (Umbraco ImageSharp) serves only the sizes on its own allow-list — any other answers 404,
+/// and Jellyfin then has no poster at all (seen on the phone) — so each image is asked for at a size
+/// Kan's own pages ask for, in its own shape: the lobby's 300×450 posters and the episode grid's
+/// 490×272 stills.
 /// </summary>
 public static class KanImages
 {
-    private const int PosterWidth = 400;
-    private const int PosterHeight = 600;
-    private const int CardWidth = 640;
-    private const int CardHeight = 360;
+    private const int PosterWidth = 300;
+    private const int PosterHeight = 450;
+    private const int CardWidth = 490;
+    private const int CardHeight = 272;
 
     /// <param name="url">An image URL with no query of its own, as the source hands them over.</param>
     public static string Sized(string url, int width, int height) =>

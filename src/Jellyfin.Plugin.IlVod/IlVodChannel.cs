@@ -29,7 +29,7 @@ namespace Jellyfin.Plugin.IlVod;
 public sealed class IlVodChannel : IChannel, IRequiresMediaInfoCallback
 {
     private const string ChannelName = "IL-VOD";
-    private const string ContentVersion = "8";
+    private const string ContentVersion = "9";
     private const string ChannelDescription = "Israeli VOD providers, fetched on demand.";
     private const string ChannelHomePageUrl = "";
 

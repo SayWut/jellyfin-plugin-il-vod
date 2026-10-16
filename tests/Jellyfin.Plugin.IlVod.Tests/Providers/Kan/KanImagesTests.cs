@@ -18,7 +18,7 @@ public class KanImagesTests
     {
         KanShowCard card = Card(imageUrl: Media + "card.jpg", posterUrl: Media + "poster.jpg");
 
-        Assert.Equal(Media + "poster.jpg?width=400&height=600", KanImages.PosterUrl(card));
+        Assert.Equal(Media + "poster.jpg?width=300&height=450", KanImages.PosterUrl(card));
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class KanImagesTests
     {
         KanShowCard card = Card(imageUrl: Media + "card.jpg", posterUrl: null);
 
-        Assert.Equal(Media + "card.jpg?width=640&height=360", KanImages.PosterUrl(card));
+        Assert.Equal(Media + "card.jpg?width=490&height=272", KanImages.PosterUrl(card));
     }
 
     [Fact]

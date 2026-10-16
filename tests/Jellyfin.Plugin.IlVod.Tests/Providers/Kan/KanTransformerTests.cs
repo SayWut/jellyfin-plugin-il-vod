@@ -67,7 +67,7 @@ public class KanTransformerTests
         IReadOnlyList<Show> shows = Transformer.ToShows(index);
 
         Assert.Equal(
-            [Media + "poster1.jpg?width=400&height=600", Media + "card2.jpg?width=640&height=360", null],
+            [Media + "poster1.jpg?width=300&height=450", Media + "card2.jpg?width=490&height=272", null],
             shows.Select(show => show.PosterUrl));
     }
 
