@@ -26,7 +26,7 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
 
     private readonly KalturaOttClient _kaltura;
     private readonly IReshet13Http _http;
-    private readonly Reshet13RecordCache _records;
+    private readonly RecordCache _records;
     private readonly Func<Reshet13Lifetimes> _readLifetimes;
     private readonly ILogger<Reshet13Source> _logger;
 
@@ -47,7 +47,7 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
     {
         _kaltura = kaltura;
         _http = http;
-        _records = new Reshet13RecordCache(cache);
+        _records = new RecordCache(cache);
         _readLifetimes = readLifetimes;
         _logger = logger;
     }
