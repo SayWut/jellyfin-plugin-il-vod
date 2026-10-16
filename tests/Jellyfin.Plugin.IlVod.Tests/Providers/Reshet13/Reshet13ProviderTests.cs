@@ -13,9 +13,9 @@ public class Reshet13ProviderTests
     }
 
     [Fact]
-    public void StartsWithNoProbeSizeLimitAndReshet13sOwnCategories()
+    public void LimitsTheProbeSizeAndUsesReshet13sOwnCategories()
     {
-        Assert.Null(Reshet13Provider.Description.ProbeSize);
+        Assert.Equal("20M", Reshet13Provider.Description.ProbeSize);
         Assert.Same(Reshet13Categories.Default, Reshet13Provider.Description.DefaultCategories);
     }
 }

@@ -132,11 +132,12 @@ item's own shape changed, `ChannelItemMapper.EpisodeShapeRevision`), or wait.
 
 ## ffmpeg probe size
 
-Jellyfin's global `-probesize 1G` makes ffmpeg buffer mako's entire episode in RAM before
-Android aborts it, because mako's streams carry a data track ffmpeg can never identify. The
+Jellyfin's global `-probesize 1G` makes ffmpeg buffer a whole mako episode in RAM before
+Android aborts it, because mako's streams carry a data track ffmpeg can never identify (Reshet 13's
+carry a `timed_id3` track, and ffmpeg kept buffering those too). The
 plugin does not change the server-wide setting. Instead it wraps Jellyfin's internal transcode
 manager and rewrites `-probesize` only for the command lines Jellyfin builds for streams of
-providers that ask for it (`ProviderInfo.ProbeSize`: `20M` for mako).
+providers that ask for it (`ProviderInfo.ProbeSize`: `20M` for mako and Reshet 13).
 `Transcoding/ProbeSizeLimitingTranscodeManager.cs` recognises the plugin's streams by their
 media source name, `il-vod/<provider>`. Every other stream is untouched. If the wrapped seam
 ever disappears in a future Jellyfin release, the plugin simply stops limiting the probe size

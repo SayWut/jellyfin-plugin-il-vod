@@ -95,7 +95,7 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
     }
 
     /// <summary>
-    /// The clean manifest of the episode's video, described from its master playlist. The episode
+    /// The episode's video, played from its clean manifest's best variant. The episode
     /// comes from an opened show when it can, else from one <c>asset/get</c>; one that states no
     /// length costs one more request, to measure it.
     /// </summary>
@@ -205,6 +205,10 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
     /// <summary>
     /// The stream described from its master playlist, and its length: Kaltura's when it states
     /// one, else measured from the best variant — one more request, and only in that case.
+    /// The best variant is what plays: Kaltura lists its lowest variant first, and Jellyfin's ffmpeg
+    /// maps a master playlist's first stream, so the master URL would play at 360p however good the
+    /// best variant is (seen on the phone). Its URL, and each of its segments', is absolute and
+    /// signed for 24 hours — far past the stream-link cache's lifetime.
     /// </summary>
     private async Task<Reshet13Stream> DescribeStreamAsync(string manifestUrl, TimeSpan? statedDuration, CancellationToken cancellationToken)
     {
@@ -213,9 +217,10 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
             return new Reshet13Stream(manifestUrl, null, statedDuration);
         }
 
+        string? bestVariantUrl = BestVariantUrlOf(manifestUrl, masterPlaylistText);
         TimeSpan? duration = statedDuration
-            ?? await MeasureDurationAsync(manifestUrl, masterPlaylistText, cancellationToken).ConfigureAwait(false);
-        return new Reshet13Stream(manifestUrl, MasterPlaylist.Describe(masterPlaylistText), duration);
+            ?? await MeasureDurationAsync(bestVariantUrl, cancellationToken).ConfigureAwait(false);
+        return new Reshet13Stream(bestVariantUrl ?? manifestUrl, MasterPlaylist.Describe(masterPlaylistText), duration);
     }
 
     /// <summary>
@@ -245,25 +250,31 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
     /// best variant playlist lists every segment, and their sum is the length. Best-effort too: a
     /// failure leaves the length unstated rather than failing playback.
     /// </summary>
-    private async Task<TimeSpan?> MeasureDurationAsync(string manifestUrl, string masterPlaylistText, CancellationToken cancellationToken)
+    private async Task<TimeSpan?> MeasureDurationAsync(string? variantUrl, CancellationToken cancellationToken)
     {
-        if (MasterPlaylist.BestVariantUri(masterPlaylistText) is not string variantUri
-            || !Uri.TryCreate(new Uri(manifestUrl), variantUri, out Uri? variantUrl))
+        if (variantUrl is null)
         {
             return null;
         }
 
         try
         {
-            return MediaPlaylist.TotalDuration(await _http.GetTextAsync(variantUrl.AbsoluteUri, cancellationToken).ConfigureAwait(false));
+            return MediaPlaylist.TotalDuration(await _http.GetTextAsync(variantUrl, cancellationToken).ConfigureAwait(false));
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             _logger.LogWarning(
                 "reshet13: could not measure the length from {HostAndPath} ({Reason}); Jellyfin will treat the stream as live",
-                SafeUrl.Redacted(variantUrl.AbsoluteUri),
+                SafeUrl.Redacted(variantUrl),
                 exception.GetType().Name);
             return null;
         }
     }
+
+    /// <summary>The master playlist's best variant as an absolute URL; <c>null</c> when it names none.</summary>
+    private static string? BestVariantUrlOf(string manifestUrl, string masterPlaylistText) =>
+        MasterPlaylist.BestVariantUri(masterPlaylistText) is string variantUri
+            && Uri.TryCreate(new Uri(manifestUrl), variantUri, out Uri? variantUrl)
+                ? variantUrl.AbsoluteUri
+                : null;
 }

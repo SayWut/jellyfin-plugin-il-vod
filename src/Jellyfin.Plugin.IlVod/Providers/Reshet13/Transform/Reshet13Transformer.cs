@@ -65,7 +65,7 @@ public sealed class Reshet13Transformer : IContentTransformer<Reshet13ShowIndex,
             ? new StreamDescription(variant.Width, variant.Height, variant.BitsPerSecond, variant.VideoProfile, variant.VideoLevel)
             : new StreamDescription(null, null, null, MasterPlaylist.UnmeasuredProfile, null);
 
-        return new StreamLink(stream.ManifestUrl, HlsContainer, description with { Format = Reshet13Streams.Format, Duration = stream.Duration });
+        return new StreamLink(stream.Url, HlsContainer, description with { Format = Reshet13Streams.Format, Duration = stream.Duration });
     }
 
     private static Show ToShow(Reshet13Series series) =>

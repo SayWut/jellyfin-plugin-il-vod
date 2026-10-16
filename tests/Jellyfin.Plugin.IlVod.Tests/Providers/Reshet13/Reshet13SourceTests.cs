@@ -235,7 +235,7 @@ public class Reshet13SourceTests
     }
 
     [Fact]
-    public async Task PlayingAnEpisodeOfAnOpenedShowOnlyFetchesTheManifest()
+    public async Task PlayingAnEpisodeOfAnOpenedShowOnlyFetchesTheManifestAndPlaysItsBestVariant()
     {
         FakeReshet13Http http = SeededHttp();
         Reshet13Source source = CreateSource(http);
@@ -246,7 +246,7 @@ public class Reshet13SourceTests
 
         Assert.Equal(postsBefore, http.Posts.Count);
         Assert.Equal([KnownManifestUrl], http.Gets.Select(call => call.Url));
-        Assert.Equal(KnownManifestUrl, stream.ManifestUrl);
+        Assert.Equal(BestVariantUrl, stream.Url);
         Assert.Equal(TimeSpan.FromSeconds(5552), stream.Duration);
         Assert.Equal(1280, stream.Variant?.Width);
     }
@@ -326,7 +326,7 @@ public class Reshet13SourceTests
 
         Reshet13Stream stream = await source.FetchStreamAsync(AssetGetId, CancellationToken.None);
 
-        Assert.Equal(AssetGetManifestUrl, stream.ManifestUrl);
+        Assert.Equal(AssetGetManifestUrl, stream.Url);
         Assert.Null(stream.Variant);
         Assert.Equal(TimeSpan.FromSeconds(3822), stream.Duration);
         Assert.Single(logger.Warnings);

@@ -50,7 +50,7 @@ public class Reshet13RequestBudgetTests
         StreamLink link = await catalog.GetStreamLinkAsync(KnownAssetId, CancellationToken.None);
         Assert.Equal(5, http.Calls.Count);
         Assert.Equal(KnownManifestUrl, http.Calls[^1].Url);
-        Assert.Equal(KnownManifestUrl, link.Url);
+        Assert.Equal(BestVariantUrl, link.Url);
 
         // | Same episode again within the stream-link lifetime | unchanged |
         await catalog.GetStreamLinkAsync(KnownAssetId, CancellationToken.None);
@@ -115,6 +115,6 @@ public class Reshet13RequestBudgetTests
         public IReadOnlyList<Episode> ToEpisodes(Reshet13SeasonPage seasonPage) =>
             [.. seasonPage.Episodes.Select(episode => new Episode(episode.AssetId, seasonPage.ShowName, 0, 0, episode.Name, null, episode.Duration, null))];
 
-        public StreamLink ToStreamLink(Reshet13Stream stream) => new(stream.ManifestUrl, "hls", new StreamDescription(null, null, null, "Main", null));
+        public StreamLink ToStreamLink(Reshet13Stream stream) => new(stream.Url, "hls", new StreamDescription(null, null, null, "Main", null));
     }
 }
