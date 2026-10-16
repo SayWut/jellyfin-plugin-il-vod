@@ -3,6 +3,7 @@ using Jellyfin.Plugin.IlVod.Cache;
 using Jellyfin.Plugin.IlVod.Configuration;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
+using Jellyfin.Plugin.IlVod.Providers.Kan;
 using Jellyfin.Plugin.IlVod.Providers.Reshet13;
 using Jellyfin.Plugin.IlVod.Transcoding;
 using MediaBrowser.Controller;
@@ -51,6 +52,7 @@ internal static class IlVodServiceCollectionExtensions
         // ProviderInfo (read by the probe-size limiter without building the provider's graph).
         services.AddMakoProvider(dataFolder, configuration);
         services.AddReshet13Provider(dataFolder, configuration);
+        services.AddKanProvider(dataFolder, configuration);
 
         services.AddSingleton(provider => new ShowListSnapshots(
             new TimedCache(provider.GetRequiredService<IClock>(), PluginDataFolder.PathOf(dataFolder, ShowSnapshotsFileName))));
