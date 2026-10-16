@@ -82,8 +82,27 @@ public static class MediaSourceFactory
     // guessing and re-encoding them. A provider that cannot name them gets none described.
     private static MediaStream[] DescribeStreams(StreamDescription description) =>
         description.Format is { } format
-            ? [DescribeVideoStream(description, format), DescribeAudioStream(description, format)]
+            ? InFfmpegOrder(DescribeVideoStream(description, format), DescribeAudioStream(description, format))
             : [];
+
+    /// <summary>
+    /// Jellyfin tells ffmpeg which input stream to map by its position in this list
+    /// (<c>EncodingHelper.FindIndex</c>), never by its <c>Index</c>. So each stream is placed at its
+    /// own index, and any track in between — another variant of the master playlist — is filled
+    /// with a data stream, a type Jellyfin never picks to play.
+    /// </summary>
+    private static MediaStream[] InFfmpegOrder(MediaStream video, MediaStream audio)
+    {
+        var streams = new MediaStream[Math.Max(video.Index, audio.Index) + 1];
+        streams[video.Index] = video;
+        streams[audio.Index] = audio;
+        for (int index = 0; index < streams.Length; index++)
+        {
+            streams[index] ??= new MediaStream { Type = MediaStreamType.Data, Index = index };
+        }
+
+        return streams;
+    }
 
     private static MediaStream DescribeVideoStream(StreamDescription description, StreamFormat format) => new()
     {
