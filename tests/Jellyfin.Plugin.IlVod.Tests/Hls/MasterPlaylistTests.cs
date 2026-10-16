@@ -129,6 +129,20 @@ public class MasterPlaylistTests
         #EXT-X-STREAM-INF:BANDWIDTH=900000,AUDIO="aac"
         video.m3u8
         """)]
+    [InlineData("""
+        #EXTM3U
+        #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="aac",URI="audio.m3u8"
+        #EXT-X-STREAM-INF:RESOLUTION=1920x1080,AUDIO="aac"
+        unrated.m3u8
+        #EXT-X-STREAM-INF:BANDWIDTH=900000,AUDIO="aac"
+        video.m3u8
+        """)]
+    [InlineData("""
+        #EXTM3U
+        #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="aac",URI="audio.m3u8"
+        #EXT-X-STREAM-INF:BANDWIDTH=900000,AUDIO="ac3"
+        video.m3u8
+        """)]
     [InlineData("#EXTM3U\n#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"aac\",URI=\"audio.m3u8\"\n")]
     public void AnyOtherLayoutHasNoMapping(string master)
     {

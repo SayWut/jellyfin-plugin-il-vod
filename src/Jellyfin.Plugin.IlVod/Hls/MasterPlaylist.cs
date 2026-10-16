@@ -18,6 +18,7 @@ public static class MasterPlaylist
     private const string AudioType = "AUDIO";
     private const string UriAttribute = "URI";
     private const string AudioGroupAttribute = "AUDIO";
+    private const string GroupIdAttribute = "GROUP-ID";
     private const string BandwidthAttribute = "BANDWIDTH";
     private const string ResolutionAttribute = "RESOLUTION";
     private const string CodecsAttribute = "CODECS";
@@ -40,14 +41,14 @@ public static class MasterPlaylist
 
     /// <summary>The highest-bandwidth variant; <c>null</c> when the playlist lists none.</summary>
     public static HlsVariant? Describe(string masterPlaylistText) =>
-        ParseVariants(masterPlaylistText).MaxBy(variant => variant.BitsPerSecond) is { } best
+        RatedVariants(ListPlaylists(masterPlaylistText)).MaxBy(variant => variant.BitsPerSecond) is { } best
             ? Describe(best)
             : null;
 
     /// <summary>The URI of the highest-bandwidth variant exactly as the playlist spells it —
     /// usually relative to the master playlist's own URL; <c>null</c> when there is none.</summary>
     public static string? BestVariantUri(string masterPlaylistText) =>
-        ParseVariants(masterPlaylistText)
+        RatedVariants(ListPlaylists(masterPlaylistText))
             .Where(variant => variant.Uri is not null)
             .MaxBy(variant => variant.BitsPerSecond)
             ?.Uri;
@@ -56,28 +57,24 @@ public static class MasterPlaylist
     /// Where ffmpeg will find the best variant's video and the audio, for a master whose variants
     /// are video only and whose audio is one separate rendition (Kan's). ffmpeg's HLS demuxer opens
     /// one playlist per URI in the order the master lists them and numbers their streams in that
-    /// order, one each here. <c>null</c> for any other layout — a variant with its own audio, several
-    /// renditions — whose numbering this cannot know; the default mapping then applies.
+    /// order, one each here. <c>null</c> for any other layout — a variant with its own audio or no
+    /// bandwidth, several renditions, a variant naming another audio group — whose numbering or
+    /// best variant this cannot be sure of; the caller then claims nothing about the tracks.
     /// </summary>
     public static HlsStreamIndices? FfmpegStreamIndices(string masterPlaylistText)
     {
         List<ListedPlaylist> playlists = ListPlaylists(masterPlaylistText);
-        List<ListedPlaylist> renditions = [.. playlists.Where(playlist => !playlist.IsVariant)];
         List<ListedPlaylist> variants = [.. playlists.Where(playlist => playlist.IsVariant)];
-
-        bool hasKansLayout =
-            renditions is [{ IsAudio: true, Uri: not null }]
-            && variants.Count > 0
-            && variants.All(variant => variant.Uri is not null && variant.NamesAudioGroup)
-            && playlists.Select(playlist => playlist.Uri).Distinct(StringComparer.Ordinal).Count() == playlists.Count;
-
-        if (!hasKansLayout)
+        if (playlists.Except(variants).ToList() is not [{ Type: AudioType, Uri: not null } audio]
+            || variants.Count == 0
+            || !variants.All(variant => variant is { Uri: not null, BitsPerSecond: not null } && variant.AudioGroup == audio.GroupId)
+            || playlists.Select(playlist => playlist.Uri).Distinct(StringComparer.Ordinal).Count() != playlists.Count)
         {
             return null;
         }
 
         ListedPlaylist bestVariant = variants.MaxBy(variant => variant.BitsPerSecond)!;
-        return new HlsStreamIndices(Video: playlists.IndexOf(bestVariant), Audio: playlists.IndexOf(renditions[0]));
+        return new HlsStreamIndices(Video: playlists.IndexOf(bestVariant), Audio: playlists.IndexOf(audio));
     }
 
     /// <summary>Every rendition and variant the master lists, in its order.</summary>
@@ -101,47 +98,34 @@ public static class MasterPlaylist
         return playlists;
     }
 
+    /// <summary>The variants that state their bandwidth, the only ones a best variant is chosen among.</summary>
+    private static IEnumerable<ListedPlaylist> RatedVariants(IEnumerable<ListedPlaylist> playlists) =>
+        playlists.Where(playlist => playlist is { IsVariant: true, BitsPerSecond: not null });
+
     private static ListedPlaylist ToRendition(IReadOnlyDictionary<string, string> attributes) => new(
         IsVariant: false,
-        IsAudio: attributes.GetValueOrDefault(TypeAttribute) == AudioType,
-        NamesAudioGroup: false,
-        BitsPerSecond: 0,
+        Type: attributes.GetValueOrDefault(TypeAttribute),
+        GroupId: attributes.GetValueOrDefault(GroupIdAttribute),
+        AudioGroup: null,
+        BitsPerSecond: null,
+        Resolution: (null, null),
+        Codecs: null,
         Uri: attributes.GetValueOrDefault(UriAttribute));
 
     private static ListedPlaylist ToVariant(IReadOnlyDictionary<string, string> attributes, string? uri) => new(
         IsVariant: true,
-        IsAudio: false,
-        NamesAudioGroup: attributes.ContainsKey(AudioGroupAttribute),
-        BitsPerSecond: TryReadBitsPerSecond(attributes) ?? 0,
+        Type: null,
+        GroupId: null,
+        AudioGroup: attributes.GetValueOrDefault(AudioGroupAttribute),
+        BitsPerSecond: TryReadBitsPerSecond(attributes),
+        Resolution: ParseResolution(attributes.GetValueOrDefault(ResolutionAttribute)),
+        Codecs: attributes.GetValueOrDefault(CodecsAttribute),
         Uri: uri);
 
-    private static HlsVariant Describe(StreamVariant variant)
+    private static HlsVariant Describe(ListedPlaylist variant)
     {
         (string profile, double? level) = ProfileAndLevelFrom(variant.Codecs);
-        return new HlsVariant(variant.Width, variant.Height, variant.BitsPerSecond, profile, level);
-    }
-
-    private static IEnumerable<StreamVariant> ParseVariants(string masterPlaylistText)
-    {
-        string[] lines = masterPlaylistText.Split('\n');
-        for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
-        {
-            string trimmedLine = lines[lineIndex].Trim();
-            if (!trimmedLine.StartsWith(StreamInfTag, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            IReadOnlyDictionary<string, string> attributes = ParseAttributes(trimmedLine[StreamInfTag.Length..]);
-            if (TryReadBitsPerSecond(attributes) is not int bitsPerSecond)
-            {
-                continue;
-            }
-
-            (int? width, int? height) = ParseResolution(attributes.GetValueOrDefault(ResolutionAttribute));
-            yield return new StreamVariant(
-                bitsPerSecond, width, height, attributes.GetValueOrDefault(CodecsAttribute), UriFollowing(lines, lineIndex));
-        }
+        return new HlsVariant(variant.Resolution.Width, variant.Resolution.Height, variant.BitsPerSecond, profile, level);
     }
 
     private static int? TryReadBitsPerSecond(IReadOnlyDictionary<string, string> attributes) =>
@@ -199,10 +183,17 @@ public static class MasterPlaylist
         return next is null || next.StartsWith('#') ? null : next;
     }
 
-    private sealed record StreamVariant(int BitsPerSecond, int? Width, int? Height, string? Codecs, string? Uri);
-
-    /// <summary>One playlist a master lists: a rendition (<c>#EXT-X-MEDIA</c>) or a variant.</summary>
-    private sealed record ListedPlaylist(bool IsVariant, bool IsAudio, bool NamesAudioGroup, int BitsPerSecond, string? Uri);
+    /// <summary>One playlist a master lists: a rendition (<c>#EXT-X-MEDIA</c>: its type and group) or
+    /// a variant (its audio group, bandwidth, resolution and codecs).</summary>
+    private sealed record ListedPlaylist(
+        bool IsVariant,
+        string? Type,
+        string? GroupId,
+        string? AudioGroup,
+        int? BitsPerSecond,
+        (int? Width, int? Height) Resolution,
+        string? Codecs,
+        string? Uri);
 
     private static IReadOnlyDictionary<string, string> ParseAttributes(string attributeList)
     {
