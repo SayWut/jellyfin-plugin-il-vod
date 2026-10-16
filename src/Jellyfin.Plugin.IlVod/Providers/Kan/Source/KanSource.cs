@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using Jellyfin.Plugin.IlVod.Cache;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Hls;
-using Jellyfin.Plugin.IlVod.Net;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Kan.Source;
@@ -30,6 +29,7 @@ public sealed class KanSource : IContentSource<KanShowIndex, KanShowPage, KanSea
     private readonly RecordCache _records;
     private readonly Func<KanLifetimes> _readLifetimes;
     private readonly ILogger<KanSource> _logger;
+    private readonly HlsPlaylistReader _playlists;
 
     /// <summary>
     /// Every episode of every show page this process has produced or read from cache, by episode
@@ -45,6 +45,7 @@ public sealed class KanSource : IContentSource<KanShowIndex, KanShowPage, KanSea
         _records = new RecordCache(cache);
         _readLifetimes = readLifetimes;
         _logger = logger;
+        _playlists = new HlsPlaylistReader(http.GetTextAsync, KanProvider.Description.Id, logger);
     }
 
     public Task<KanShowIndex> FetchIndexAsync(CancellationToken cancellationToken) =>
@@ -230,72 +231,17 @@ public sealed class KanSource : IContentSource<KanShowIndex, KanShowPage, KanSea
 
     private async Task<KanStream> DescribeStreamAsync(string masterUrl, TimeSpan? knownLength, CancellationToken cancellationToken)
     {
-        if (await ReadMasterPlaylistAsync(masterUrl, cancellationToken).ConfigureAwait(false) is not string masterPlaylistText)
+        if (await _playlists.ReadMasterAsync(masterUrl, cancellationToken).ConfigureAwait(false) is not string masterPlaylistText)
         {
             return new KanStream(masterUrl, null, null, knownLength);
         }
 
         TimeSpan? length = knownLength
-            ?? await MeasureLengthAsync(BestVariantUrlOf(masterUrl, masterPlaylistText), cancellationToken).ConfigureAwait(false);
+            ?? await _playlists.MeasureLengthAsync(HlsPlaylistReader.BestVariantUrlOf(masterUrl, masterPlaylistText), cancellationToken).ConfigureAwait(false);
         return new KanStream(
             masterUrl,
             MasterPlaylist.Describe(masterPlaylistText),
             MasterPlaylist.FfmpegStreamIndices(masterPlaylistText),
             length);
     }
-
-    /// <summary>
-    /// Best-effort: the master URL is right whether or not its playlist could be read just now, so
-    /// a failure leaves the stream undescribed rather than failing playback; the player reads the
-    /// playlist itself.
-    /// </summary>
-    private async Task<string?> ReadMasterPlaylistAsync(string masterUrl, CancellationToken cancellationToken)
-    {
-        try
-        {
-            return await _http.GetTextAsync(masterUrl, cancellationToken).ConfigureAwait(false);
-        }
-        catch (Exception exception) when (exception is not OperationCanceledException)
-        {
-            _logger.LogWarning(
-                "kan: could not describe the master playlist at {HostAndPath} ({Reason}); using the default stream description",
-                SafeUrl.Redacted(masterUrl),
-                exception.GetType().Name);
-            return null;
-        }
-    }
-
-    /// <summary>
-    /// Jellyfin treats a source with no run time as a live stream — players join late and cannot
-    /// rewind — so an episode with no known length is measured: the best variant playlist lists
-    /// every segment, and their sum is the length. Best-effort too: a failure leaves the length
-    /// unstated rather than failing playback.
-    /// </summary>
-    private async Task<TimeSpan?> MeasureLengthAsync(string? variantUrl, CancellationToken cancellationToken)
-    {
-        if (variantUrl is null)
-        {
-            return null;
-        }
-
-        try
-        {
-            return MediaPlaylist.TotalDuration(await _http.GetTextAsync(variantUrl, cancellationToken).ConfigureAwait(false));
-        }
-        catch (Exception exception) when (exception is not OperationCanceledException)
-        {
-            _logger.LogWarning(
-                "kan: could not measure the length from {HostAndPath} ({Reason}); Jellyfin will treat the stream as live",
-                SafeUrl.Redacted(variantUrl),
-                exception.GetType().Name);
-            return null;
-        }
-    }
-
-    /// <summary>The master playlist's best variant as an absolute URL; <c>null</c> when it names none.</summary>
-    private static string? BestVariantUrlOf(string masterUrl, string masterPlaylistText) =>
-        MasterPlaylist.BestVariantUri(masterPlaylistText) is string variantUri
-            && Uri.TryCreate(new Uri(masterUrl), variantUri, out Uri? variantUrl)
-                ? variantUrl.AbsoluteUri
-                : null;
 }

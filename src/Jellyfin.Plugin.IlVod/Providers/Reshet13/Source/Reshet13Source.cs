@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using Jellyfin.Plugin.IlVod.Cache;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Hls;
-using Jellyfin.Plugin.IlVod.Net;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.IlVod.Providers.Reshet13.Source;
@@ -25,7 +24,7 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
     private const string EmptyCatalogueMessage = "Reshet 13's series list names no series";
 
     private readonly KalturaOttClient _kaltura;
-    private readonly IReshet13Http _http;
+    private readonly HlsPlaylistReader _playlists;
     private readonly RecordCache _records;
     private readonly Func<Reshet13Lifetimes> _readLifetimes;
     private readonly ILogger<Reshet13Source> _logger;
@@ -46,7 +45,7 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
         ILogger<Reshet13Source> logger)
     {
         _kaltura = kaltura;
-        _http = http;
+        _playlists = new HlsPlaylistReader(http.GetTextAsync, Reshet13Provider.Description.Id, logger);
         _records = new RecordCache(cache);
         _readLifetimes = readLifetimes;
         _logger = logger;
@@ -212,69 +211,14 @@ public sealed class Reshet13Source : IContentSource<Reshet13ShowIndex, Reshet13S
     /// </summary>
     private async Task<Reshet13Stream> DescribeStreamAsync(string manifestUrl, TimeSpan? statedDuration, CancellationToken cancellationToken)
     {
-        if (await ReadMasterPlaylistAsync(manifestUrl, cancellationToken).ConfigureAwait(false) is not string masterPlaylistText)
+        if (await _playlists.ReadMasterAsync(manifestUrl, cancellationToken).ConfigureAwait(false) is not string masterPlaylistText)
         {
             return new Reshet13Stream(manifestUrl, null, statedDuration);
         }
 
-        string? bestVariantUrl = BestVariantUrlOf(manifestUrl, masterPlaylistText);
+        string? bestVariantUrl = HlsPlaylistReader.BestVariantUrlOf(manifestUrl, masterPlaylistText);
         TimeSpan? duration = statedDuration
-            ?? await MeasureDurationAsync(bestVariantUrl, cancellationToken).ConfigureAwait(false);
+            ?? await _playlists.MeasureLengthAsync(bestVariantUrl, cancellationToken).ConfigureAwait(false);
         return new Reshet13Stream(bestVariantUrl ?? manifestUrl, MasterPlaylist.Describe(masterPlaylistText), duration);
     }
-
-    /// <summary>
-    /// Best-effort, the same ruling as mako's <c>StreamResolver</c>: the manifest URL is right
-    /// whether or not its playlist could be read just now, so a failure leaves the stream
-    /// undescribed (no variant) rather than failing playback; the player reads the playlist itself.
-    /// </summary>
-    private async Task<string?> ReadMasterPlaylistAsync(string manifestUrl, CancellationToken cancellationToken)
-    {
-        try
-        {
-            return await _http.GetTextAsync(manifestUrl, cancellationToken).ConfigureAwait(false);
-        }
-        catch (Exception exception) when (exception is not OperationCanceledException)
-        {
-            _logger.LogWarning(
-                "reshet13: could not describe the master playlist at {HostAndPath} ({Reason}); using the default stream description",
-                SafeUrl.Redacted(manifestUrl),
-                exception.GetType().Name);
-            return null;
-        }
-    }
-
-    /// <summary>
-    /// Jellyfin treats a source with no run time as a live stream — players join late and cannot
-    /// rewind — so an episode Kaltura states no length for is measured the way mako's are: the
-    /// best variant playlist lists every segment, and their sum is the length. Best-effort too: a
-    /// failure leaves the length unstated rather than failing playback.
-    /// </summary>
-    private async Task<TimeSpan?> MeasureDurationAsync(string? variantUrl, CancellationToken cancellationToken)
-    {
-        if (variantUrl is null)
-        {
-            return null;
-        }
-
-        try
-        {
-            return MediaPlaylist.TotalDuration(await _http.GetTextAsync(variantUrl, cancellationToken).ConfigureAwait(false));
-        }
-        catch (Exception exception) when (exception is not OperationCanceledException)
-        {
-            _logger.LogWarning(
-                "reshet13: could not measure the length from {HostAndPath} ({Reason}); Jellyfin will treat the stream as live",
-                SafeUrl.Redacted(variantUrl),
-                exception.GetType().Name);
-            return null;
-        }
-    }
-
-    /// <summary>The master playlist's best variant as an absolute URL; <c>null</c> when it names none.</summary>
-    private static string? BestVariantUrlOf(string manifestUrl, string masterPlaylistText) =>
-        MasterPlaylist.BestVariantUri(masterPlaylistText) is string variantUri
-            && Uri.TryCreate(new Uri(manifestUrl), variantUri, out Uri? variantUrl)
-                ? variantUrl.AbsoluteUri
-                : null;
 }
