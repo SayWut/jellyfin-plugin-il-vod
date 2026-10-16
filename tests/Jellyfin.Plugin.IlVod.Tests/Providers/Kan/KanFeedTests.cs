@@ -93,7 +93,17 @@ public class KanFeedTests
 
     [Fact]
     public void AnEntryWithNoNumericIdIsSkipped() =>
-        Assert.Empty(KanFeed.Parse(Feed(Entry("abc", "video")), "9").Episodes);
+        Assert.Equal(["5"], KanFeed.Parse(Feed(Entry("abc", "video"), Entry("5", "video")), "9").Episodes.Select(e => e.EntryId));
+
+    /// <summary>Kan changing how it spells ids must not read as a show with no episodes: Jellyfin
+    /// would delete every one of them.</summary>
+    [Fact]
+    public void AFeedWhoseEveryVideoEntryIsUnreadableIsNotAFeed() =>
+        Assert.Throws<FormatException>(() => KanFeed.Parse(Feed(Entry("abc", "video"), Entry("7", "audio")), "9"));
+
+    [Fact]
+    public void AFeedOfOnlyAudioEntriesIsAnEmptyShow() =>
+        Assert.Empty(KanFeed.Parse(Feed(Entry("7", "audio")), "9").Episodes);
 
     [Fact]
     public void AProgramWithNoEntriesIsAnEmptyShow() =>
@@ -102,6 +112,8 @@ public class KanFeedTests
     [Theory]
     [InlineData("""{"title":"","entry":[]}""")]
     [InlineData("""{"entry":[]}""")]
+    [InlineData("""{"title":"תוכנית"}""")]
+    [InlineData("""{"title":"תוכנית","entry":{}}""")]
     [InlineData("""[]""")]
     [InlineData("<html>challenge</html>")]
     public void AnAnswerThatNamesNoProgramIsNotAFeed(string answer) =>

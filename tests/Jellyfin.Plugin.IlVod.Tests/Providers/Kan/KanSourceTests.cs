@@ -103,18 +103,36 @@ public class KanSourceTests
         Assert.Equal(["1", "2", "3"], index.Shows.Select(show => show.ProgramId));
     }
 
+    /// <summary>A rail that comes up short is Kan's unstable sort shifting cards between pages
+    /// mid-walk: it is walked once more, and if it is still short Kan is answering inconsistently
+    /// right now — unavailable, never a short list, and never cached.</summary>
     [Fact]
-    public async Task AWalkEndingShortOfTheStatedTotalIsRefusedAndNeverCached()
+    public async Task AWalkEndingShortTwiceIsRefusedAsUnavailableAndNeverCached()
     {
         FakeKanHttp http = HttpWithDramaPages(
             KanHtml.GenrePage(4, 2, KanHtml.Card("1"), KanHtml.Card("2")),
             KanHtml.GenrePage(4, 2, KanHtml.Card("2"), KanHtml.Card("3")));
         KanSource source = CreateSource(http);
 
-        await Assert.ThrowsAsync<FormatException>(() => source.FetchIndexAsync(CancellationToken.None));
-        await Assert.ThrowsAsync<FormatException>(() => source.FetchIndexAsync(CancellationToken.None));
+        await Assert.ThrowsAsync<KanUnavailableException>(() => source.FetchIndexAsync(CancellationToken.None));
+        await Assert.ThrowsAsync<KanUnavailableException>(() => source.FetchIndexAsync(CancellationToken.None));
 
         Assert.Equal(2, http.Requests.Count(url => url == KanUrls.Lobby));
+        Assert.Equal(4, http.Requests.Count(url => url == KanUrls.GenrePage(DramaSlug, 1)));
+    }
+
+    [Fact]
+    public async Task AWalkEndingShortServesTheStaleIndex()
+    {
+        FakeKanHttp http = SeededHttp();
+        KanSource source = CreateSource(http);
+        await source.FetchIndexAsync(CancellationToken.None);
+
+        _clock.Advance(PastEveryLifetime);
+        http.RespondTo(KanUrls.GenrePage(DramaSlug, 1), KanHtml.GenrePage(3, null, KanHtml.Card("1"), KanHtml.Card("2")));
+        KanShowIndex stale = await source.FetchIndexAsync(CancellationToken.None);
+
+        Assert.Equal(3, stale.Shows.Count);
     }
 
     [Fact]
@@ -394,7 +412,7 @@ public class KanSourceTests
         FakeKanHttp http = new();
         http.RespondTo(
             SatireEpisodePage,
-            """<script type="application/json" data-redge-config="p">{"file":{"hls":"//evil.example/a.m3u8"}}</script>""");
+            """<script type="application/json" data-redge-config="p">{"id":"1107310","file":{"hls":"//evil.example/a.m3u8"}}</script>""");
         KanSource source = CreateSource(http);
 
         await Assert.ThrowsAsync<StreamUnavailableException>(() => source.FetchStreamAsync(SatireEpisodeId, CancellationToken.None));

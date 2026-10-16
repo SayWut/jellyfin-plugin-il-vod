@@ -50,7 +50,7 @@ public static partial class KanUrls
         new Uri(new Uri(Host), imagePath).GetLeftPart(UriPartial.Path);
 
     private static string CheckedId(string id, string parameterName) =>
-        KanEpisodeId.IsNumericId(id) ? id : throw new ArgumentException($"kan id '{id}' is not numeric", parameterName);
+        KanIds.IsNumeric(id) ? id : throw new ArgumentException($"kan id '{id}' is not numeric", parameterName);
 
     [GeneratedRegex(@"^[A-Za-z0-9%\-]+$")]
     private static partial Regex GenreSlugPattern();

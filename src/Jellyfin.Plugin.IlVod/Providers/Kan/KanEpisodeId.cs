@@ -22,7 +22,7 @@ public static class KanEpisodeId
         programId = null;
         entryId = null;
         string[] parts = episodeId.Split(Separator);
-        if (parts is not [var program, var entry] || !IsNumericId(program) || !IsNumericId(entry))
+        if (parts is not [var program, var entry] || !KanIds.IsNumeric(program) || !KanIds.IsNumeric(entry))
         {
             return false;
         }
@@ -30,6 +30,4 @@ public static class KanEpisodeId
         (programId, entryId) = (program, entry);
         return true;
     }
-
-    public static bool IsNumericId(string id) => id.Length > 0 && id.All(char.IsAsciiDigit);
 }

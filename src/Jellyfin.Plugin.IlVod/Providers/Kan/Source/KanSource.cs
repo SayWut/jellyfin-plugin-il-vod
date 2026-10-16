@@ -55,7 +55,7 @@ public sealed class KanSource : IContentSource<KanShowIndex, KanShowPage, KanSea
     /// good, so it is refused before any request.</exception>
     public async Task<KanShowPage> FetchShowAsync(string showId, CancellationToken cancellationToken)
     {
-        if (!KanEpisodeId.IsNumericId(showId))
+        if (!KanIds.IsNumeric(showId))
         {
             throw new ArgumentException($"kan show id '{showId}' is not a program id", nameof(showId));
         }
@@ -153,11 +153,26 @@ public sealed class KanSource : IContentSource<KanShowIndex, KanShowPage, KanSea
     /// <summary>
     /// Every card of the rail's genre, page by page. Kan's pages are sorted on a key that is not
     /// unique, so a card can repeat on the next page while another slips between them: repeats are
-    /// dropped, and a walk that ends short of the genre's stated total is refused — never answered
-    /// short, or Jellyfin would delete the shows it missed.
+    /// dropped, and a walk that ends short of the genre's stated total is walked once more. Still
+    /// short, Kan is answering inconsistently right now — unavailable, so a stale copy may stand in
+    /// — and never answered short, or Jellyfin would delete the shows it missed.
     /// </summary>
-    /// <exception cref="FormatException">The walk ended short, or the pager is not believable.</exception>
+    /// <exception cref="KanUnavailableException">Both walks ended short.</exception>
+    /// <exception cref="FormatException">The pager is not believable.</exception>
     private async Task<IReadOnlyList<KanGenreCard>> WalkRailAsync(KanRail rail, CancellationToken cancellationToken)
+    {
+        (IReadOnlyList<KanGenreCard> cards, int statedTotal) = await WalkRailOnceAsync(rail, cancellationToken).ConfigureAwait(false);
+        if (cards.Count < statedTotal)
+        {
+            (cards, statedTotal) = await WalkRailOnceAsync(rail, cancellationToken).ConfigureAwait(false);
+        }
+
+        return cards.Count >= statedTotal
+            ? cards
+            : throw new KanUnavailableException($"kan genre '{rail.Slug}' listed {cards.Count} of the {statedTotal} programs it states, twice");
+    }
+
+    private async Task<(IReadOnlyList<KanGenreCard> Cards, int StatedTotal)> WalkRailOnceAsync(KanRail rail, CancellationToken cancellationToken)
     {
         KanGenrePage firstPage = await FetchGenrePageAsync(rail, 1, cancellationToken).ConfigureAwait(false);
         if (firstPage.LastPage > MostGenrePages)
@@ -171,10 +186,7 @@ public sealed class KanSource : IContentSource<KanShowIndex, KanShowPage, KanSea
             cards.AddRange((await FetchGenrePageAsync(rail, page, cancellationToken).ConfigureAwait(false)).Cards);
         }
 
-        List<KanGenreCard> distinctCards = [.. cards.DistinctBy(card => card.ProgramId)];
-        return distinctCards.Count >= (firstPage.StatedTotal ?? 0)
-            ? distinctCards
-            : throw new FormatException($"kan genre '{rail.Slug}' listed {distinctCards.Count} of the {firstPage.StatedTotal} programs it states");
+        return ([.. cards.DistinctBy(card => card.ProgramId)], firstPage.StatedTotal);
     }
 
     private async Task<KanGenrePage> FetchGenrePageAsync(KanRail rail, int page, CancellationToken cancellationToken) =>
@@ -208,7 +220,7 @@ public sealed class KanSource : IContentSource<KanShowIndex, KanShowPage, KanSea
         string episodePage = await _http.GetTextAsync(KanUrls.EpisodePage(programId, entryId), cancellationToken).ConfigureAwait(false);
         try
         {
-            return KanPlayerConfig.ParseHlsUrl(episodePage);
+            return KanPlayerConfig.ParseHlsUrl(episodePage, entryId);
         }
         catch (FormatException exception)
         {

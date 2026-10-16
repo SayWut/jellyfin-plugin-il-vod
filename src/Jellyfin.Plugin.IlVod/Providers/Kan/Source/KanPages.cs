@@ -26,16 +26,15 @@ public static partial class KanPages
         return new KanLobby(rails, LobbyCardsByProgramId(html));
     }
 
-    /// <exception cref="FormatException"><paramref name="html"/> has neither cards nor a stated
-    /// total, or has a card without a program's id, link or name.</exception>
+    /// <summary>Every genre page states its total (all 42 did on 2026-10-16), and the walk is checked
+    /// against it, so a page without one is no genre page: believing it would let a broken pager end
+    /// the walk early and the catalogue come back short, unnoticed.</summary>
+    /// <exception cref="FormatException"><paramref name="html"/> states no total, or has a card
+    /// without a program's id, link or name.</exception>
     public static KanGenrePage ParseGenrePage(string html)
     {
+        int statedTotal = StatedTotalOf(html) ?? throw new FormatException("kan genre page states no total");
         List<KanGenreCard> cards = [.. html.Split(GenreCardMarker).Skip(1).Select(ToGenreCard).DistinctBy(card => card.ProgramId)];
-        int? statedTotal = StatedTotalOf(html);
-        if (cards.Count == 0 && statedTotal is null)
-        {
-            throw new FormatException("kan genre page lists no programs and states no total");
-        }
 
         return new KanGenrePage(cards, statedTotal, LastPageOf(html));
     }

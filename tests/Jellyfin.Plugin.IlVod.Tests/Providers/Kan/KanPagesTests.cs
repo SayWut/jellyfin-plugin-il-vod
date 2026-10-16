@@ -90,6 +90,12 @@ public class KanPagesTests
         Assert.Equal(0, page.StatedTotal);
     }
 
+    /// <summary>The stated total is what a walk is checked against: without it a pager that broke
+    /// would end the walk at page 1 and the catalogue would come back short, unnoticed.</summary>
+    [Fact]
+    public void APageWithCardsButNoStatedTotalIsNoGenrePage() =>
+        Assert.Throws<FormatException>(() => KanPages.ParseGenrePage(KanHtml.GenrePage(statedTotal: null, lastPage: null, KanHtml.Card("7"))));
+
     [Fact]
     public void ACardWithNoImageHasNone() =>
         Assert.Null(Assert.Single(KanPages.ParseGenrePage(KanHtml.GenrePage(1, null, KanHtml.Card("7", image: null))).Cards).ImageUrl);
@@ -97,6 +103,6 @@ public class KanPagesTests
     [Theory]
     [InlineData("<html><body>Just a moment...</body></html>")]
     [InlineData("""<li class="grid-list-item"><div class="card">no link</div></li> 1 תוצאות""")]
-    public void APageWithNeitherCardsNorATotalOrWithABrokenCardIsNoGenrePage(string html) =>
+    public void APageWithNoTotalOrWithABrokenCardIsNoGenrePage(string html) =>
         Assert.Throws<FormatException>(() => KanPages.ParseGenrePage(html));
 }

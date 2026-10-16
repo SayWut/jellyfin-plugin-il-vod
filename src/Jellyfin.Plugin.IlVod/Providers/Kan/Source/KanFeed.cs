@@ -5,8 +5,9 @@ namespace Jellyfin.Plugin.IlVod.Providers.Kan.Source;
 
 /// <summary>
 /// Reads a program feed (<c>api/mobile/program</c>) into a <see cref="KanShowPage"/>. The feed
-/// tells an unknown id apart only by naming no program, so that is what makes an answer no feed;
-/// a program with no entries (a film not yet online) is a valid, empty show.
+/// tells an unknown id apart only by naming no program, so that is what makes an answer no feed, as
+/// does one with no entry list; a program whose list is empty (a film played from its show page) is
+/// a valid, empty show.
 /// </summary>
 public static class KanFeed
 {
@@ -36,18 +37,28 @@ public static class KanFeed
             throw new FormatException($"kan program {programId}: the answer names no program");
         }
 
-        IEnumerable<JsonElement> entries = Child(feed, "entry") is { ValueKind: JsonValueKind.Array } array
-            ? array.EnumerateArray()
-            : [];
-        return new KanShowPage(programId, showName, [.. entries.Where(IsPlayable).Select(ReadEntry)]);
+        if (Child(feed, "entry") is not { ValueKind: JsonValueKind.Array } entries)
+        {
+            throw new FormatException($"kan program {programId}: the answer lists no entries");
+        }
+
+        List<JsonElement> videos = [.. entries.EnumerateArray().Where(IsVideo)];
+        List<KanEntry> episodes = [.. videos.Where(HasPageId).Select(ReadEntry)];
+        if (videos.Count > 0 && episodes.Count == 0)
+        {
+            throw new FormatException($"kan program {programId}: no entry has an id this plugin can read");
+        }
+
+        return new KanShowPage(programId, showName, episodes);
     }
 
-    /// <summary>A YouTube entry is the same episode on Kan's own player too; an audio entry is a
-    /// radio item, and one with no numeric id has no page to play.</summary>
-    private static bool IsPlayable(JsonElement entry) =>
-        Text(Child(entry, "type"), "value") != AudioType
-        && Text(entry, "id") is string id
-        && KanEpisodeId.IsNumericId(id);
+    /// <summary>A YouTube entry is the same episode on Kan's own player too; an audio entry is a radio item.</summary>
+    private static bool IsVideo(JsonElement entry) => Text(Child(entry, "type"), "value") != AudioType;
+
+    /// <summary>One with no numeric id has no page to play. A few such entries are skipped; a feed of
+    /// nothing else means Kan changed its ids, and is refused rather than read as an empty show,
+    /// which Jellyfin would answer by deleting every episode.</summary>
+    private static bool HasPageId(JsonElement entry) => Text(entry, "id") is string id && KanIds.IsNumeric(id);
 
     private static KanEntry ReadEntry(JsonElement entry)
     {
