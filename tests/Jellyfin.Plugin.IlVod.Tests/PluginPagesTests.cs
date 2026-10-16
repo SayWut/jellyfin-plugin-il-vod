@@ -42,6 +42,23 @@ public class PluginPagesTests
         Assert.Contains("config.Reshet13", html, StringComparison.Ordinal);
     }
 
+    /// <summary>The category rows live in a dialog the page opens, not on the page itself, and the
+    /// dialog sits inside the form so Save still reads them.</summary>
+    [Fact]
+    public void SettingsPageEditsCategoriesInADialogInsideTheForm()
+    {
+        string html = EmbeddedSettingsPageHtml();
+        int formStart = html.IndexOf("<form id=\"IlVodConfigForm\">", StringComparison.Ordinal);
+        int dialogStart = html.IndexOf("<dialog id=\"IlVodCategoriesDialog\"", StringComparison.Ordinal);
+        int rows = html.IndexOf("<tbody id=\"IlVodCategories\">", StringComparison.Ordinal);
+        int dialogEnd = html.IndexOf("</dialog>", StringComparison.Ordinal);
+        int formEnd = html.IndexOf("</form>", StringComparison.Ordinal);
+
+        Assert.True(formStart < dialogStart && dialogStart < rows && rows < dialogEnd && dialogEnd < formEnd);
+        Assert.Contains("id=\"IlVodEditCategories\"", html, StringComparison.Ordinal);
+        Assert.Contains(".showModal()", html, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void SettingsPageListsProvidersAndCategoriesFromThePluginsOwnApi()
     {

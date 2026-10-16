@@ -7,6 +7,30 @@
 <body>
 <div id="IlVodConfigPage" data-role="page" class="page type-interior pluginConfigurationPage"
      data-require="emby-input,emby-button,emby-checkbox,emby-select">
+    <style>
+        /* A native dialog's browser defaults (light colours, a border) are swapped for the theme's:
+           .dialog and .formDialogHeader/.formDialogFooter carry its background. The theme's .dialog
+           also sets margin: 0, which would pin the dialog to the top-left corner instead of centring it. */
+        #IlVodCategoriesDialog {
+            margin: auto;
+            color: inherit;
+            border: none;
+            padding: 0;
+            width: min(40em, 94vw);
+            max-height: 88vh;
+            flex-direction: column;
+        }
+        #IlVodCategoriesDialog[open] { display: flex; }
+        #IlVodCategoriesDialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+        #IlVodCategoriesDialog .ilVodDialogContent { flex: 1; min-height: 0; overflow-y: auto; padding: 0 1em 1em; }
+        /* The theme pins .formDialogFooter over the dialog's bottom edge, which would cover the last
+           rows and the Add button; here it takes its own place below the scrolling rows. */
+        #IlVodCategoriesDialog .formDialogFooter { position: static; flex-shrink: 0; }
+        #IlVodCategories .ilVodGroup th { text-align: start; padding-top: 1.2em; }
+        #IlVodCategories td { vertical-align: middle; }
+        /* emby-input adds an empty floating label above each field, which pushes it below its row's text. */
+        #IlVodCategories .inputLabel:empty { display: none; }
+    </style>
     <div data-role="content">
         <div class="content-primary">
             <form id="IlVodConfigForm">
@@ -22,24 +46,41 @@
                 <div class="verticalSection">
                     <h2 class="sectionTitle">Categories</h2>
                     <div class="fieldDescription">
-                        Each provider names its categories its own way. Type the shared category a provider's
-                        category should be shown as; leave a row empty to keep the provider's default. A show whose
-                        categories no row names is shown under אחר.
+                        Each provider names its categories its own way; each is shown as one of the shared
+                        categories. A show whose categories no row names is shown under אחר.
                     </div>
-                    <table class="detailTable" style="width: 100%;">
-                        <thead>
-                        <tr>
-                            <th style="text-align: start;">Provider</th>
-                            <th style="text-align: start;">Provider's category</th>
-                            <th style="text-align: start;">Shown as</th>
-                        </tr>
-                        </thead>
-                        <tbody id="IlVodCategories"></tbody>
-                    </table>
-                    <datalist id="IlVodSharedCategories"></datalist>
-                    <button is="emby-button" type="button" id="IlVodAddCategory" class="raised emby-button">
-                        <span>Add a category</span>
+                    <p id="IlVodCategoriesSummary"></p>
+                    <button is="emby-button" type="button" id="IlVodEditCategories" class="raised emby-button">
+                        <span>Edit categories</span>
                     </button>
+
+                    <!-- Inside the form, so its rows are read on Save like any other field. -->
+                    <dialog id="IlVodCategoriesDialog" class="dialog" aria-labelledby="IlVodCategoriesTitle">
+                        <div class="formDialogHeader">
+                            <button is="paper-icon-button-light" type="button" class="btnCancel autoSize ilVodCloseCategories" title="Close">
+                                <span class="material-icons close" aria-hidden="true"></span>
+                            </button>
+                            <h3 id="IlVodCategoriesTitle" class="formDialogHeaderTitle">Categories</h3>
+                        </div>
+                        <div class="ilVodDialogContent">
+                            <div class="fieldDescription">
+                                Type the shared category a provider's category should be shown as; leave a row empty
+                                to keep the provider's default. Changes are kept when you press Save.
+                            </div>
+                            <table class="detailTable" style="width: 100%;">
+                                <tbody id="IlVodCategories"></tbody>
+                            </table>
+                            <datalist id="IlVodSharedCategories"></datalist>
+                            <button is="emby-button" type="button" id="IlVodAddCategory" class="raised emby-button">
+                                <span>Add a category</span>
+                            </button>
+                        </div>
+                        <div class="formDialogFooter">
+                            <button is="emby-button" type="button" class="raised button-submit block formDialogFooterItem emby-button ilVodCloseCategories">
+                                <span>Done</span>
+                            </button>
+                        </div>
+                    </dialog>
                 </div>
 
                 <div class="verticalSection">
@@ -118,27 +159,40 @@
                     + ' value="' + escapeHtml(value) + '" placeholder="' + escapeHtml(placeholder) + '" />';
             }
 
+            // A heading row over one group of rows: a provider's, or the added ones.
+            function addGroupRow(title, firstColumn) {
+                page.querySelector('#IlVodCategories').insertAdjacentHTML('beforeend',
+                    '<tr class="ilVodGroup"><th colspan="2"><h3 style="margin: 0;">' + escapeHtml(title) + '</h3></th></tr>'
+                    + '<tr class="ilVodGroup"><th>' + escapeHtml(firstColumn) + '</th><th>Shown as</th></tr>');
+            }
+
             // A row the provider's defaults name: the provider's category is fixed text.
             function addDefaultRow(providerId, sourceName, defaultName, overrideName) {
                 page.querySelector('#IlVodCategories').insertAdjacentHTML('beforeend',
-                    '<tr data-provider-id="' + escapeHtml(providerId) + '" data-source-name="' + escapeHtml(sourceName) + '"'
+                    '<tr class="ilVodCategory" data-provider-id="' + escapeHtml(providerId) + '" data-source-name="' + escapeHtml(sourceName) + '"'
                     + ' data-default-name="' + escapeHtml(defaultName) + '">'
-                    + '<td>' + escapeHtml(providerName(providerId)) + '</td>'
                     + '<td>' + escapeHtml(sourceName) + '</td>'
                     + '<td>' + sharedNameInput(overrideName, defaultName) + '</td>'
                     + '</tr>');
             }
 
-            // A row the user adds for a category the provider's defaults do not name.
+            // A row the user adds for a category the provider's defaults do not name: which provider,
+            // and its category, share the first column. emby-select hangs its arrow on its parent, so
+            // the select gets a .selectContainer of its own.
             function addCustomRow(providerId, sourceName, sharedName) {
+                if (!page.querySelector('#IlVodCategories tr[data-custom]')) {
+                    addGroupRow('Added categories', 'Provider and its category');
+                }
                 var options = providers.map(function (candidate) {
                     var selected = candidate.Id === providerId ? ' selected' : '';
                     return '<option value="' + escapeHtml(candidate.Id) + '"' + selected + '>' + escapeHtml(candidate.DisplayName) + '</option>';
                 }).join('');
                 page.querySelector('#IlVodCategories').insertAdjacentHTML('beforeend',
-                    '<tr data-custom="true">'
-                    + '<td><select is="emby-select" class="ilVodProviderId">' + options + '</select></td>'
-                    + '<td><input is="emby-input" type="text" class="ilVodSourceName" value="' + escapeHtml(sourceName) + '" /></td>'
+                    '<tr class="ilVodCategory" data-custom="true">'
+                    + '<td><div class="selectContainer" style="margin-bottom: 0.5em;">'
+                    + '<select is="emby-select" class="ilVodProviderId">' + options + '</select></div>'
+                    + '<div><input is="emby-input" type="text" class="ilVodSourceName" placeholder="Provider\'s category"'
+                    + ' value="' + escapeHtml(sourceName) + '" /></div></td>'
                     + '<td>' + sharedNameInput(sharedName, '') + '</td>'
                     + '</tr>');
             }
@@ -151,6 +205,7 @@
 
                 var shown = {};
                 providers.forEach(function (provider) {
+                    addGroupRow(provider.DisplayName, "Provider's category");
                     Object.keys(provider.DefaultCategories || {}).forEach(function (sourceName) {
                         var match = overrides.filter(function (row) {
                             return row.ProviderId === provider.Id && row.SourceName === sourceName;
@@ -164,11 +219,31 @@
                         addCustomRow(row.ProviderId, row.SourceName, row.SharedName);
                     }
                 });
+                renderCategoriesSummary();
+            }
+
+            // The page shows only a count; the rows themselves live in the dialog.
+            function renderCategoriesSummary() {
+                var rows = page.querySelectorAll('#IlVodCategories tr.ilVodCategory').length;
+                var changed = readOverrides().length;
+                page.querySelector('#IlVodCategoriesSummary').textContent = rows + ' categories from '
+                    + providers.length + (providers.length === 1 ? ' provider' : ' providers') + (changed ? ', ' + changed + ' changed from the defaults.' : ', all on their defaults.');
+            }
+
+            function openCategories() {
+                page.querySelector('#IlVodCategoriesDialog').showModal();
+            }
+
+            function closeCategories() {
+                var dialog = page.querySelector('#IlVodCategoriesDialog');
+                if (dialog.open) {
+                    dialog.close();
+                }
             }
 
             function readOverrides() {
                 var overrides = [];
-                page.querySelectorAll('#IlVodCategories tr').forEach(function (row) {
+                page.querySelectorAll('#IlVodCategories tr.ilVodCategory').forEach(function (row) {
                     var sharedName = row.querySelector('.ilVodSharedName').value.trim();
                     if (!sharedName) {
                         return;
@@ -213,10 +288,22 @@
 
             page.querySelector('#IlVodAddCategory').addEventListener('click', function () {
                 addCustomRow(providers.length ? providers[0].Id : '', '', '');
+                var added = page.querySelector('#IlVodCategories tr[data-custom]:last-child');
+                added.scrollIntoView({ block: 'nearest' });
+                added.querySelector('.ilVodSourceName').focus();
             });
+
+            page.querySelector('#IlVodEditCategories').addEventListener('click', openCategories);
+            page.querySelectorAll('.ilVodCloseCategories').forEach(function (button) {
+                button.addEventListener('click', closeCategories);
+            });
+            // Closing by any route (Done, the X, Escape) refreshes the count on the page.
+            page.querySelector('#IlVodCategoriesDialog').addEventListener('close', renderCategoriesSummary);
 
             page.querySelector('#IlVodConfigForm').addEventListener('submit', function (event) {
                 event.preventDefault();
+                // Enter in a dialog field submits the form too: save, and leave the page uncovered.
+                closeCategories();
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(IlVodConfig.pluginUniqueId).then(function (config) {
                     config.DisabledProviderIds = [];
