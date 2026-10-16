@@ -183,18 +183,30 @@ public class KanTransformerTests
         Assert.Equal((5, 0), (link.Description.VideoStreamIndex, link.Description.AudioStreamIndex));
     }
 
+    /// <summary>
+    /// Kan's master lists its audio first, so the default mapping (video 0, audio 1) would hand
+    /// ffmpeg the audio as the video. When the tracks' order is unknown — the master could not be
+    /// read, or lists them some other way — no streams are claimed and Jellyfin probes the master.
+    /// </summary>
     [Fact]
-    public void AStreamWhoseMasterCouldNotBeReadIsStillInKansFormatButClaimsNoResolution()
+    public void AStreamWhoseTracksAreNotKnownClaimsNoFormatSoJellyfinProbesIt()
     {
-        KanStream stream = new(MasterUrl, Variant: null, StreamIndices: null, Duration: null);
+        KanStream stream = new(MasterUrl, Variant: null, StreamIndices: null, Duration: new TimeSpan(0, 29, 35));
 
         StreamLink link = Transformer.ToStreamLink(stream);
 
         Assert.Equal(MasterUrl, link.Url);
-        Assert.Equal(
-            new StreamDescription(null, null, null, MasterPlaylist.UnmeasuredProfile, null) { Format = KanStreams.Format },
-            link.Description);
-        Assert.Equal((0, 1), (link.Description.VideoStreamIndex, link.Description.AudioStreamIndex));
+        Assert.Null(link.Description.Format);
+        Assert.Equal((null, null), (link.Description.Width, link.Description.Height));
+        Assert.Equal(new TimeSpan(0, 29, 35), link.Description.Duration);
+    }
+
+    [Fact]
+    public void AReadableMasterInAnotherLayoutClaimsNoFormatEither()
+    {
+        KanStream stream = new(MasterUrl, new HlsVariant(1920, 1080, 5_000_000, "High", 4.0), StreamIndices: null, Duration: null);
+
+        Assert.Null(Transformer.ToStreamLink(stream).Description.Format);
     }
 
     /// <summary>מהדורת כאן חדשות's feed, newest first: no episode states a season.</summary>

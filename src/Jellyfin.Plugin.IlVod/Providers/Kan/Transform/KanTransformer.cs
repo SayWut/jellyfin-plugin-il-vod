@@ -54,15 +54,24 @@ public sealed class KanTransformer : IContentTransformer<KanShowIndex, KanShowPa
             .ToList();
     }
 
-    /// <summary>The URL stays the master playlist: Kan's audio is a separate rendition, so a variant's
-    /// own URL would play silent. ffmpeg is told instead which of the master's tracks to map.</summary>
+    /// <summary>
+    /// The URL stays the master playlist: Kan's audio is a separate rendition, so a variant's own
+    /// URL would play silent. ffmpeg is told instead which of the master's tracks to map — and when
+    /// that is not known, nothing is claimed about the tracks at all, since the default mapping
+    /// (video first) would hand ffmpeg Kan's audio as the video; Jellyfin then probes the master.
+    /// </summary>
     public StreamLink ToStreamLink(KanStream stream)
     {
-        StreamDescription description = DescribedFormat(stream) with { Format = KanStreams.Format, Duration = stream.Duration };
+        StreamDescription description = DescribedFormat(stream) with { Duration = stream.Duration };
 
         if (stream.StreamIndices is { } indices)
         {
-            description = description with { VideoStreamIndex = indices.Video, AudioStreamIndex = indices.Audio };
+            description = description with
+            {
+                Format = KanStreams.Format,
+                VideoStreamIndex = indices.Video,
+                AudioStreamIndex = indices.Audio,
+            };
         }
 
         return new StreamLink(stream.Url, HlsContainer, description);
