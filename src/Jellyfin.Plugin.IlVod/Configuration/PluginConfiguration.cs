@@ -10,6 +10,7 @@ public sealed class PluginConfiguration : BasePluginConfiguration
     private CategoryOverride[] _categoryOverrides = [];
     private MakoSettings _mako = new();
     private Reshet13Settings _reshet13 = new();
+    private KanSettings _kan = new();
 
     /// <summary>
     /// The providers whose content is not loaded at all. Disabled rather than enabled ids, so a
@@ -39,6 +40,12 @@ public sealed class PluginConfiguration : BasePluginConfiguration
     {
         get => _reshet13;
         set => _reshet13 = value ?? new Reshet13Settings();
+    }
+
+    public KanSettings Kan
+    {
+        get => _kan;
+        set => _kan = value ?? new KanSettings();
     }
 
     /// <summary>

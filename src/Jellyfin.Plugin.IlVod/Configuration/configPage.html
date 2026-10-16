@@ -114,6 +114,18 @@
                     </div>
                 </div>
 
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">כאן 11</h2>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="KanCatalogueCacheHours">Catalogue cache (hours)</label>
+                        <input id="KanCatalogueCacheHours" name="KanCatalogueCacheHours" type="number" min="1" is="emby-input" />
+                        <div class="fieldDescription">
+                            How long the show list is kept before Kan is asked again. Opening the channel with a cold
+                            cache reads the Kan BOX lobby and every genre page, about 40 requests.
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <button is="emby-button" type="submit" class="raised button-submit block emby-button">
                         <span>Save</span>
@@ -282,6 +294,8 @@
                     page.querySelector('#AppVersion').value = mako.AppVersion || '';
                     var reshet13 = config.Reshet13 || {};
                     page.querySelector('#Reshet13CatalogueCacheHours').value = reshet13.CatalogueCacheHours;
+                    var kan = config.Kan || {};
+                    page.querySelector('#KanCatalogueCacheHours').value = kan.CatalogueCacheHours;
                     Dashboard.hideLoadingMsg();
                 }).catch(showFailure);
             });
@@ -318,6 +332,8 @@
                     config.Mako.AppVersion = page.querySelector('#AppVersion').value.trim();
                     config.Reshet13 = config.Reshet13 || {};
                     config.Reshet13.CatalogueCacheHours = parseInt(page.querySelector('#Reshet13CatalogueCacheHours').value, 10);
+                    config.Kan = config.Kan || {};
+                    config.Kan.CatalogueCacheHours = parseInt(page.querySelector('#KanCatalogueCacheHours').value, 10);
                     return ApiClient.updatePluginConfiguration(IlVodConfig.pluginUniqueId, config).then(function (result) {
                         Dashboard.processPluginConfigurationUpdateResult(result);
                     });
