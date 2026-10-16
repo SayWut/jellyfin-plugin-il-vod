@@ -42,6 +42,15 @@ public class PluginPagesTests
         Assert.Contains("config.Reshet13", html, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void SettingsPageHasKansCatalogueCacheSetting()
+    {
+        string html = EmbeddedSettingsPageHtml();
+
+        Assert.Contains("KanCatalogueCacheHours", html, StringComparison.Ordinal);
+        Assert.Contains("config.Kan", html, StringComparison.Ordinal);
+    }
+
     /// <summary>The category rows live in a dialog the page opens, not on the page itself, and the
     /// dialog sits inside the form so Save still reads them.</summary>
     [Fact]

@@ -1,6 +1,8 @@
 using Jellyfin.Plugin.IlVod.Aggregation;
 using Jellyfin.Plugin.IlVod.Configuration;
 using Jellyfin.Plugin.IlVod.Core;
+using Jellyfin.Plugin.IlVod.Providers.Kan;
+using Jellyfin.Plugin.IlVod.Providers.Kan.Source;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
 using Jellyfin.Plugin.IlVod.Providers.Mako.Source;
 using Jellyfin.Plugin.IlVod.Providers.Reshet13;
@@ -32,7 +34,9 @@ public sealed class PluginServiceRegistratorTests
         Assert.IsType<SourceCatalog<MakoShowIndex, ShowPage, MakoSeasonPage, MakoResolvedStream>>(mako.Catalog);
         IContentProvider reshet13 = Assert.Single(providers.OfType<Reshet13Provider>());
         Assert.IsType<SourceCatalog<Reshet13ShowIndex, Reshet13ShowPage, Reshet13SeasonPage, Reshet13Stream>>(reshet13.Catalog);
-        Assert.Equal(2, providers.Length);
+        IContentProvider kan = Assert.Single(providers.OfType<KanProvider>());
+        Assert.IsType<SourceCatalog<KanShowIndex, KanShowPage, KanSeasonPage, KanStream>>(kan.Catalog);
+        Assert.Equal(3, providers.Length);
         Assert.Equal(providers.Select(each => each.Info), provider.GetServices<ProviderInfo>());
     }
 
@@ -58,6 +62,39 @@ public sealed class PluginServiceRegistratorTests
 
         provider.GetRequiredService<Reshet13BrowseCache>().Value.Write("shows", "[]", TimeSpan.FromHours(24));
         Assert.True(File.Exists(Path.Combine(dataFolder.Path, "reshet13-cache.json")));
+    }
+
+    [Fact]
+    public void KansCacheLifetimesComeFromItsSettingsAndFloorToOneHour()
+    {
+        PluginConfiguration configuration = new() { Kan = new KanSettings { CatalogueCacheHours = 0, ShowCacheHours = 3 } };
+
+        KanLifetimes lifetimes = KanServiceCollectionExtensions.LifetimesFrom(configuration);
+
+        Assert.Equal(TimeSpan.FromHours(1), lifetimes.Catalogue);
+        Assert.Equal(TimeSpan.FromHours(3), lifetimes.Show);
+    }
+
+    [Fact]
+    public void KansStreamLinkCacheWritesNoFileAndItsBrowseCacheIsPersisted()
+    {
+        using TemporaryDirectory dataFolder = new();
+        using ServiceProvider provider = BuildProvider(dataFolder.Path);
+
+        provider.GetRequiredService<KanStreamLinkCache>().Value.Write("11510-1107310", "{\"url\":\"https://cdn.test/x\"}", TimeSpan.FromMinutes(5));
+        Assert.Empty(Directory.GetFiles(dataFolder.Path));
+
+        provider.GetRequiredService<KanBrowseCache>().Value.Write("index", "{}", TimeSpan.FromHours(24));
+        Assert.True(File.Exists(Path.Combine(dataFolder.Path, "kan-cache.json")));
+    }
+
+    [Fact]
+    public void KansHttpClientIsTheRealOne()
+    {
+        using TemporaryDirectory dataFolder = new();
+        using ServiceProvider provider = BuildProvider(dataFolder.Path);
+
+        Assert.IsType<KanHttpClient>(provider.GetRequiredService<IKanHttp>());
     }
 
     /// <summary>A setting of 0 (or a stray negative value) must not cache the catalogue for no

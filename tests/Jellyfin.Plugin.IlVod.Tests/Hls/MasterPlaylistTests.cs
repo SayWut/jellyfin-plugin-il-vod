@@ -70,4 +70,82 @@ public class MasterPlaylistTests
     {
         Assert.Null(MasterPlaylist.BestVariantUri(master));
     }
+
+    /// <summary>
+    /// Kan's master, as ffprobe numbered it on 2026-10-16: the audio rendition is stream 0, then
+    /// one video stream per variant in listed order, so the 1080p variant listed last is stream 5.
+    /// </summary>
+    [Fact]
+    public void ASeparateAudioRenditionIsMappedWithTheBestVariantsVideo()
+    {
+        HlsStreamIndices indices = MasterPlaylist.FfmpegStreamIndices(FixtureFile.ReadText("kan-master.m3u8"))!;
+
+        Assert.Equal(new HlsStreamIndices(Video: 5, Audio: 0), indices);
+    }
+
+    [Fact]
+    public void StreamsAreNumberedInTheOrderTheirPlaylistsAreListed()
+    {
+        const string master = """
+            #EXTM3U
+            #EXT-X-STREAM-INF:BANDWIDTH=500000,AUDIO="aac"
+            low.m3u8
+            #EXT-X-STREAM-INF:BANDWIDTH=900000,AUDIO="aac"
+            high.m3u8
+            #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="aac",DEFAULT=YES,URI="audio.m3u8"
+            """;
+
+        Assert.Equal(new HlsStreamIndices(Video: 1, Audio: 2), MasterPlaylist.FfmpegStreamIndices(master));
+    }
+
+    /// <summary>A variant that carries its own audio is two streams, whose order ffmpeg alone knows:
+    /// such a master is left to the default mapping.</summary>
+    [Fact]
+    public void VariantsWithTheirOwnAudioHaveNoMapping()
+    {
+        Assert.Null(MasterPlaylist.FfmpegStreamIndices(FixturePlaylist));
+    }
+
+    [Theory]
+    [InlineData("""
+        #EXTM3U
+        #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="aac",NAME="HEB",URI="heb.m3u8"
+        #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="aac",NAME="ENG",URI="eng.m3u8"
+        #EXT-X-STREAM-INF:BANDWIDTH=900000,AUDIO="aac"
+        video.m3u8
+        """)]
+    [InlineData("""
+        #EXTM3U
+        #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="aac",URI="audio.m3u8"
+        #EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",URI="subs.m3u8"
+        #EXT-X-STREAM-INF:BANDWIDTH=900000,AUDIO="aac"
+        video.m3u8
+        """)]
+    [InlineData("""
+        #EXTM3U
+        #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="aac",URI="audio.m3u8"
+        #EXT-X-STREAM-INF:BANDWIDTH=500000,AUDIO="aac"
+        video.m3u8
+        #EXT-X-STREAM-INF:BANDWIDTH=900000,AUDIO="aac"
+        video.m3u8
+        """)]
+    [InlineData("""
+        #EXTM3U
+        #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="aac",URI="audio.m3u8"
+        #EXT-X-STREAM-INF:RESOLUTION=1920x1080,AUDIO="aac"
+        unrated.m3u8
+        #EXT-X-STREAM-INF:BANDWIDTH=900000,AUDIO="aac"
+        video.m3u8
+        """)]
+    [InlineData("""
+        #EXTM3U
+        #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="aac",URI="audio.m3u8"
+        #EXT-X-STREAM-INF:BANDWIDTH=900000,AUDIO="ac3"
+        video.m3u8
+        """)]
+    [InlineData("#EXTM3U\n#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"aac\",URI=\"audio.m3u8\"\n")]
+    public void AnyOtherLayoutHasNoMapping(string master)
+    {
+        Assert.Null(MasterPlaylist.FfmpegStreamIndices(master));
+    }
 }

@@ -1,6 +1,7 @@
 using Jellyfin.Plugin.IlVod.Browsing;
 using Jellyfin.Plugin.IlVod.Core;
 using Jellyfin.Plugin.IlVod.Providers.Mako;
+using MediaBrowser.Controller.MediaEncoding;
 using MediaBrowser.Model.Dto;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.MediaInfo;
@@ -80,6 +81,49 @@ public class MediaSourceFactoryTests
         Assert.Equal("h264", video.Codec);
         Assert.Equal("aac", audio.Codec);
         Assert.NotEqual(video.Index, audio.Index);
+    }
+
+    [Fact]
+    public void ByDefaultTheVideoIsTheFirstStreamAndTheAudioTheSecond()
+    {
+        MediaSourceInfo source = MediaSourceFactory.Create(
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, MakoStreams.DefaultDescription),
+            "mako");
+
+        Assert.Equal(0, Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Video).Index);
+        Assert.Equal(1, Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Audio).Index);
+    }
+
+    /// <summary>
+    /// Jellyfin numbers a stream for ffmpeg's <c>-map 0:N</c> by its position in the source's list
+    /// (<c>EncodingHelper.FindIndex</c>), never by its <c>Index</c> — measured on the phone, where a
+    /// two-stream list mapped Kan's 540p variant. So a master whose audio is track 0 and whose best
+    /// video is track 5 lists six streams, with ones Jellyfin never picks in between.
+    /// </summary>
+    [Fact]
+    public void EachStreamSitsWhereFfmpegNumbersIt()
+    {
+        StreamDescription description = MakoStreams.DefaultDescription with { VideoStreamIndex = 5, AudioStreamIndex = 0 };
+        MediaSourceInfo source = MediaSourceFactory.Create(
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, description),
+            "kan");
+
+        MediaStream video = Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Video);
+        MediaStream audio = Assert.Single(source.MediaStreams, stream => stream.Type == MediaStreamType.Audio);
+        Assert.Equal(5, EncodingHelper.FindIndex(source.MediaStreams, video));
+        Assert.Equal(0, EncodingHelper.FindIndex(source.MediaStreams, audio));
+        Assert.Equal((5, 0), (video.Index, audio.Index));
+        Assert.All(source.MediaStreams.Except([video, audio]), filler => Assert.Equal(MediaStreamType.Data, filler.Type));
+    }
+
+    [Fact]
+    public void ByDefaultTheVideoIsMappedFirstAndTheAudioSecond()
+    {
+        MediaSourceInfo source = MediaSourceFactory.Create(
+            new StreamLink("https://cdn.test/master.m3u8", string.Empty, MakoStreams.DefaultDescription),
+            "mako");
+
+        Assert.Equal([MediaStreamType.Video, MediaStreamType.Audio], source.MediaStreams.Select(stream => stream.Type));
     }
 
     [Fact]

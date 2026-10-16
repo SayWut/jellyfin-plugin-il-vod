@@ -1,0 +1,4995 @@
+{
+ "title": "מה שתגידו",
+ "type": {
+  "value": "feed"
+ },
+ "entry": [
+  {
+   "programId": "11510",
+   "id": "1107310",
+   "title": "פרק 2 - 15.10.26",
+   "description": "הבחירות שבפתח, הקלטות אוריך, זיוף הפרוטוקולים וזוכת פרס נובל לשלום",
+   "published": "2026-10-08T08:10:02+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "qhBkWWc-fSI",
+    "teaser": "qhBkWWc-fSI"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/עונה-6/1107310/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/0xgpuh0r/ep02-master-digital00_03_36_23still001.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/0xgpuh0r/ep02-master-digital00_03_36_23still001.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:35",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 6,
+     "episode_number": 2,
+     "duration": "00:29:35",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "15-10-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1109548",
+   "title": "טריילר",
+   "description": "קומיקאים ודעתנים מספרים על השבוע שעבר על ישראל והעולם",
+   "published": "2026-10-15T14:23:19+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://r.il.cdn-redge.media/file/oil/kancdn/player/view.html?id=2255767",
+    "teaser": "https://r.il.cdn-redge.media/file/oil/kancdn/player/view.html?id=2255767"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/1109548/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/sonlnlpm/מהשתגידוטריילר26.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/sonlnlpm/מהשתגידוטריילר26.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "27",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 0,
+     "episode_number": 1000,
+     "duration": "00:00:27",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "15-10-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1107309",
+   "title": "פרק 1 - 08.10.26",
+   "description": "הבחירות שבפתח, פרשת \"פליי דובאי\", שלוש שנים ל-7.10 ",
+   "published": "2026-10-08T08:09:32+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "FajEcL9BZMs",
+    "teaser": "FajEcL9BZMs"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/עונה-6/1107309/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/zkdlxolf/מה-שתגידו.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/lhynrm10/מה-שתגידו.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:46",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 6,
+     "episode_number": 1,
+     "duration": "00:30:46",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "08-10-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1072018",
+   "title": "פרק 14 - ספיישל מונדיאל",
+   "description": "הזוגות פותחים על כל מה שקרה השבוע במונדיאל, המכביה וגם הבחירות הקרבות",
+   "published": "2026-07-06T16:15:44+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "ZXuH5ns2VSc",
+    "teaser": "ZXuH5ns2VSc"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1072018/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/lxfgttap/אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/lxfgttap/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "32:20",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 14,
+     "duration": "00:32:20",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "08-07-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1051382",
+   "title": "פרק 13 - ספיישל מונדיאל",
+   "description": "נבחרת המצחיקנים מגיעה לבעוט בכל מה שהוא לא כדור!",
+   "published": "2026-06-10T19:46:11+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "lcwTlREtEns",
+    "teaser": "lcwTlREtEns"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1051382/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/ksuhpt4k/טאמב-אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/ksuhpt4k/טאמב-אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:07",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 13,
+     "duration": "00:30:07",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "10-06-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1048950",
+   "title": "פרק 12 - 04.06.26",
+   "description": "המגעים להפסקת אש, פיזור הכנסת, הפיטורין בהייטק וגם טרנד השיזוף הקיצוני",
+   "published": "2026-06-04T18:09:36+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "qousZ3fVC_w",
+    "teaser": "qousZ3fVC_w"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": null
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": []
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:58",
+    "analyticsCustomProperties": {
+     "programId": null,
+     "show_name": null,
+     "channel_name": null,
+     "season": null,
+     "episode_number": 12,
+     "duration": "00:30:58",
+     "program_genre": null,
+     "content_customDimension_7": "04-06-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1046320",
+   "title": "פרק 11 - 28.05.26",
+   "description": "ההסכם עם איראן, הלחימה בלבנון, הבחירות, משבר הטיסות וגם תרבות הטיפים",
+   "published": "2026-05-28T17:59:39+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "k9ZhKamCcKI",
+    "teaser": "k9ZhKamCcKI"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1046320/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/qilmzaw3/מה_שתגידו.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/qilmzaw3/מה_שתגידו.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:12",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 11,
+     "duration": "00:31:12",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "28-05-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1043486",
+   "title": "פרק 10 - 20.05.26",
+   "description": "האם המלחמה חוזרת? מתי יהיו בחירות? האם מערכת החינוך קורסת?",
+   "published": "2026-05-20T18:36:37+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "1bv_ZoRq9_k",
+    "teaser": "1bv_ZoRq9_k"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1043486/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/0j1lajxd/s057962600_05_25_04still002.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/0j1lajxd/s057962600_05_25_04still002.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:12",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 10,
+     "duration": "00:31:12",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "20-05-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1038510",
+   "title": "פרק 8 - 07.05.26",
+   "description": "השתהות המלחמה, מצב המשטרה, והמחירים בסופר ",
+   "published": "2026-05-07T16:37:06+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "0gCLmVCHJoA",
+    "teaser": "0gCLmVCHJoA"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1038510/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/qqrpa13g/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/qqrpa13g/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:44",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 8,
+     "duration": "00:30:44",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "07-05-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1035866",
+   "title": "פרק 7 - 30.04.26",
+   "description": "המפץ הפוליטי, הפסקת האש בצפון, ונשים וחרדים ראש בראש בצה\"ל",
+   "published": "2026-04-30T18:48:00+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "NjQchFNf3V4",
+    "teaser": "NjQchFNf3V4"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1035866/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/1jhbbgto/מהשתגידולאתר1.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/1jhbbgto/מהשתגידולאתר1.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:41",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 7,
+     "duration": "00:31:41",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "30-04-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1032157",
+   "title": "פרק 6 - ספיישל עצמאות",
+   "description": "הזוגות עם הפה הכי גדול מניפים דגל כחול-לבן וחוגגים יום הולדת למדינה",
+   "published": "2026-04-22T14:57:00+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "T2Eh53gkLd8",
+    "teaser": "T2Eh53gkLd8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1032157/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/1k1lvycl/mashetagidu_digital_se05ep06_22042600_04_32_12still001.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/1k1lvycl/mashetagidu_digital_se05ep06_22042600_04_32_12still001.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:45",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 6,
+     "duration": "00:28:45",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "22-04-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1031409",
+   "title": "ריב או אודישן?",
+   "description": "קותי חולק איך זה לריב עם מגי",
+   "published": "2026-04-20T16:08:03+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "",
+    "teaser": ""
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/1031409/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/pukjkygl/הצצה1.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/pukjkygl/הצצה1.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "42",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 0,
+     "episode_number": 100,
+     "duration": "00:00:42",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "20-04-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1029788",
+   "title": "פרק 5 - 16.04.26",
+   "description": "הפסקת האש, המגעים עם לבנון ואפילו \"ארטמיס 2\"",
+   "published": "2026-04-16T21:42:00+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "KCRYgH82zzc",
+    "teaser": "KCRYgH82zzc"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1029788/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/2lvkufoh/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/2lvkufoh/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "32:08",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 5,
+     "duration": "00:32:08",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "16-04-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1019038",
+   "title": "פרק 4 - 26.03.26",
+   "description": "המשך מלחמת \"שאגת הארי\" ורשימת ההישגים הלא מאוד ברורה",
+   "published": "2026-03-26T18:25:07+02:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "L_dj2byFiOQ",
+    "teaser": "L_dj2byFiOQ"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1019038/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/cvebayz1/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/cvebayz1/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:29",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 4,
+     "duration": "00:31:29",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "26-03-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1015489",
+   "title": "פרק 3 - 19.03.26",
+   "description": "מלחמת \"שאגת הארי\", המשך החקיקה המשפטית וטקס האוסקר",
+   "published": "2026-03-19T18:08:04+02:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "9M1CK2Dxcx0",
+    "teaser": "9M1CK2Dxcx0"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1015489/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/qx1fqu1c/אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/qx1fqu1c/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:25",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 3,
+     "duration": "00:28:25",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "19-03-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1011164",
+   "title": "פרק 2 - 12.03.26",
+   "description": "מלחמת איראן ה-2, חנינה לנתניהו ויום האישה",
+   "published": "2026-03-12T19:39:06+02:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "lyXm05tePJY",
+    "teaser": "lyXm05tePJY"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1011164/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/gwrawqg2/545da0d5-fb02-4c46-8f84-f620ccb2d8f9.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/gwrawqg2/545da0d5-fb02-4c46-8f84-f620ccb2d8f9.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:50",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 2,
+     "duration": "00:28:50",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "12-03-2026"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "961244",
+   "title": "פרק 1 - ספיישל סוף המלחמה?",
+   "description": "האנשים עם הפה הכי גדול מסכמים את השבוע בתוכנית מיוחדת לסוף המלחמה",
+   "published": "2025-10-18T00:39:10+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_bhdpoga0/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_bhdpoga0/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/961244/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/ya0l2zij/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/ya0l2zij/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "26:12",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 1,
+     "duration": "00:26:12",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "18-10-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "934743",
+   "title": "פרק 39 - 24.07.25",
+   "description": "הכנסת יוצאת לפגרה, הדרוזים נלחמים בסוריה, התקרית האלימה נגד איימן עודה",
+   "published": "2025-07-24T10:29:46+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_ae15a41t/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_ae15a41t/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/934743/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/qi2atuvp/מה-שתגידו-לאתר-סופי-סופי-סופי.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/qi2atuvp/מה-שתגידו-לאתר-סופי-סופי-סופי.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:20",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 39,
+     "duration": "00:30:20",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "24-07-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "932383",
+   "title": "פרק 38 - 17.07.25",
+   "description": "עסקת החטופים, קריסת המשטרה ושובה של הרפורמה",
+   "published": "2025-07-17T09:48:20+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_6xt2uaqc/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_6xt2uaqc/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/932383/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/0lybsv4z/מה-שתגידו-מתוקן.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/0lybsv4z/מה-שתגידו-מתוקן.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:18",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 38,
+     "duration": "00:30:18",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "17-07-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "930010",
+   "title": "פרק 37 - 10.07.25",
+   "description": "ההתקדמות להפסקת אש, עליהום על הרמטכ\"ל, עסקת אנבידיה וגם בובות לבובו. ",
+   "published": "2025-07-10T09:43:31+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_7koecyo0/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_7koecyo0/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/930010/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/c0tn1zgf/mashtagidu_s04ep37_digital_10072500_00_43_14still001.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/c0tn1zgf/mashtagidu_s04ep37_digital_10072500_00_43_14still001.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:38",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 37,
+     "duration": "00:30:38",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "10-07-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "927696",
+   "title": "פרק 36 - 03.07.25",
+   "description": "משפט נתניהו ועסקה תמורת עסקה, אלימות ביו\"ש והחופש הגדול יוצא לדרך",
+   "published": "2025-07-03T11:42:10+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_n9fiyecj/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_n9fiyecj/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/927696/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/sukh3gb3/ליוטיוב-חדש.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/sukh3gb3/ליוטיוב-חדש.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:45",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 36,
+     "duration": "00:28:45",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "03-07-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "925530",
+   "title": "פרק 35 - 26.06.25",
+   "description": "החיים במקלטים, הנחיות פיקוד העורף, האיום על ח'אמנאי וההצטרפות של טראמפ",
+   "published": "2025-06-26T11:14:48+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_puwu98ec/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_puwu98ec/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/925530/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/qohmj52o/תמונה-אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/qohmj52o/תמונה-אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "27:12",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 35,
+     "duration": "00:27:12",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "26-06-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "922781",
+   "title": "פרק 34 - 19.06.25",
+   "description": "האנשים עם הפה הכי גדול מסכמים שבוע של מלחמה עם איראן",
+   "published": "2025-06-19T11:43:41+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_36dqxek5/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_36dqxek5/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/922781/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/3rtp2es4/מה-שתגידו-אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/3rtp2es4/מה-שתגידו-אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:52",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 34,
+     "duration": "00:28:52",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "19-06-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "919120",
+   "title": "פרק 33 - 12.06.25",
+   "description": "השבוע: ריח הבחירות, המשט לעזה, מלחמות הכנופיות, טראמפ מול מאסק",
+   "published": "2025-06-12T11:36:01+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_vtb15dvx/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_vtb15dvx/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/919120/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/orxinztw/מה-שתגידו.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/orxinztw/מה-שתגידו.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:32",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 33,
+     "duration": "00:30:32",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "12-06-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "913311",
+   "title": "פרק 32 - 29.05.25",
+   "description": "השבוע: מינוי האלוף זיני, 600 יום למלחמה, בינה מלאכותית וחג השבועות",
+   "published": "2025-05-29T10:47:47+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_qdip5nhq/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_qdip5nhq/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/913311/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/uaqf4054/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/uaqf4054/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:00",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 32,
+     "duration": "00:31:00",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "29-05-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "910869",
+   "title": "פרק 31 - 22.05.25",
+   "description": "מלחמה מול הסכם, הביזנס של טראמפ, מכונת הרעל וגם עליות המחירים",
+   "published": "2025-05-22T11:26:56+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_e0yds98u/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_e0yds98u/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/910869/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/echjbiyp/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/echjbiyp/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:24",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 31,
+     "duration": "00:31:24",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "22-05-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "903008",
+   "title": "פרק 30 - ספיישל אירוויזיון 2025",
+   "description": "האנשים עם הפה הכי גדול בטלוויזיה מתכוננים לגמר הגדול בבאזל",
+   "published": "2025-05-15T15:56:57+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_86dkn7yf/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_86dkn7yf/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/903008/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/ltblv4ek/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/ltblv4ek/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "25:28",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 30,
+     "duration": "00:25:28",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "17-05-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "894941",
+   "title": "פרק 29 - ספיישל עצמאות 2025",
+   "description": "האנשים עם הפה הכי גדול בישראל בספיישל עצמאות בסימן \"חילופי זוגות\"",
+   "published": "2025-04-29T11:26:01+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_9nje3k1w/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_9nje3k1w/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/894941/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/ktujkh1t/מה-שתגידו-נקי.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/ktujkh1t/מה-שתגידו-נקי.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "22:28",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 29,
+     "duration": "00:22:28",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "01-05-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "878722",
+   "title": "פרק 28 - 03.04.25",
+   "description": "קטארגייט, מינוי ראש השב\"כ, עסקת חטופים, ההפגנות בטורקיה וגם פסח בא",
+   "published": "2025-04-03T11:03:47+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_zlxhn3rj/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_zlxhn3rj/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/878722/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/bcporxub/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/bcporxub/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:40",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 28,
+     "duration": "00:29:40",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "03-04-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "875993",
+   "title": "פרק 27 - 27.03.25",
+   "description": "חזרת המלחמה, ההתנגשות החוקתית, ה\"דיפ סטייט\", מוקדמות המונדיאל והקיץ",
+   "published": "2025-03-27T10:50:47+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_al5om45l/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_al5om45l/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/875993/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/xhwfrhtu/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/xhwfrhtu/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:22",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 27,
+     "duration": "00:30:22",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "27-03-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "872828",
+   "title": "פרק 26 - 20.03.25",
+   "description": "פיטורי ראש השב''כ, התקציב, גיוס פרופיל 64 וגל הברחת החיות האקזוטיות",
+   "published": "2025-03-20T09:42:56+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_dv7z5cee/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_dv7z5cee/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/872828/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/22knrn0m/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/22knrn0m/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:57",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 26,
+     "duration": "00:31:57",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "20-03-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "871778",
+   "title": "טריילר",
+   "description": "קומיקאים ודעתנים מספרים על השבוע שעבר על ישראל והעולם",
+   "published": "2025-03-17T22:43:17+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_qt5aild9/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_qt5aild9/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/871778/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/of2bmwto/https-cdnbackstage-apicom-key-backstage-cms-production-uploads-1920x1080-1653bcb0-f2c7-11ec-87e7-b1d975722ca7-assets-images-51db549d-f3ca-4cb9-9c61-f27dc2fccfeb.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/of2bmwto/https-cdnbackstage-apicom-key-backstage-cms-production-uploads-1920x1080-1653bcb0-f2c7-11ec-87e7-b1d975722ca7-assets-images-51db549d-f3ca-4cb9-9c61-f27dc2fccfeb.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "35",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 0,
+     "episode_number": 1,
+     "duration": "00:00:35",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "17-03-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "870218",
+   "title": "פרק 25 - 13.03.25",
+   "description": "הפרישה של הגרי, החינוך של השר קיש, מגיפת הפודקאסטים וכמובן–פורים",
+   "published": "2025-03-13T10:03:23+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_623k8ugp/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_623k8ugp/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/870218/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/ypah4szu/טאמבנייל-פרק-25-לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/ypah4szu/טאמבנייל-פרק-25-לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:23",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 25,
+     "duration": "00:30:23",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "13-03-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "867734",
+   "title": "פרק 24 - 06.03.25",
+   "description": "הפסקת הפסקת האש, עלילות הנשיא טראמפ, טקס האוסקר ויום האישה הבינלאומי",
+   "published": "2025-03-06T10:46:00+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_ndwhup2o/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_ndwhup2o/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/867734/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/otqpxfj3/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/otqpxfj3/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:40",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 24,
+     "duration": "00:30:40",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "06-03-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "863379",
+   "title": "פרק 23 - 27.02.25",
+   "description": "עסקת חטופים, משפט נתניהו, מחדלי השב\"כ, הלווית נסראללה ויום המשפחה",
+   "published": "2025-02-23T10:22:52+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_gfa2y2q1/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_gfa2y2q1/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/863379/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/d5kninzx/מה-שתגידו-לאתר-פרק-23.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/d5kninzx/מה-שתגידו-לאתר-פרק-23.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:02",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 23,
+     "duration": "00:29:02",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "27-02-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "862468",
+   "title": "פרק 22 - 21.02.25",
+   "description": "500 ימים למלחמה, \"קטאר-גייט\", החזרה לשגרה בצפון, גל הפשיעה",
+   "published": "2025-02-20T16:47:33+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_dakd4xab/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_dakd4xab/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/862468/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/3mbjxar2/kan-box_hero_image-test.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/3mbjxar2/kan-box_hero_image-test.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "32:21",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 22,
+     "duration": "00:32:21",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "21-02-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "859342",
+   "title": "פרק 21 - 13.02.25",
+   "description": "נתניהו בארה\"ב, עסקת החטופים, סערת האירוויזיון וגם וולנטיינ'ס דיי!",
+   "published": "2025-02-12T13:52:09+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_x47nm3k8/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_x47nm3k8/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/859342/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/idwb41o2/מה-שתגידו-לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/idwb41o2/מה-שתגידו-לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:28",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 21,
+     "duration": "00:31:28",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "13-02-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "856129",
+   "title": "מותר קצת לפלח",
+   "description": "יעל ושוש פוליאקוב מתווכחות האם מותר קצת לפלח מדי פעם",
+   "published": "2025-02-04T17:12:50+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_6g0jrzv9/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_6g0jrzv9/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/856129/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/gmwdejg5/מה-שתגידו-2.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/gmwdejg5/מה-שתגידו-2.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "1:02",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 0,
+     "episode_number": 102,
+     "duration": "00:01:02",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "15-12-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "856904",
+   "title": "פרק 20 - 06.02.25",
+   "description": "רמטכ\"ל חצי תימני יחסוך בתקציב הביטחון ומה כדאי לבקש מטראמפ בפעם הבאה? ",
+   "published": "2025-02-06T11:03:16+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_u7hvxrca/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_u7hvxrca/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/856904/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/isedgiiy/לאתר-2.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/isedgiiy/לאתר-2.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:22",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 20,
+     "duration": "00:31:22",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "06-02-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "852992",
+   "title": "פרק 19 - 29.01.25",
+   "description": "השופט עמית והמשבר החוקתי, המירוץ לרמטכ\"לות והמחירים המטורפים של וולט",
+   "published": "2025-01-28T12:27:02+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_zm41u4lz/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_zm41u4lz/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/852992/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/51te2knt/אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/51te2knt/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:54",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 19,
+     "duration": "00:31:54",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "29-01-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "848124",
+   "title": "פרק 18 - 18.01.25",
+   "description": "עסקת החטופים, מתווה ההסכמה במערכת המשפט, התפוררות האופוזיציה",
+   "published": "2025-01-16T12:05:07+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_231nzcp0/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_231nzcp0/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/848124/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/1jblpfbm/אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/1jblpfbm/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:06",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 18,
+     "duration": "00:31:06",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "18-01-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "845351",
+   "title": "פרק 17 - 09.01.25",
+   "description": "עסקת חטופים, פרשת אייל גולן, צווי מעצר בין-לאומיים, מאי גולן ",
+   "published": "2025-01-09T10:02:50+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0htr3064/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0htr3064/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/845351/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/ibijmbxt/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/ibijmbxt/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:01",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 17,
+     "duration": "00:29:01",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "09-01-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "842997",
+   "title": "פרק 16 - 02.01.25",
+   "description": "המהפכה הרפואית ואשפוז נתניהו, עליות המחירים, ומטוסים נופלים מהשמיים",
+   "published": "2025-01-02T11:22:50+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_q8n75u6k/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_q8n75u6k/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/842997/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/itfoxute/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/itfoxute/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:30",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 16,
+     "duration": "00:31:30",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "02-01-2025"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "840611",
+   "title": "פרק 15 - 26.12.24",
+   "description": "גם האנשים עם הפה הכי גדול מתגייסים ליום המילואימניקים של ''כאן''! ",
+   "published": "2024-12-26T11:15:38+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_vw86nxbr/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_vw86nxbr/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/840611/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/d0petvk3/רועי-וברק-מה-שתגידו-לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/d0petvk3/רועי-וברק-מה-שתגידו-לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:25",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 15,
+     "duration": "00:30:25",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "26-12-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "837860",
+   "title": "פרק 14 - 19.12.24",
+   "description": "ההפיכה המשפטית, גיוס החרדים, מופעי חנוכה ואפילו הגרלת מוקדמות המונדיאל",
+   "published": "2024-12-19T10:49:32+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_mhqesmv7/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_mhqesmv7/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/837860/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/gyclpv41/55555.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/gyclpv41/55555.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "33:30",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 14,
+     "duration": "00:33:30",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "19-12-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "832655",
+   "title": "פרק 13 - 05.12.24",
+   "description": "בליץ חקיקה בכנסת, צווי מעצר בהאג, חזרת משפט נתניהו ואפילו קצת נוסטלגיה",
+   "published": "2024-12-05T09:57:35+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_25gbjtme/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_25gbjtme/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/832655/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/4owjv12a/פרק-13-לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/4owjv12a/פרק-13-לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:18",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 13,
+     "duration": "00:31:18",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "05-12-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "828640",
+   "title": "פרק 12 - 28.11.24",
+   "description": "בליץ חקיקה בכנסת, צווי מעצר בהאג, חזרת משפט נתניהו ואפילו קצת נוסטלגיה",
+   "published": "2024-11-25T16:00:05+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_zf2vkh7h/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_zf2vkh7h/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/828640/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/1vmll3ef/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/1vmll3ef/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:16",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 12,
+     "duration": "00:29:16",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "28-11-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "811889",
+   "title": "פרק 11 - 21.11.24",
+   "description": "המחאה החזירה את הרפורמה המשפטית? ההסדרה בלבנון בדרך?",
+   "published": "2024-10-13T12:25:12+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_tl9ih7tc/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_tl9ih7tc/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/811889/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/23lfh0rg/מה-שתגידו.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/23lfh0rg/מה-שתגידו.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:33",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 11,
+     "duration": "00:31:33",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "13-10-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "811888",
+   "title": "פרק 10 - 14.11.24",
+   "description": "הפרשיות בלשכת רוה\"מ וקבוצת הוואטסאפ הסודית של בן גביר",
+   "published": "2024-10-13T12:22:07+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_mel42y66/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_mel42y66/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/811888/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/zvrpgzv1/מה-שתגידו-1411.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/zvrpgzv1/מה-שתגידו-1411.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:47",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 10,
+     "duration": "00:30:47",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "14-11-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "811885",
+   "title": "פרק 9 - 07.11.24",
+   "description": "הנצחון של טראמפ, ליל גלנט השני, החקירות בלשכת רה\"מ וגל הפרידות בביצה",
+   "published": "2024-10-13T12:19:11+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_ntthrc9j/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_ntthrc9j/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/811885/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/3veprs2g/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/3veprs2g/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:12",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 9,
+     "duration": "00:31:12",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "07-11-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "811883",
+   "title": "פרק 8 - 31.10.24",
+   "description": "התקיפה באיראן, שובה של החקיקה המשפטית ורגע לפני הבחירות באמריקה",
+   "published": "2024-10-13T12:12:11+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_7y40ugtn/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_7y40ugtn/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/811883/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/mcuh5uab/מה-שתגידו-נקי-פרק-8.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/mcuh5uab/מה-שתגידו-נקי-פרק-8.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:03",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 8,
+     "duration": "00:31:03",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "31-10-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "810228",
+   "title": "פרק 7 - ספיישל חגים - 20.10.24",
+   "description": "האנשים עם הפה הכי גדול חוגגים את סוכות בפרט וחגי תשרי בכלל",
+   "published": "2024-10-08T15:22:50+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_9ie8bn4a/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_9ie8bn4a/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/810228/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/plvp4i2f/תמונה-לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/plvp4i2f/תמונה-לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:17",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 7,
+     "duration": "00:31:17",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "20-10-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "804702",
+   "title": "פרק 6 - 26.09.24",
+   "description": "סיכום המערכה בצפון, הישראלי שריגל עבור איראן מחירי העגבניות שעולים",
+   "published": "2024-09-26T10:36:30+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_pqv9csbf/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_pqv9csbf/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/804702/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/f31h3g5u/אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/f31h3g5u/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:21",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 6,
+     "duration": "00:31:21",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "26-09-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "801935",
+   "title": "פרק 5 - 19.09.24",
+   "description": "מה הם חושבים על הביפרים בלבנון, המגעים בין נתניהו לסער והחורף שהגיע?",
+   "published": "2024-09-19T10:28:58+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_gxrm8b10/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_gxrm8b10/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/801935/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/osdcscgq/מה-שתגידו-פרק-5.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/osdcscgq/מה-שתגידו-פרק-5.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:34",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 5,
+     "duration": "00:31:34",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "19-09-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "799388",
+   "title": "פרק 4 - 12.09.24",
+   "description": "הרפורמה, עימות האריס- טראמפ, פרשיית \"הקובבה\" והאירוסין של נועה קירל",
+   "published": "2024-09-12T10:09:25+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_2n2abjfg/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_2n2abjfg/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/799388/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/qvxp523u/מה-שתגידו-משופר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/qvxp523u/מה-שתגידו-משופר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:51",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 4,
+     "duration": "00:30:51",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "12-09-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "796886",
+   "title": "פרק 3 - 05.09.24",
+   "description": "הפגנות לעסקה, שביתה שלא צלחה, השבוע הראשון ללימודים ואיחוד אואזיס",
+   "published": "2024-09-05T10:28:52+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0yubmece/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0yubmece/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/796886/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/t1vj5qj1/מה-שתגידו.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/t1vj5qj1/מה-שתגידו.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:12",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 3,
+     "duration": "00:31:12",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "05-09-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "794089",
+   "title": "פרק 2 - 29.08.24",
+   "description": "מתקפת המנע בלבנון, השר בן גביר נגד כל העולם והשבוע האחרון של אוגוסט",
+   "published": "2024-08-29T10:38:09+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_7vkr6bfv/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_7vkr6bfv/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/794089/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/kijng5yn/קותי-אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/kijng5yn/קותי-אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:51",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 2,
+     "duration": "00:30:51",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "29-08-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "791651",
+   "title": "פרק 1 - 22.08.24",
+   "description": "האנשים עם הפה הכי גדול פותחים על כל מה שקרה",
+   "published": "2024-08-22T09:52:28+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_zctzr1dl/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_zctzr1dl/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s4/791651/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/nzthrimh/מה-שתגידו-עונה-4-פרק-1.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/nzthrimh/מה-שתגידו-עונה-4-פרק-1.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:04",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 4,
+     "episode_number": 1,
+     "duration": "00:31:04",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "22-08-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "747766",
+   "title": "מה שתגידו | ספיישל אירוויזיון",
+   "description": "האנשים עם הפה הכי גדול מגיעים לסכם את תחרות הזמר הגדולה בעולם",
+   "published": "2024-05-10T21:09:30+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_fxuuqdfy/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_fxuuqdfy/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/747766/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/usyna0w3/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/usyna0w3/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "27:19",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 18,
+     "duration": "00:27:19",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "11-05-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "709040",
+   "title": "פרק 17 - 22.02.24",
+   "description": "הלחץ להקמת מדינה פלסטינית, פוטין המחסל השקט, והאם הבחירות באמת באופק?",
+   "published": "2024-02-22T12:57:48+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0zvtadla/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0zvtadla/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/709040/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/muphkidh/אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/muphkidh/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:00",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 17,
+     "duration": "00:30:00",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "22-02-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "704887",
+   "title": "פרק 16 - 15.02.24",
+   "description": "חוק הגיוס, הפעולה ברפיח, מודיס ומי בכלל רוצה לחגוג את יום האהבה?",
+   "published": "2024-02-15T10:40:56+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_kj2y0ka6/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_kj2y0ka6/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/704887/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/rbgb4r0v/אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/rbgb4r0v/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:58",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 16,
+     "duration": "00:28:58",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "15-02-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "700176",
+   "title": "פרק 15 - 08.02.24",
+   "description": "חוזרים לגיל 21, מתבאסים מהקולנוע ומי ינצח בקרב בין בן גביר לאמריקה?",
+   "published": "2024-02-08T10:01:45+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_vdq74x6r/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_vdq74x6r/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/700176/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/kjoo5hzy/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/kjoo5hzy/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:00",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 15,
+     "duration": "00:30:00",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "08-02-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "696200",
+   "title": "פרק 14 - 03.02.24",
+   "description": "מי אוהב תיאוריות קונספירציה ולמי יש כל לאירוויזיון?",
+   "published": "2024-02-01T10:42:45+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_3b5fq5kc/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_3b5fq5kc/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/696200/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/fzyjvg3i/אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/fzyjvg3i/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "27:58",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 14,
+     "duration": "00:27:58",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "03-02-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "692107",
+   "title": "פרק 13 - 25.01.24",
+   "description": "הולכים לבחירות, מי רוצה מדינה פלסטינית וט\"ו בשבט, זוכרים את החג הזה?",
+   "published": "2024-01-25T13:09:09+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_epsyeriq/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_epsyeriq/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/692107/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/wdxflyeq/אתר-2.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/wdxflyeq/אתר-2.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "27:15",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 13,
+     "duration": "00:27:15",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "25-01-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "686822",
+   "title": "פרק 12 - המיטב",
+   "description": "לקט הקטעים הכי מצחיקים של האנשים עם הפה הכי גדול בישראל",
+   "published": "2024-01-18T08:54:31+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0z8liuyt/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0z8liuyt/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/686822/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/ti0d2x5e/artboard-1.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/ti0d2x5e/artboard-1.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:54",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 12,
+     "duration": "00:28:54",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "18-01-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "682284",
+   "title": "פרק 11 - 11.01.24",
+   "description": "מאה ימים למלחמה, מדיניות החיסולים, וישראל נוסעת להאג",
+   "published": "2024-01-11T10:34:42+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_mtkyt6sy/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_mtkyt6sy/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/682284/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/eqff2gkz/טאמבנייל-לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/eqff2gkz/טאמבנייל-לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:50",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 11,
+     "duration": "00:28:50",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "11-01-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "669017",
+   "title": "פרק 10 - 04.01.24",
+   "description": "מלחמת בג''צ, סבב המינויים הבכירים, האוניברסיטאות והשנה החדשה",
+   "published": "2024-01-04T10:42:27+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_scruxhpv/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_scruxhpv/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/669017/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/bb2pkgbs/אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/bb2pkgbs/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:46",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 10,
+     "duration": "00:28:46",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "04-01-2024"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "664220",
+   "title": "פרק 9 - 28.12.23",
+   "description": "מה השלב הבא במלחמה ואיך מסכמים שנה שכולם היו מעדיפים לשכוח",
+   "published": "2023-12-28T09:46:45+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_e5htv4cn/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_e5htv4cn/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/664220/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/pe1n1fbu/מה-שתגידו-לאתר-פרק-9.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/pe1n1fbu/מה-שתגידו-לאתר-פרק-9.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "27:30",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 9,
+     "duration": "00:27:30",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "28-12-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "659615",
+   "title": "פרק 8 - 21.12.23",
+   "description": "מבצעי המוסד בחו''ל, זוגיות בביצה בזמן מלחמה, תחילת ''הקמפיין''",
+   "published": "2023-12-21T12:23:26+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_i8zpz3fh/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_i8zpz3fh/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/659615/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/fcqgilqw/לאתר-פרק-8.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/fcqgilqw/לאתר-פרק-8.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:52",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 8,
+     "duration": "00:29:52",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "21-12-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "654184",
+   "title": "פרק 7 - 14.12.23",
+   "description": "מיטוט החמאס, שיקום העוטף, אויבים מעבר לים, קריסת הכלכלה ותחיית התרבות",
+   "published": "2023-12-13T18:12:52+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_9duk0iy8/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_9duk0iy8/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/654184/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/5x2bt1t2/טאמנייל-אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/5x2bt1t2/טאמנייל-אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "26:04",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 7,
+     "duration": "00:26:04",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "14-12-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "642549",
+   "title": "פרק 6 - 06.12.23",
+   "description": "חזרה ללחימה, פוליטיקה קטנה ואפילו חנוכה",
+   "published": "2023-12-06T11:33:32+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_3yfl9679/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_3yfl9679/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/642549/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/rejhywhz/מה-שתגידו.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/hefnt1es/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:43",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 6,
+     "duration": "00:29:43",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "06-12-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "630886",
+   "title": "פרק 5 - 01.12.23",
+   "description": "החזרת השבויים, נשים במלחמה, ומה הסיפור עם קטאר?",
+   "published": "2023-11-29T23:36:41+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_pb0ejm56/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_pb0ejm56/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/630886/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/5vgfukyq/לאתר-3-פרק-5.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/5vgfukyq/לאתר-3-פרק-5.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:08",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 5,
+     "duration": "00:28:08",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "01-12-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "619206",
+   "title": "פרק 4 - 22.11.23",
+   "description": "התנאים להפסקת אש, ההתלקחות בצפון ופוליטיקה בזמן מלחמה",
+   "published": "2023-11-22T10:27:40+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_2eoyilon/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_2eoyilon/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/619206/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/3fpfvh0j/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/3fpfvh0j/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "25:43",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 4,
+     "duration": "00:25:43",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "22-11-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "611154",
+   "title": "פרק 3 - 16.11.23",
+   "description": "הסיכויים שלנו באירוויזיון, האתרוג ששרד והפוליטקאים הכושלים",
+   "published": "2023-11-16T10:06:03+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_m2sxgo6l/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_m2sxgo6l/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/611154/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/y1vbr05d/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/y1vbr05d/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "26:35",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 3,
+     "duration": "00:26:35",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "16-11-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "601468",
+   "title": "פרק 2 - 09.11.23",
+   "description": "שגרת המלחמה, כיתור הרצועה, אנטישמיות גואה וצוללות גרעיניות",
+   "published": "2023-11-09T10:47:43+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_efy8j2y8/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_efy8j2y8/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/601468/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/llyjb3ox/לאתר-9112023.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/llyjb3ox/לאתר-9112023.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "27:00",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 2,
+     "duration": "00:27:00",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "09-11-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "592411",
+   "title": "פרק 1 - 02.11.23",
+   "description": "הזוגות עם הפה הכי גדול בישראל מתגייסים כדי לדבר על כל מה שקורה",
+   "published": "2023-11-02T14:11:49+02:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_twmrtoze/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_twmrtoze/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s3/592411/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/ofxjyuky/לאתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/ofxjyuky/לאתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:34",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 3,
+     "episode_number": 1,
+     "duration": "00:28:34",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "02-11-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "481513",
+   "title": "פרק 11 - 10.08.23",
+   "description": "פרק סיום עונה. מהחופשה של נתניהו ועד הצמות של קותי",
+   "published": "2023-08-10T11:03:24+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_gv60ufpo/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_gv60ufpo/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/481513/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/wquk1rce/לאתר.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/wquk1rce/לאתר.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:00",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 11,
+     "duration": "00:30:00",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "10-08-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "472260",
+   "title": "פרק 10 - 03.08.23",
+   "description": "טלטלות במשטרה, הרכבת הארצית ואפילו חייזרים",
+   "published": "2023-08-03T12:18:51+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_hh1lk6nl/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_hh1lk6nl/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/472260/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/dflkcywg/s043287600_23_47_06still003.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/dflkcywg/s043287600_23_47_06still003.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:22",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 10,
+     "duration": "00:29:22",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "03-08-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "463294",
+   "title": " פרק 9 - 27.07.23",
+   "description": "ביטול עילת הסבירות, הקרע בצבא ושביתת הרופאים",
+   "published": "2023-07-27T11:03:50+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_ljkbq2ud/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_ljkbq2ud/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/463294/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/zorj1vs3/image.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/zorj1vs3/image.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:00",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 9,
+     "duration": "00:30:00",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "27-07-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "451277",
+   "title": "פרק 8 - 20.07.23",
+   "description": "יום השיבוש, חזבאללה, מעמד האישה וקבורה בקומות",
+   "published": "2023-07-20T12:25:08+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_npco9xml/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_npco9xml/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/451277/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/s5uj0r4p/s0432874mxf01_14_18_08still003.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/s5uj0r4p/s0432874mxf01_14_18_08still003.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "32:11",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 8,
+     "duration": "00:32:11",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "23-07-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "444633",
+   "title": "פרק 7 - 13.07.23",
+   "description": "יום השיבוש, הקרע עם ארצות הברית וכמה חם בחוץ!",
+   "published": "2023-07-13T12:52:40+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_63xp4byd/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_63xp4byd/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/444633/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/l2dlvrif/image.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/l2dlvrif/image.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:00",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 7,
+     "duration": "00:30:00",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "13-07-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "436628",
+   "title": "פרק 6 - 06.07.23",
+   "description": "שובה של המחאה, הנבחרת הצעירה ואלטון ג'ון",
+   "published": "2023-07-06T15:51:10+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_mnis3xrp/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_mnis3xrp/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/436628/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/lnxomhbh/hawow.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/lnxomhbh/hawow.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:39",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 6,
+     "duration": "00:29:39",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "06-07-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "422124",
+   "title": "פרק 5 - 29.06.23",
+   "description": "ממשפט נתניהו עד קופה ראשית",
+   "published": "2023-06-29T18:15:22+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_aoof5ie6/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_aoof5ie6/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/422124/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/mqiblwkx/לאתר-פרק-5.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/mqiblwkx/לאתר-פרק-5.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "34:50",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 5,
+     "duration": "00:34:50",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "29-06-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "409819",
+   "title": "פרק 4 - 22.06.23",
+   "description": "מהבחירות ללשכת עורכי הדין ועד ספיידרמן",
+   "published": "2023-06-22T18:39:04+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_gn8ivesr/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_gn8ivesr/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/409819/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/tmkkdco4/אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/tmkkdco4/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:07",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 4,
+     "duration": "00:30:07",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "22-06-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "396793",
+   "title": "פרק 3 - 18.06.23",
+   "description": "מהוועדה למינוי שופטים ועד ברונו מארס: הזוגות פותחים הכול",
+   "published": "2023-06-15T13:56:59+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_lh507ouv/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_lh507ouv/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/396793/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/htfpp5v1/מה-שתגידו-לכל-מה-שלא-יוטיוב.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/htfpp5v1/מה-שתגידו-לכל-מה-שלא-יוטיוב.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:10",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 3,
+     "duration": "00:31:10",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "18-06-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "390961",
+   "title": "פרק 2 - 15.06.23",
+   "description": "הזוגות הכי ישירים בטלוויזיה פותחים על כל מה שקרה השבוע",
+   "published": "2023-06-09T16:54:45+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_g669cxbg/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_g669cxbg/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/390961/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/43qhlvce/artboard-1.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/43qhlvce/artboard-1.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:45",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 2,
+     "duration": "00:29:45",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "15-06-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "383404",
+   "title": "פרק 1 - 01.06.23",
+   "description": "הצמדים חוזרים בעונה חדשה ומסכמים את ארועי השבוע",
+   "published": "2023-06-01T21:12:12+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_zeai9mfs/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_zeai9mfs/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/383404/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/yjihoeoc/אתר.jpg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/dl3prndb/אתר.jpg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:31",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 1,
+     "duration": "00:30:31",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "01-06-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "327781",
+   "title": "מה שתגידו | ספיישל יום העצמאות",
+   "description": "הזוגות של מה שתגידו יוצאים מהאולפן הממוזג כדי לחגוג בכל רחבי הארץ",
+   "published": "2023-05-02T22:24:00+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_u531vxke/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_u531vxke/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s2/327781/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/q51a0c3a/2023-4-25-imgid-98983_b.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/jj3ogfq4/2023-4-25-imgid-98983_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:31",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 2,
+     "episode_number": 0,
+     "duration": "00:30:31",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": ""
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "163241",
+   "title": "פרק 13 - 23.03.23",
+   "description": "חיים לוינסון ורועי עידן, קותי סבג ומאיה בצלאל, אלי ביתאן ומנדי גרוזמן",
+   "published": "2023-04-23T21:18:48+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0lve2110/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0lve2110/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/163241/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/tihktu2y/https-kanstaticazureedgenet-download-pictures-2023-3-23-imgid-96717_aa.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/vmvmv050/2023-3-23-imgid-96717_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:38",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 13,
+     "duration": "00:30:38",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "23-03-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "162790",
+   "title": "פרק 12 - 16.03.23",
+   "description": "החרפת ההתנגדות, מתווה הנשיא, היועצת המשפטית, ואפילו השטיח בצבע שמפניה",
+   "published": "2023-04-23T21:11:51+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0pfqyvcu/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_0pfqyvcu/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/162790/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/jdmh2lcc/https-kanstaticazureedgenet-download-pictures-2023-3-16-imgid-96178_aa.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/i30bgv52/2023-3-16-imgid-96178_b.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "28:11",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 12,
+     "duration": "00:28:11",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "16-03-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "162267",
+   "title": "פרק 11 - 11.03.23",
+   "description": "מרשק ופרידמן, הפוליאקוביות, חוגי וכהנא, קותי ומאיה וזוג חדש",
+   "published": "2023-04-23T21:04:13+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_skqtrmxx/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_skqtrmxx/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/162267/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/xfyn1zdq/https-kanstaticazureedgenet-download-pictures-2023-3-9-imgid-95625_aa.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/fcri4ujy/2023-3-9-imgid-95625_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:27",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 11,
+     "duration": "00:30:27",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "11-03-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "161760",
+   "title": "פרק 10 - 02.03.23",
+   "description": "יום השיבוש, מצור המספרה, תקציב המדינה - מדברים על כל מה שקרה השבוע",
+   "published": "2023-04-23T20:56:45+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_qnjboufp/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_qnjboufp/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/161760/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/vxiahuhb/https-kanstaticazureedgenet-download-pictures-2023-3-2-imgid-95166_aa.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/zvfhzl5a/2023-3-2-imgid-95166_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:22",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 10,
+     "duration": "00:30:22",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "02-03-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "161214",
+   "title": "פרק 9 - 23.02.23",
+   "description": "פותחים על כל מה שקרה השבוע: ההפגנות, החקיקות ואפילו יום המשפחה",
+   "published": "2023-04-23T20:48:53+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_a6pp51jx/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_a6pp51jx/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/161214/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/wfplplne/https-kanstaticazureedgenet-download-pictures-2023-2-23-imgid-94668_aa.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/fc5mdlva/2023-2-23-imgid-94668_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:31",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 9,
+     "duration": "00:29:31",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "23-02-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "160533",
+   "title": "פרק 8 - 16.02.23",
+   "description": "התכנית שמסכמת את כל מה שקרה השבוע, בלי חסמים ובלי הנחות",
+   "published": "2023-04-23T20:39:44+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_nozljtfk/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_nozljtfk/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/160533/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/4pyft22g/https-kanstaticazureedgenet-download-pictures-2023-2-16-imgid-94128_aa.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/g3jpcqef/2023-2-16-imgid-94128_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "27:14",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 8,
+     "duration": "00:27:14",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "16-02-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "159969",
+   "title": "פרק 7 - 09.02.23",
+   "description": "מה לא עושים ברעידת אדמה? ברית מילה או קולונוסקופיה",
+   "published": "2023-04-23T20:32:19+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_17hl9j3a/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_17hl9j3a/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/159969/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/xljjyw11/https-kanstaticazureedgenet-download-pictures-2023-2-9-imgid-93608_aa.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/k1dpbrmc/2023-2-9-imgid-93608_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "27:56",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 7,
+     "duration": "00:27:56",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "09-02-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "159228",
+   "title": "מה שתגידו | 02.02.23 -המיטב",
+   "description": "פוליטיקה, סילבסטר וכבד קצוץ - לקט חגיגי עם פה מלוכלך",
+   "published": "2023-04-23T20:22:32+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_osw5xyws/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_osw5xyws/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/159228/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/c52pg0um/https-kanstaticazureedgenet-download-pictures-2023-2-2-imgid-92905_aa.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/0evnh5zt/2023-2-2-imgid-92905_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:13",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 6,
+     "duration": "00:30:13",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "02-02-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "158826",
+   "title": "פרק 5 - 26.01.23",
+   "description": "מדברים על אריה דרעי, בליץ החקיקה, מבריחות הקוקאין ואפילו על ביונסה",
+   "published": "2023-04-23T20:16:55+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_t91pq76i/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_t91pq76i/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/158826/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/f02pxfvi/https-kanstaticazureedgenet-download-pictures-2023-1-26-imgid-92370_aa.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/tnllwpam/2023-1-26-imgid-92370_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:53",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 5,
+     "duration": "00:29:53",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "26-01-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "157871",
+   "title": "פרק 4- 19.01.23",
+   "description": "טל פרידמן ויוסי מרשק, שוש, יעל ויונתן פוליאקוב, גלית חוגי וגלעד כהנא",
+   "published": "2023-04-23T20:03:57+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_tjm5ge72/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_tjm5ge72/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/157871/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/z3jnul1l/2023-1-19-imgid-91695_b.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/ftrbmzc0/2023-1-19-imgid-91695_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:22",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 4,
+     "duration": "00:30:22",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "19-01-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "157241",
+   "title": "פרק 3 -12.01.23",
+   "description": "המהפכה המשפטית של יריב לוין והכביסה המלוכלכת של הנסיך הארי ",
+   "published": "2023-04-23T19:55:33+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_2uo8zw91/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_2uo8zw91/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/157241/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/gphngb1o/https-kanstaticazureedgenet-download-pictures-2023-1-12-imgid-91057_aa.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/kyfmrf04/2023-1-12-imgid-91058_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "31:25",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 3,
+     "duration": "00:31:25",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "12-01-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "156746",
+   "title": "פרק 2 -05.01.23",
+   "description": "מה זוכרים הקומיקאים מתקופת עפרה חזה?",
+   "published": "2023-04-23T19:48:58+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_2mk27btx/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_2mk27btx/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/156746/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/gj1mrpoj/https-kanstaticazureedgenet-download-pictures-2023-1-5-imgid-90563_aa.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/2oyld4ta/2023-1-5-imgid-90563_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "30:25",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 2,
+     "duration": "00:30:25",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "05-01-2023"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "156261",
+   "title": "פרק 1 - 29.12.23",
+   "description": "תוכנית בידור חדשה! צמדים של קומיקאים ינתחו את כל מה שקרה השבוע",
+   "published": "2023-04-23T16:07:44+03:00",
+   "type": {
+    "value": "video"
+   },
+   "content": {
+    "type": "video/hls",
+    "src": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_j48tphxj/format/applehttp/protocol/https/desiredFileName.m3u8",
+    "teaser": "https://cdnapisec.kaltura.com/p/2717431/sp/271743100/playManifest/entryId/1_j48tphxj/format/applehttp/protocol/https/desiredFileName.m3u8"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s1/156261/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/hu5cmnin/2022-12-29-imgid-90084_b.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/uvkatijm/2022-12-29-imgid-90084_c.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "29:49",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 1,
+     "episode_number": 1,
+     "duration": "00:29:49",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "29-12-2022"
+    }
+   }
+  },
+  {
+   "programId": "11510",
+   "id": "1041298",
+   "title": "פרק 9 - ספיישל אירוויזיון",
+   "description": "רגע לפני הגמר, הזוגות פותחים על התחרות שחוגגת 70",
+   "published": "2026-05-14T22:17:09+03:00",
+   "type": {
+    "value": "youtube"
+   },
+   "content": {
+    "type": "youtube-id",
+    "src": "E9Ux9Y4ZUbU",
+    "teaser": "E9Ux9Y4ZUbU"
+   },
+   "link": {
+    "rel": "alternate",
+    "href": "https://www.kan.org.il/content/kan/kan-11/p-11510/s5/1041298/?app=true"
+   },
+   "media_group": [
+    {
+     "type": "image",
+     "media_item": [
+      {
+       "src": "https://mobapi.kan.org.il/media/fh3f2bjs/תמונה-מאנה.jpeg?width=480",
+       "key": "image_base",
+       "type": "image"
+      },
+      {
+       "src": "https://mobapi.kan.org.il/media/fh3f2bjs/תמונה-מאנה.jpeg?width=480",
+       "key": "image_base_16x9",
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "extensions": {
+    "duration_length": "22:09",
+    "analyticsCustomProperties": {
+     "programId": 11510,
+     "show_name": "מה שתגידו",
+     "channel_name": "כאן 11",
+     "season": 5,
+     "episode_number": 9,
+     "duration": "00:22:09",
+     "program_genre": "קומדיה וסאטירה",
+     "content_customDimension_7": "16-05-2026"
+    }
+   }
+  }
+ ]
+}

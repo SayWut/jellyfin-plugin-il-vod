@@ -18,9 +18,6 @@ public static class MediaSourceFactory
     /// </summary>
     private const string SourceNamePrefix = "il-vod/";
 
-    private const int VideoStreamIndex = 0;
-    private const int AudioStreamIndex = 1;
-
     // The value Jellyfin itself uses for live streams. Without it, a source with unknown
     // streams is analysed for up to 200 seconds before ffmpeg outputs anything.
     private const int AnalyzeDurationMilliseconds = 3000;
@@ -85,14 +82,33 @@ public static class MediaSourceFactory
     // guessing and re-encoding them. A provider that cannot name them gets none described.
     private static MediaStream[] DescribeStreams(StreamDescription description) =>
         description.Format is { } format
-            ? [DescribeVideoStream(description, format), DescribeAudioStream(format)]
+            ? InFfmpegOrder(DescribeVideoStream(description, format), DescribeAudioStream(description, format))
             : [];
+
+    /// <summary>
+    /// Jellyfin tells ffmpeg which input stream to map by its position in this list
+    /// (<c>EncodingHelper.FindIndex</c>), never by its <c>Index</c>. So each stream is placed at its
+    /// own index, and any track in between — another variant of the master playlist — is filled
+    /// with a data stream, a type Jellyfin never picks to play.
+    /// </summary>
+    private static MediaStream[] InFfmpegOrder(MediaStream video, MediaStream audio)
+    {
+        var streams = new MediaStream[Math.Max(video.Index, audio.Index) + 1];
+        streams[video.Index] = video;
+        streams[audio.Index] = audio;
+        for (int index = 0; index < streams.Length; index++)
+        {
+            streams[index] ??= new MediaStream { Type = MediaStreamType.Data, Index = index };
+        }
+
+        return streams;
+    }
 
     private static MediaStream DescribeVideoStream(StreamDescription description, StreamFormat format) => new()
     {
         Type = MediaStreamType.Video,
         Codec = format.VideoCodec,
-        Index = VideoStreamIndex,
+        Index = description.VideoStreamIndex,
         Width = description.Width,
         Height = description.Height,
         BitRate = description.BitsPerSecond,
@@ -105,11 +121,11 @@ public static class MediaSourceFactory
         NalLengthSize = format.NalLengthSize,
     };
 
-    private static MediaStream DescribeAudioStream(StreamFormat format) => new()
+    private static MediaStream DescribeAudioStream(StreamDescription description, StreamFormat format) => new()
     {
         Type = MediaStreamType.Audio,
         Codec = format.AudioCodec,
-        Index = AudioStreamIndex,
+        Index = description.AudioStreamIndex,
         Channels = format.AudioChannels,
         SampleRate = format.AudioSampleRate,
         Profile = format.AudioProfile,

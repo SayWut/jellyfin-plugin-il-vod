@@ -4,8 +4,9 @@ A Jellyfin Channel plugin that shows Israeli VOD providers inside Jellyfin as **
 "IL-VOD": every enabled provider's shows on one tile, under one shared set of categories. It
 fetches only what a user opens or plays — nothing is downloaded, synced or crawled.
 
-Providers today: **mako 12+** and **רשת 13** (whose streams play from an Israeli IP only, like
-mako's). Adding another one is a matter of one folder under
+Providers today: **mako 12+**, **רשת 13** (whose streams play from an Israeli IP only, like
+mako's) and **כאן 11** (the Kan BOX shows of Kan 11 and its current-affairs strip; Kan's archive,
+kids, digital and radio content is left out). Adding another one is a matter of one folder under
 `src/Jellyfin.Plugin.IlVod/Providers/` — see `docs/adding-a-provider.md`.
 
 History: this began as the mako-only plugin "Mako" (moved out of oneplus-media-server on
@@ -93,6 +94,13 @@ Dashboard → Plugins → IL-VOD:
     again. The default is 24 hours; a cold open costs one request (plus a login about once a
     week). A show's episode list is kept for 6 hours (config-file-only: `Reshet13.ShowCacheHours`).
 
+- **כאן 11**:
+  - **Catalogue cache (hours)**: how long the show list is kept before Kan is asked again. The
+    default is 24 hours; a cold open reads the Kan BOX lobby and every genre page (about 40
+    requests, four at a time). A show's episode list is kept for 6 hours (config-file-only:
+    `Kan.ShowCacheHours`). Kan's show feed lists at most a show's 200 most recent episodes, so a
+    daily show (or one of the few long-running series) shows its latest 200.
+
 Changes apply on the next request; no restart is needed. mako's other cache lifetimes (show
 page, past season, current season) and the stream-link lifetime are config-file-only.
 
@@ -103,6 +111,7 @@ page, past season, current season) and the stream-link lifetime are config-file-
 | `mako-cache.json` | mako's page text and config files (genre lists 24 h, show 12 h, seasons 6 h / 7 d) | force mako to be refetched |
 | `mako-device.id` | the device id mako's entitlement service sees | get a new device id |
 | `reshet13-cache.json` | Reshet 13's series list and each opened show's episode list, parsed (24 h / 6 h) | force Reshet 13 to be refetched |
+| `kan-cache.json` | Kan's show list and each opened show's episode list, parsed (24 h / 6 h) | force Kan to be refetched |
 | `show-snapshots.json` | each provider's last good show list, used only when a provider fails | forget the fallbacks |
 
 A resolved stream link is never written to any of these, or anywhere else on disk (N3). It

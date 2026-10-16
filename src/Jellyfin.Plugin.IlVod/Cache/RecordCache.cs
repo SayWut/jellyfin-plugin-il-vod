@@ -1,15 +1,15 @@
 using System.Text.Json;
-using Jellyfin.Plugin.IlVod.Cache;
 
-namespace Jellyfin.Plugin.IlVod.Providers.Reshet13.Source;
+namespace Jellyfin.Plugin.IlVod.Cache;
 
 /// <summary>
-/// Reshet 13's parsed records, kept as JSON in a <see cref="TimedCache"/>. The records are cached
-/// rather than Kaltura's answers because a long show's raw episode list runs to about 1 MB, of
-/// which the records keep a small fraction. A cached copy that no longer reads back as the whole
-/// record (written by an older or newer version of the plugin) counts as no copy at all.
+/// A provider's parsed records, kept as JSON in a <see cref="TimedCache"/>. The records are cached
+/// rather than the provider's answers because those run far larger — a long show's raw Kaltura
+/// episode list is about 1 MB, Kan's lobby 2 MB — of which the records keep a small fraction. A
+/// cached copy that no longer reads back as the whole record (written by an older or newer version
+/// of the plugin) counts as no copy at all.
 /// </summary>
-public sealed class Reshet13RecordCache
+public sealed class RecordCache
 {
     /// <summary>
     /// By default System.Text.Json fills a missing constructor parameter with <c>null</c>, so a copy
@@ -25,7 +25,7 @@ public sealed class Reshet13RecordCache
 
     private readonly TimedCache _cache;
 
-    public Reshet13RecordCache(TimedCache cache)
+    public RecordCache(TimedCache cache)
     {
         _cache = cache;
     }

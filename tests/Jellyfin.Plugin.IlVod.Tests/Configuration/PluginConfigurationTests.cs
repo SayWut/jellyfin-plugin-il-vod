@@ -24,6 +24,8 @@ public class PluginConfigurationTests
         Assert.Equal(6, configuration.Mako.CurrentSeasonCacheHours);
         Assert.Equal(24, configuration.Reshet13.CatalogueCacheHours);
         Assert.Equal(6, configuration.Reshet13.ShowCacheHours);
+        Assert.Equal(24, configuration.Kan.CatalogueCacheHours);
+        Assert.Equal(6, configuration.Kan.ShowCacheHours);
         Assert.Equal(5, configuration.StreamLinkCacheMinutes);
     }
 
@@ -32,12 +34,13 @@ public class PluginConfigurationTests
     [Fact]
     public void AMissingListOrSectionReadsAsEmptyOrDefaultNeverNull()
     {
-        PluginConfiguration configuration = new() { DisabledProviderIds = null!, CategoryOverrides = null!, Mako = null!, Reshet13 = null! };
+        PluginConfiguration configuration = new() { DisabledProviderIds = null!, CategoryOverrides = null!, Mako = null!, Reshet13 = null!, Kan = null! };
 
         Assert.Empty(configuration.DisabledProviderIds);
         Assert.Empty(configuration.CategoryOverrides);
         Assert.Equal("43.0", configuration.Mako.AppVersion);
         Assert.Equal(24, configuration.Reshet13.CatalogueCacheHours);
+        Assert.Equal(24, configuration.Kan.CatalogueCacheHours);
     }
 
     [Fact]
@@ -49,6 +52,7 @@ public class PluginConfigurationTests
             CategoryOverrides = [new CategoryOverride { ProviderId = "mako", SourceName = "דוקומנטרי", SharedName = "דוקו" }],
             Mako = new MakoSettings { AppVersion = "44.0" },
             Reshet13 = new Reshet13Settings { CatalogueCacheHours = 48 },
+            Kan = new KanSettings { CatalogueCacheHours = 12 },
         };
         System.Xml.Serialization.XmlSerializer serializer = new(typeof(PluginConfiguration));
         using StringWriter writer = new();
@@ -62,6 +66,7 @@ public class PluginConfigurationTests
         Assert.Equal(("mako", "דוקומנטרי", "דוקו"), (row.ProviderId, row.SourceName, row.SharedName));
         Assert.Equal("44.0", read.Mako.AppVersion);
         Assert.Equal(48, read.Reshet13.CatalogueCacheHours);
+        Assert.Equal(12, read.Kan.CatalogueCacheHours);
     }
 
     [Fact]
